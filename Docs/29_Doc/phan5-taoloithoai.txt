@@ -1,0 +1,319 @@
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# PHẦN 5: VẼ LỜI THOẠI
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def draw_speech_tail(draw, bubble_x, bubble_y, bubble_width, bubble_height, position="left", color=(255, 255, 255, 240)):
+    """Vẽ đuôi bubble chỉ về nhân vật - HỖ TRỢ 8 HƯỚNG"""
+    if position == "left":
+        # Đuôi bên trái (nhân vật ở bên trái)
+        tail_points = [
+            (bubble_x, bubble_y + bubble_height // 2),
+            (bubble_x - 15, bubble_y + bubble_height // 2 + 20),
+            (bubble_x, bubble_y + bubble_height // 2 + 15)
+        ]
+    elif position == "right":
+        # Đuôi bên phải (nhân vật ở bên phải)
+        tail_points = [
+            (bubble_x + bubble_width, bubble_y + bubble_height // 2),
+            (bubble_x + bubble_width + 15, bubble_y + bubble_height // 2 + 20),
+            (bubble_x + bubble_width, bubble_y + bubble_height // 2 + 15)
+        ]
+    elif position == "top-left":
+        # Đuôi góc trên trái (nhân vật ở góc trên trái)
+        tail_points = [
+            (bubble_x + 20, bubble_y),
+            (bubble_x - 10, bubble_y - 15),
+            (bubble_x + 35, bubble_y)
+        ]
+    elif position == "top-right":
+        # Đuôi góc trên phải (nhân vật ở góc trên phải)
+        tail_points = [
+            (bubble_x + bubble_width - 35, bubble_y),
+            (bubble_x + bubble_width + 10, bubble_y - 15),
+            (bubble_x + bubble_width - 20, bubble_y)
+        ]
+    elif position == "bottom-left":
+        # Đuôi góc dưới trái (nhân vật ở góc dưới trái)
+        tail_points = [
+            (bubble_x + 20, bubble_y + bubble_height),
+            (bubble_x - 10, bubble_y + bubble_height + 15),
+            (bubble_x + 35, bubble_y + bubble_height)
+        ]
+    elif position == "bottom-right":
+        # Đuôi góc dưới phải (nhân vật ở góc dưới phải)
+        tail_points = [
+            (bubble_x + bubble_width - 35, bubble_y + bubble_height),
+            (bubble_x + bubble_width + 10, bubble_y + bubble_height + 15),
+            (bubble_x + bubble_width - 20, bubble_y + bubble_height)
+        ]
+    elif position == "top":
+        # Đuôi ở trên (nhân vật phía trên)
+        tail_points = [
+            (bubble_x + bubble_width // 2 - 10, bubble_y),
+            (bubble_x + bubble_width // 2, bubble_y - 15),
+            (bubble_x + bubble_width // 2 + 10, bubble_y)
+        ]
+    elif position == "bottom":
+        # Đuôi ở dưới (nhân vật phía dưới)
+        tail_points = [
+            (bubble_x + bubble_width // 2 - 10, bubble_y + bubble_height),
+            (bubble_x + bubble_width // 2, bubble_y + bubble_height + 15),
+            (bubble_x + bubble_width // 2 + 10, bubble_y + bubble_height)
+        ]
+    else:
+        return
+    
+    # Shadow cho tail
+    shadow_tail = [(x + 3, y + 3) for x, y in tail_points]
+    draw.polygon(shadow_tail, fill=(0, 0, 0, 80))
+    
+    # Tail chính
+    draw.polygon(tail_points, fill=color, outline=(0, 0, 0, 255), width=3)
+
+
+def draw_character_dialogue(img, dialogues):
+    """
+    Vẽ bubble lời thoại NHỎ GỌN, CẠNH nhân vật, KHÔNG CHE MẶT
+    
+    Args:
+        img: PIL Image
+        dialogues: list of dict:
+            [{"character": "An", 
+              "text": "Hôm nay đẹp trời!", 
+              "character_position": "bottom-left",  # Nhân vật ở đâu
+              "bubble_position": "top-right",       # Bubble đặt ở đâu (ngược lại)
+              "tail_direction": "bottom-left"},     # Đuôi chỉ về nhân vật
+             ...]
+    """
+    if not dialogues:
+        return img
+    
+    draw = ImageDraw.Draw(img, 'RGBA')
+    w, h = img.size
+    
+    # Màu bubble khác nhau cho từng nhân vật
+    character_colors = {
+        "An": (255, 200, 200, 240),      # Hồng nhạt
+        "Bình": (200, 220, 255, 240),    # Xanh nhạt
+        "Chi": (255, 240, 200, 240),     # Vàng nhạt
+        "Dũng": (220, 255, 220, 240),    # Xanh lá nhạt
+        "narrator": (240, 240, 240, 240) # Xám
+    }
+    
+    # Vị trí mặc định bubble (ƯU TIÊN center-top để an toàn)
+    default_bubble_positions = {
+        "An": "top-right",      # Thường ở dưới trái → bubble trên phải
+        "Bình": "top-left",     # Thường ở dưới phải → bubble trên trái
+        "Chi": "center-top",    # An toàn nhất
+        "Dũng": "center-top",   # An toàn nhất
+        "narrator": "center-top"
+    }
+    
+    # Map tail direction mặc định
+    default_tail_directions = {
+        "An": "bottom-left",
+        "Bình": "bottom-right",
+        "Chi": "bottom",
+        "Dũng": "bottom",
+        "narrator": "bottom"
+    }
+    
+    # Font nhỏ hơn để bubble gọn
+    font_size = max(16, min(28, int(w / 28)))  # Giảm size: 16-28 (thay vì 18-32)
+    
+    # Load font
+    try:
+        font = ImageFont.truetype("arial.ttf", font_size)
+        font_name = ImageFont.truetype("arialbd.ttf", font_size - 3)
+    except:
+        try:
+            font = ImageFont.truetype("C:\\Windows\\Fonts\\arial.ttf", font_size)
+            font_name = ImageFont.truetype("C:\\Windows\\Fonts\\arialbd.ttf", font_size - 3)
+        except:
+            font = ImageFont.load_default()
+            font_name = font
+    
+    # Vẽ từng bubble tại vị trí cụ thể
+    for idx, dialogue in enumerate(dialogues):
+        char = dialogue.get("character", "narrator")
+        text = dialogue.get("text", "")
+        
+        # HỖ TRỢ CẢ FORMAT CŨ VÀ MỚI
+        # Format mới (ưu tiên): bubble_position + tail_direction
+        bubble_pos = dialogue.get('bubble_position', None)
+        tail_dir = dialogue.get('tail_direction', None)
+        
+        # Format cũ: position
+        if not bubble_pos:
+            bubble_pos = dialogue.get('position', default_bubble_positions.get(char, "center-top"))
+        if not tail_dir:
+            tail_dir = default_tail_directions.get(char, "bottom")
+        
+        if not text:
+            continue
+        
+        # Chọn màu
+        bubble_color = character_colors.get(char, (255, 255, 255, 240))
+        
+        # ✨ BUBBLE NHỎ GỌN HƠN - chỉ vừa đủ chứa text
+        max_bubble_width = int(w * 0.35)  # Tối đa 35% (giảm từ 45%)
+        min_bubble_width = int(w * 0.15)  # Tối thiểu 15% (giảm từ 25%)
+        padding = 10  # Giảm padding từ 12 → 10
+        
+        # Wrap text với chiều rộng động
+        words = text.split()
+        lines = []
+        current_line = ""
+        max_line_width = max_bubble_width - padding * 2
+        
+        for word in words:
+            test_line = current_line + word + " "
+            try:
+                bbox = draw.textbbox((0, 0), test_line, font=font)
+                line_width = bbox[2] - bbox[0]
+            except:
+                line_width = len(test_line) * (font_size // 2)
+            
+            if line_width <= max_line_width:
+                current_line = test_line
+            else:
+                if current_line:
+                    lines.append(current_line.strip())
+                current_line = word + " "
+        
+        if current_line:
+            lines.append(current_line.strip())
+        
+        lines = lines[:3]  # Max 3 dòng
+        
+        # Tính chiều rộng thực của bubble dựa trên text dài nhất
+        actual_bubble_width = min_bubble_width
+        for line in lines:
+            try:
+                bbox = draw.textbbox((0, 0), line, font=font)
+                line_width = bbox[2] - bbox[0] + padding * 2
+                actual_bubble_width = max(actual_bubble_width, line_width)
+            except:
+                pass
+        actual_bubble_width = min(actual_bubble_width, max_bubble_width)
+        
+        # Tính chiều cao
+        line_height = font_size + 4  # Giảm line spacing
+        name_height = font_size - 2 if char != "narrator" else 0
+        bubble_height = len(lines) * line_height + padding * 2 + name_height + 3
+        
+        # ✨ VỊ TRÍ BUBBLE THÔNG MINH - đặt NGƯỢC với nhân vật để KHÔNG CHE MẶT
+        margin = 35  # Margin an toàn
+        
+        # Phân tích bubble_pos để đặt vị trí
+        if bubble_pos == "center-top":
+            # AN TOÀN NHẤT: bubble giữa trên cùng
+            bubble_x = (w - actual_bubble_width) // 2
+            bubble_y = margin
+        elif bubble_pos == "center":
+            # Giữa hoàn toàn
+            bubble_x = (w - actual_bubble_width) // 2
+            bubble_y = (h - bubble_height) // 2
+        elif bubble_pos == "center-bottom":
+            # Giữa dưới cùng
+            bubble_x = (w - actual_bubble_width) // 2
+            bubble_y = h - bubble_height - margin
+        elif bubble_pos == "top-left":
+            # Góc trên trái
+            bubble_x = margin
+            bubble_y = margin
+        elif bubble_pos == "top-right":
+            # Góc trên phải
+            bubble_x = w - actual_bubble_width - margin
+            bubble_y = margin
+        elif bubble_pos == "bottom-left":
+            # Góc dưới trái (ít dùng vì thường che nhân vật)
+            bubble_x = margin
+            bubble_y = h - bubble_height - margin
+        elif bubble_pos == "bottom-right":
+            # Góc dưới phải (ít dùng)
+            bubble_x = w - actual_bubble_width - margin
+            bubble_y = h - bubble_height - margin
+        elif bubble_pos == "left":
+            # Bên trái giữa
+            bubble_x = margin
+            bubble_y = h // 2 - bubble_height // 2
+        elif bubble_pos == "right":
+            # Bên phải giữa
+            bubble_x = w - actual_bubble_width - margin
+            bubble_y = h // 2 - bubble_height // 2
+        elif bubble_pos == "top":
+            # Giữa trên (như center-top)
+            bubble_x = (w - actual_bubble_width) // 2
+            bubble_y = margin
+        elif bubble_pos == "bottom":
+            # Giữa dưới
+            bubble_x = (w - actual_bubble_width) // 2
+            bubble_y = h - bubble_height - margin
+        else:
+            # Mặc định: center-top (an toàn nhất)
+            bubble_x = (w - actual_bubble_width) // 2
+            bubble_y = margin
+        
+        bubble_width = actual_bubble_width
+        
+        # Vẽ đuôi bubble TRƯỚC (để bubble đè lên) - dùng tail_dir
+        if tail_dir:
+            draw_speech_tail(draw, bubble_x, bubble_y, bubble_width, bubble_height, tail_dir, bubble_color)
+        
+        # Shadow
+        shadow_offset = 3
+        draw.rounded_rectangle(
+            [bubble_x + shadow_offset, bubble_y + shadow_offset,
+             bubble_x + bubble_width + shadow_offset, bubble_y + bubble_height + shadow_offset],
+            radius=12,
+            fill=(0, 0, 0, 80)
+        )
+        
+        # Bubble chính
+        draw.rounded_rectangle(
+            [bubble_x, bubble_y, bubble_x + bubble_width, bubble_y + bubble_height],
+            radius=12,
+            fill=bubble_color,
+            outline=(0, 0, 0, 255),
+            width=3
+        )
+        
+        # Tên nhân vật
+        text_y = bubble_y + padding
+    `\0099999999999999\
+        ;GJSDJGD7``       if char != "narrator":
+            draw.text(
+                (bubble_x + padding + 5, text_y),
+                f"💬 {char}:",
+                fill=(80, 80, 80, 255),
+                font=font_name
+            )
+            text_y += name_height + 3
+        
+        # Nội dung (căn giữa trong bubble)
+        for line in lines:
+            try:
+                bbox = draw.textbbox((0, 0), line, font=font)
+                text_width = bbox[2] - bbox[0]
+            except:
+                text_width = len(line) * (font_size // 2)
+            
+            text_x = bubble_x + (bubble_width - text_width) // 2
+            
+            # Shadow
+            draw.text((text_x + 1, text_y + 1), line, fill=(120, 120, 120, 150), font=font)
+            # Main
+            draw.text((text_x, text_y), line, fill=(0, 0, 0, 255), font=font)
+            
+            text_y += line_height
+    
+    return img
+
+
+def draw_dialogue_bubble(img, dialogue_text, position="top"):
+    """Wrapper cũ - chuyển sang format mới"""
+    # Chuyển đổi sang format mới
+    dialogues = [{"character": "narrator", "text": dialogue_text}]
+    return draw_character_dialogue(img, dialogues)

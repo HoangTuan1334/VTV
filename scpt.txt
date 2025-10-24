@@ -1,0 +1,89 @@
+---
+# SCRIPT DEFINITION FOR CONSISTENCY
+# ANCHOR: A professional Vietnamese female news anchor, in her early 30s, with a confident and engaging presence. She has her hair styled in a neat, professional bun and is wearing a modern, sleek white pantsuit.
+# STUDIO: A state-of-the-art virtual news studio with a polished dark floor that reflects soft blue and white ambient lighting. The background is a large, curved LED screen.
+---
+
+**[SCENE 1] - ANCHOR'S OPENING**
+
+*   **Timestamp:** 00:00 - 00:07 (7 seconds)
+*   **Visual:** Medium shot of the **Anchor** in the **Studio**. The LED screen behind her displays a dynamic, abstract logo for the show, composed of glowing blue and white lines. She smiles warmly.
+*   **Voiceover:** "Kính chào quý vị khán giả. Chào mừng quý vị đã quay trở lại với chương trình 'Công nghệ và Tương lai'."
+*   **Sound:** Opening theme fades out, replaced by a professional, medium-tempo news background track.
+
+**[SCENE 2] - MONTAGE: SMART FACTORY**
+
+*   **Timestamp:** 00:14 - 00:22 (8 seconds)
+*   **Visual:** Smooth cross-dissolve to a fast-paced, hyper-realistic, AI-generated montage. A close-up of a robotic arm assembling a microchip with flawless precision.
+*   **Voiceover:** "Trí tuệ Nhân tạo đang từng bước thay đổi bộ mặt trong các nhà máy thông minh đến chuỗi cung ứng,"
+*   **Sound:** The background music becomes more upbeat and optimistic.
+
+**[SCENE 3] - MONTAGE: AUTOMATED WAREHOUSE**
+
+*   **Timestamp:** 00:22 - 00:30 (8 seconds)
+*   **Visual:** The montage continues with a wide shot of a smart warehouse where autonomous robots navigate aisles seamlessly.
+*   **Voiceover:** "AI đã và đang chứng tỏ vai trò không thể thiếu trong việc nâng cao năng suất và tạo ra lợi thế cạnh tranh."
+*   **Sound:** Upbeat music with subtle, high-tech mechanical sound effects.
+
+**[SCENE 4] - ANCHOR INTRODUCES AGRICULTURE**
+
+*   **Timestamp:** 00:30 - 00:37 (7 seconds)
+*   **Visual:** Return to the **Studio**. The **Anchor** and setting are identical to Scene 1. The screen behind her now shows an animation of a digital leaf.
+*   **Voiceover:** "Đặc biệt, một lĩnh vực đang có những bước chuyển mình mạnh mẽ nhất chính là nông nghiệp."
+*   **Sound:** Music shifts to a cheerful and inspirational tone.
+
+**[SCENE 5] - DRONES TAKE FLIGHT**
+
+*   **Timestamp:** 00:37 - 00:45 (8 seconds)
+*   **Visual:** Hard cut to an expansive aerial drone shot, revealing a vast, lush green rice paddy field in the Mekong Delta. A fleet of smart agricultural drones takes off in perfect unison.
+*   **Voiceover:** "Trên những cánh đồng Việt Nam, công nghệ máy bay không người lái tích hợp AI đang mở ra một cuộc cách mạng."
+*   **Sound:** Inspirational music swells. The gentle hum of drone motors.
+
+**[SCENE 6] - DRONE'S PRECISION WORK**
+
+*   **Timestamp:** 00:45 - 00:53 (8 seconds)
+*   **Visual:** A dynamic close-up follows one drone as it glides over the field. A picture-in-picture overlay shows its control screen, displaying real-time data on crop health.
+*   **Voiceover:** "Chúng không chỉ giúp tiết kiệm tài nguyên, giảm sức lao động mà còn phân tích dữ liệu để đưa ra các giải pháp canh tác tối ưu."
+*   **Sound:** Gentle hum of the drone, soft digital beeps from the overlay.
+
+**[SCENE 7] - FARMER'S TESTIMONIAL (PART 1)**
+
+*   **Timestamp:** 00:53 - 01:01 (8 seconds)
+*   **Visual:** Smooth wipe transition to a ground-level interview. A confident, smiling farmer, around 45-50 years old, stands in his field holding a tablet.
+*   **Voiceover:** "Từ ngày có máy bay phun thuốc tự động này, chúng tôi khỏe re. Trước kia một hecta phải phun cả ngày, giờ chỉ mất có 15-20 phút."
+*   **Sound:** Natural ambient sounds of the countryside. Background music fades to a very low volume.
+
+**[SCENE 8] - FARMER'S TESTIMONIAL (PART 2)**
+
+*   **Timestamp:** 01:01 - 01:08 (7 seconds)
+*   **Visual:** Close-up on the farmer's proud and joyful expression as he gestures towards the drones operating in the background.
+*   **Voiceover:** "Mà nó phun đều, chính xác, lúa tốt hơn hẳn, sâu bệnh cũng giảm rõ rệt."
+*   **Sound:** Natural ambient sounds continue.
+
+**[SCENE 9] - FROM FIELD TO FACTORY**
+
+*   **Timestamp:** 01:08 - 01:16 (8 seconds)
+*   **Visual:** Dynamic match cut from the rice field to an AI-generated sequence inside a modern agricultural processing plant. Harvested rice is fed onto a sophisticated automated conveyor belt.
+*   **Voiceover:** "Và sự thay đổi không chỉ dừng lại trên cánh đồng. AI còn theo chân nông sản vào các nhà máy,"
+*   **Sound:** Clean, rhythmic sounds of an efficient production line.
+
+**[SCENE 10] - AI-POWERED SORTING**
+
+*   **Timestamp:** 01:16 - 01:24 (8 seconds)
+*   **Visual:** AI-powered camera systems scan and sort the rice grains at incredible speed based on quality and size, ensuring uniform high-quality output.
+*   **Voiceover:** "...tối ưu hóa quy trình sau thu hoạch, nâng cao giá trị hạt gạo Việt trên thị trường quốc tế."
+*   **Sound:** Rhythmic production line sounds continue.
+
+**[SCENE 11] - ANCHOR'S CONCLUSION**
+
+*   **Timestamp:** 01:24 - 01:32 (8 seconds)
+*   **Visual:** Return to the **Studio** with the same **Anchor** and setting. The graphic on the screen behind her transitions into an animation of a futuristic farm.
+*   **Voiceover:** "Rõ ràng, với sự trợ giúp của Trí tuệ Nhân tạo, một nền nông nghiệp thông minh, bền vững và hiệu quả không còn là câu chuyện của tương lai."
+*   **Sound:** The background music swells, becoming powerful and heroic.
+
+**[SCENE 12] - FINAL OUTRO**
+
+*   **Timestamp:** 01:32 - 01:38 (6 seconds)
+*   **Visual:** The camera slowly pushes in for a final close-up on the **Anchor**. She looks directly into the camera with a professional smile. The screen behind her displays the show's abstract logo, which then animates into a stylized graphic of a globe.
+*   **Voiceover:** "Đây là sản phẩm tham dự cuộc thi AI Thực Chiến."
+*   **Sound:** The main theme music rises to a grand crescendo, reaching a peak before a clean finish.

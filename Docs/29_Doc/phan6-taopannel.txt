@@ -1,0 +1,319 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# PHẦN 6: TẠO PANEL IMAGES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def create_panel_images(story_script, selected_layouts):
+    """Tạo ảnh cho từng panel"""
+    panel_images = {}
+    character_references = {}
+    os.makedirs("panel_images", exist_ok=True)
+    
+    for i, page_data in enumerate(story_script['pages']):
+        page_num = page_data['page_num']
+        
+        # 🔧 FIX: Tìm layout theo page_num thay vì dùng index i
+        layout_info = None
+        for layout in selected_layouts:
+            if layout['page_num'] == page_num:
+                layout_info = layout
+                break
+        
+        if layout_info is None:
+            print(f"⚠️ CẢNH BÁO: Không tìm thấy layout cho trang {page_num}, bỏ qua...")
+            continue
+        
+        is_demo_page = page_data.get('is_demo', False)
+        
+        # Kiểm tra số panels
+        num_panels_in_layout = len(layout_info['panels'])
+        num_panels_in_script = len(page_data['panels'])
+        
+        if num_panels_in_script > num_panels_in_layout:
+            print(f"⚠️ Trang {page_num}: Cắt {num_panels_in_script} → {num_panels_in_layout} panels")
+            page_data['panels'] = page_data['panels'][:num_panels_in_layout]
+        
+        if is_demo_page:
+            print(f"\n📄 TRANG 0 [DEMO]: {len(page_data['panels'])} panels")
+        else:
+            print(f"\n📄 TRANG {page_num}: {len(page_data['panels'])} panels")
+        
+        page_panels = []
+        
+        for j, panel_data in enumerate(page_data['panels']):
+            panel_num = panel_data['panel_num']
+            x, y, w, h = layout_info['panels'][j]
+            
+            print(f"   🎨 Panel {panel_num}: {w}x{h}px")
+            
+            characters_in_panel = panel_data.get('characters_in_panel', [])
+            
+            # Build character description
+            if is_demo_page and panel_data.get('purpose') == 'character_reference':
+                char_descriptions = []
+                for char_name in characters_in_panel:
+                    char_info = next((c for c in story_script['characters'] if c['name'] == char_name), None)
+                    if char_info:
+                        full_desc = f"{char_name}: {char_info['description']}"
+                        char_descriptions.append(full_desc)
+                        
+                        if char_name not in character_references:
+                            character_references[char_name] = char_info['description']
+                            print(f"      💾 Reference: {char_name}")
+                
+                char_desc_text = ", ".join(char_descriptions)
+            else:
+                char_descriptions = []
+                for char_name in characters_in_panel:
+                    if char_name in character_references:
+                        ref_desc = character_references[char_name]
+                        char_descriptions.append(f"The same character {char_name} from page 0 ({ref_desc})")
+                    else:
+                        char_info = next((c for c in story_script['characters'] if c['name'] == char_name), None)
+                        if char_info:
+                            char_descriptions.append(f"{char_name} ({char_info['description']})")
+                
+                char_desc_text = ", ".join(char_descriptions)
+            
+            # Tạo prompt
+            if is_demo_page:
+                panel_prompt = f"""
+{story_script['art_style']} - CHARACTER REFERENCE
+
+{panel_data['visual_prompt']}
+
+CHARACTERS: {char_desc_text}
+
+Vietnamese Independence Day theme, patriotic atmosphere, school setting
+NO TEXT/DIALOGUE in image
+"""
+            else:
+                panel_prompt = f"""
+{story_script['art_style']}
+
+{panel_data['visual_prompt']}
+
+CHARACTERS (same as page 0): {char_desc_text}
+
+Vietnamese Independence Day celebration theme
+Maintain character consistency from page 0
+NO TEXT/DIALOGUE in image
+"""
+            
+            # Tạo ảnh với manual test - KHÔNG GIỚI HẠN số lần thử
+            panel_path = f"panel_images/page_{page_num:02d}_panel_{panel_num:02d}.png"
+            attempt = 1
+            accepted = False
+            
+            while not accepted:
+                try:
+                    if attempt > 1:
+                        print(f"      🔄 Thử lại lần {attempt}...")
+                    
+                    panel_img = generate_image_with_gemini(panel_prompt, w, h)
+                    
+                    # Lưu ảnh gốc (không có bubble) để có thể vẽ lại
+                    original_img = panel_img.copy()
+                    
+                    # Lấy dialogues để chỉnh sửa
+                    dialogues = panel_data.get('dialogues', [])
+                    if not dialogues and panel_data.get('dialogue'):
+                        # Format cũ: convert sang format mới
+                        dialogues = [{"character": "narrator", "text": panel_data['dialogue'], "bubble_position": "center-top"}]
+                    
+                    # Copy dialogues để chỉnh sửa
+                    editable_dialogues = [d.copy() for d in dialogues]
+                    
+                    # Vẽ bubble lần đầu
+                    if editable_dialogues:
+                        print(f"      💬 Hội thoại: {len(editable_dialogues)} nhân vật")
+                        for d in editable_dialogues:
+                            char = d.get('character', 'narrator')
+                            text = d.get('text', '')[:40]
+                            print(f"         - {char}: {text}...")
+                        panel_img = draw_character_dialogue(original_img.copy(), editable_dialogues)
+                    
+                    # Lưu tạm để preview
+                    temp_path = f"panel_images/TEMP_page_{page_num:02d}_panel_{panel_num:02d}.png"
+                    panel_img.save(temp_path, quality=100)
+                    
+                    # Yêu cầu xác nhận với tùy chọn chỉnh sửa
+                    print(f"\n      {'='*60}")
+                    print(f"      🖼️  ẢNH VỪA TẠO:")
+                    print(f"      📁 File: {temp_path}")
+                    print(f"      📐 Kích thước: {panel_img.size}")
+                    print(f"      📝 Prompt: {panel_data.get('visual_prompt', '')[:80]}...")
+                    print(f"      {'='*60}")
+                    
+                    # Menu review ảnh
+                    print(f"      👀 Vui lòng mở file và xem ảnh!")
+                    print(f"      📂 Đường dẫn: {os.path.abspath(temp_path)}")
+                    
+                    while True:
+                        print(f"\n      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+                        print(f"      📋 LỰA CHỌN:")
+                        print(f"         y - ✅ Chấp nhận ảnh này")
+                        print(f"         n - 🔄 Tạo lại ảnh hoàn toàn")
+                        print(f"         e - ✏️  Chỉnh sửa vị trí textbox")
+                        print(f"         s - ⏭️  Bỏ qua panel này")
+                        print(f"      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+                        
+                        choice = input(f"      ❓ Lựa chọn của bạn (y/n/e/s): ").strip().lower()
+                        
+                        if choice == 'y':
+                            # Chấp nhận - đổi tên file
+                            if os.path.exists(panel_path):
+                                os.remove(panel_path)
+                            os.rename(temp_path, panel_path)
+                            
+                            page_panels.append({
+                                "panel_num": panel_num,
+                                "image": panel_img,
+                                "path": panel_path,
+                                "position": (x, y, w, h)
+                            })
+                            
+                            print(f"      ✅ Đã chấp nhận và lưu: {panel_path}\n")
+                            accepted = True
+                            break
+                        
+                        elif choice == 'e':
+                            # Chỉnh sửa vị trí bubble
+                            print(f"\n      ✏️  CHỈNH SỬA VỊ TRÍ TEXTBOX")
+                            print(f"      {'='*60}")
+                            
+                            if not editable_dialogues:
+                                print(f"      ⚠️  Panel này không có lời thoại để chỉnh sửa")
+                                continue
+                            
+                            # Hiển thị danh sách nhân vật
+                            print(f"      📝 Danh sách textbox hiện tại:")
+                            for idx, d in enumerate(editable_dialogues):
+                                char = d.get('character', 'narrator')
+                                text = d.get('text', '')[:30]
+                                current_pos = d.get('bubble_position', d.get('position', 'chưa set'))
+                                print(f"         {idx+1}. {char}: '{text}...' → Vị trí: {current_pos}")
+                            
+                            # Chọn textbox để chỉnh
+                            while True:
+                                try:
+                                    bubble_idx = input(f"\n      ❓ Chọn textbox để chỉnh (1-{len(editable_dialogues)}, 0=Xong): ").strip()
+                                    bubble_idx = int(bubble_idx)
+                                    
+                                    if bubble_idx == 0:
+                                        # Vẽ lại với vị trí mới
+                                        print(f"\n      🎨 Đang vẽ lại textbox với vị trí mới...")
+                                        panel_img = draw_character_dialogue(original_img.copy(), editable_dialogues)
+                                        panel_img.save(temp_path, quality=100)
+                                        print(f"      ✅ Đã cập nhật! Vui lòng xem lại file: {temp_path}")
+                                        break
+                                    
+                                    if 1 <= bubble_idx <= len(editable_dialogues):
+                                        selected_dialogue = editable_dialogues[bubble_idx - 1]
+                                        char_name = selected_dialogue.get('character', 'narrator')
+                                        
+                                        # Hiển thị menu vị trí
+                                        print(f"\n      📍 VỊ TRÍ CÓ SẴN cho '{char_name}':")
+                                        positions = {
+                                            '1': ('center-top', '⬆️  Giữa trên (an toàn nhất)'),
+                                            '2': ('top-left', '↖️  Góc trên trái'),
+                                            '3': ('top-right', '↗️  Góc trên phải'),
+                                            '4': ('center', '⏺️  Chính giữa'),
+                                            '5': ('left', '⬅️  Bên trái giữa'),
+                                            '6': ('right', '➡️  Bên phải giữa'),
+                                            '7': ('bottom-left', '↙️  Góc dưới trái'),
+                                            '8': ('bottom-right', '↘️  Góc dưới phải'),
+                                            '9': ('center-bottom', '⬇️  Giữa dưới'),
+                                        }
+                                        
+                                        for key, (pos_name, desc) in positions.items():
+                                            print(f"         {key}. {desc}")
+                                        
+                                        pos_choice = input(f"\n      ❓ Chọn vị trí mới (1-9): ").strip()
+                                        
+                                        if pos_choice in positions:
+                                            new_position, desc = positions[pos_choice]
+                                            selected_dialogue['bubble_position'] = new_position
+                                            
+                                            # Cập nhật tail_direction phù hợp
+                                            tail_mapping = {
+                                                'center-top': 'bottom',
+                                                'top-left': 'top-left',
+                                                'top-right': 'top-right',
+                                                'center': 'bottom',
+                                                'left': 'left',
+                                                'right': 'right',
+                                                'bottom-left': 'bottom-left',
+                                                'bottom-right': 'bottom-right',
+                                                'center-bottom': 'bottom',
+                                            }
+                                            selected_dialogue['tail_direction'] = tail_mapping.get(new_position, 'bottom')
+                                            
+                                            print(f"      ✅ Đã cập nhật '{char_name}' → {desc}")
+                                        else:
+                                            print(f"      ⚠️  Lựa chọn không hợp lệ")
+                                    else:
+                                        print(f"      ⚠️  Số không hợp lệ. Nhập 1-{len(editable_dialogues)} hoặc 0")
+                                
+                                except ValueError:
+                                    print(f"      ⚠️  Vui lòng nhập số")
+                            
+                            # Sau khi chỉnh xong, quay lại menu chính
+                            continue
+                            
+                        elif choice == 'n':
+                            # Tạo lại
+                            print(f"      🔄 Sẽ tạo lại ảnh...\n")
+                            attempt += 1
+                            break
+                            
+                        elif choice == 's':
+                            # Skip - dùng ảnh hiện tại nhưng không hỏi lại
+                            if os.path.exists(panel_path):
+                                os.remove(panel_path)
+                            os.rename(temp_path, panel_path)
+                            
+                            page_panels.append({
+                                "panel_num": panel_num,
+                                "image": panel_img,
+                                "path": panel_path,
+                                "position": (x, y, w, h)
+                            })
+                            
+                            print(f"      ⏭️  Đã bỏ qua và lưu: {panel_path}\n")
+                            accepted = True
+                            break
+                        else:
+                            print(f"      ⚠️  Vui lòng nhập 'y', 'n', hoặc 's'")
+                    
+                    if accepted or choice == 's':
+                        break
+                        
+                except Exception as e:
+                    print(f"      ❌ Lỗi: {e}")
+                    print(f"      🔄 Sẽ thử lại sau 3 giây...")
+                    time.sleep(3)
+                    attempt += 1
+                    
+                    # Hỏi người dùng có muốn tiếp tục thử lại không
+                    retry = input(f"\n      ❓ Tiếp tục thử lại? (y=Có/n=Bỏ qua panel này): ").strip().lower()
+                    if retry == 'n':
+                        print(f"      ⏭️  Bỏ qua panel này, tạo placeholder...")
+                        # Tạo ảnh placeholder
+                        placeholder = Image.new("RGB", (w, h), "lightgray")
+                        draw_obj = ImageDraw.Draw(placeholder)
+                        draw_obj.text((w//2, h//2), f"Panel {panel_num}\nBỏ qua", fill="black", anchor="mm")
+                        
+                        placeholder.save(panel_path)
+                        
+                        page_panels.append({
+                            "panel_num": panel_num,
+                            "image": placeholder,
+                            "path": panel_path,
+                            "position": (x, y, w, h)
+                        })
+                        break
+                    # Nếu 'y' thì tiếp tục vòng lặp while
+        
+        panel_images[page_num] = page_panels
+    
+    return panel_images

@@ -1,0 +1,190 @@
+import json
+import os
+import random
+import base64
+import time
+from PIL import Image, ImageDraw, ImageFont
+from pathlib import Path
+import google.generativeai as genai
+import requests
+from io import BytesIO
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# PHẦN 1: CẤU HÌNH
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# ⚙️ Cấu hình API
+GEMINI_API_KEY = "AIzaSyCwhqIs7GrVi1G6wgtejD_w_niFFQws6mo"
+genai.configure(api_key=GEMINI_API_KEY)
+
+# Models
+text_model = genai.GenerativeModel('gemini-2.0-flash-exp')
+try:
+    image_model = genai.GenerativeModel('gemini-2.5-flash-image')
+    print("✅ Đã cấu hình Gemini API")
+except Exception as e:
+    print(f"⚠️ Lỗi khởi tạo image model: {e}")
+    image_model = None
+
+# 📐 Cấu hình trang A4 (300 DPI)
+PAGE_W, PAGE_H = 2100, 2970
+MARGIN = 50
+GAP = 20
+    "layout_3": [  # 6 khung đều, chia 2x3
+        (MARGIN, MARGIN, (PAGE_W//2)-GAP, 950),
+        ((PAGE_W//2)+GAP, MARGIN, (PAGE_W//2)-GAP*2, 950),
+        (MARGIN, 1000, (PAGE_W//2)-GAP, 950),
+        ((PAGE_W//2)+GAP, 1000, (PAGE_W//2)-GAP*2, 950),
+        (MARGIN, 2000, (PAGE_W//2)-GAP, 950),
+        ((PAGE_W//2)+GAP, 2000, (PAGE_W//2)-GAP*2, 950),
+    ],
+    "layout_intro": [  # Layout cho trang giới thiệu (6 khung)
+        (MARGIN, MARGIN, PAGE_W - 2*MARGIN, 450),
+        (MARGIN, 550, (PAGE_W//2)-GAP, 700),
+        ((PAGE_W//2)+GAP, 550, (PAGE_W//2)-GAP*2, 700),
+        (MARGIN, 1300, (PAGE_W//2)-GAP, 700),
+        ((PAGE_W//2)+GAP, 1300, (PAGE_W//2)-GAP*2, 700),
+        (MARGIN, 2050, PAGE_W - 2*MARGIN, 850),
+    ],
+}
+
+# 🇻🇳 KỊCH BẢN MẶC ĐỊNH - CHỦ ĐỀ QUỐC KHÁNH
+DEFAULT_STORY = """
+Truyện tranh về kỷ niệm 80 năm Quốc khánh Việt Nam 2/9/1945 - 2/9/2025
+
+Câu chuyện xoay quanh nhóm học sinh trường THPT chuẩn bị các hoạt động kỷ niệm Quốc khánh:
+
+TRANG 0 [DEMO]: Giới thiệu nhân vật
+- Panel 1: Banner "Kỷ niệm 80 năm Quốc khánh 2/9/1945"
+- Panel 2-5: 4 học sinh chính (An, Bình, Chi, Dũng) - thành viên ban tổ chức
+- Panel 6: Khung cảnh trường học trang hoàng cờ đỏ sao vàng
+
+TRANG 1: Họp kế hoạch
+- Nhóm học sinh họp bàn kế hoạch tổ chức lễ kỷ niệm
+- Thảo luận các hoạt động: Văn nghệ, triển lãm ảnh, thi vẽ tranh, flashmob
+
+TRANG 2: Chuẩn bị hoạt động
+- Các bạn cùng trang trí hội trường
+- Treo cờ đỏ sao vàng, băng rôn, poster lịch sử
+- Chuẩn bị trang phục áo dài, đạo cụ biểu diễn
+
+TRANG 3: Lễ chào cờ
+- Buổi lễ chào cờ trang trọng sáng ngày 2/9
+- Học sinh hát Quốc ca
+- Không khí nghiêm trang, xúc động
+
+TRANG 4: Triển lãm lịch sử
+- Triển lãm ảnh về lịch sử dựng nước
+- Các bạn giới thiệu tư liệu cho bạn bè
+- Tìm hiểu về ngày 2/9/1945 lịch sử
+
+TRANG 5: Văn nghệ chào mừng
+- Biểu diễn múa, hát ca khúc yêu nước
+- Flashmob cờ đỏ sao vàng giữa sân trường
+- Không khí sôi động, tràn đầy niềm tự hào
+
+KẾT: Ý nghĩa Quốc khánh
+- Nhóm bạn cùng nhau trước cờ Tổ quốc
+- Cảm nhận về ý nghĩa ngày Quốc khánh
+- Quyết tâm học tập tốt, đóng góp cho đất nước
+
+Phong cách: Manhwa hiện đại, màu sắc tươi sáng, tôn vinh tinh thần yêu nước
+"""
+
+# 📝 PROMPTS TỔNG QUAN CHO TỪNG TRANG (để xuất ra)
+PAGE_PROMPTS = {
+    0: {
+        "title": "TRANG 0 - GIỚI THIỆU NHÂN VẬT [DEMO]",
+        "description": "Character reference sheet cho 4 học sinh Việt Nam",
+        "panels": [
+            "Panel 1: Title banner '80 năm Quốc khánh 2/9/1945-2025' với cờ đỏ sao vàng",
+            "Panel 2: AN - Nữ sinh, tóc dài buộc đuôi ngựa, áo dài trắng, năng động",
+            "Panel 3: BÌNH - Nam sinh, tóc ngắn, áo trắng quần tây, tự tin",
+            "Panel 4: CHI - Nữ sinh, tóc ngang vai, áo dài trắng, hiền lành",
+            "Panel 5: DŨNG - Nam sinh, tóc mái chéo, áo trắng, phong thái lãnh đạo",
+            "Panel 6: Cảnh trường học trang hoàng cờ đỏ sao vàng, băng rôn"
+        ],
+        "mood": "Reference sheet style, clean, detailed character designs"
+    },
+    1: {
+        "title": "TRANG 1 - HỌP KẾ HOẠCH",
+        "description": "Nhóm bạn họp bàn chuẩn bị hoạt động kỷ niệm",
+        "panels": [
+            "Panel 1: Cảnh 4 bạn ngồi quanh bàn trong lớp học, sổ tay, bút",
+            "Panel 2: An đứng dậy trình bày ý tưởng (close-up, nhiệt tình)",
+            "Panel 3: Bình ghi chép kế hoạch vào sổ",
+            "Panel 4: Chi và Dũng thảo luận, trên bàn có bản vẽ thiết kế"
+        ],
+        "mood": "Năng động, hào hứng, tinh thần làm việc nhóm"
+    },
+    2: {
+        "title": "TRANG 2 - CHUẨN BỊ HOẠT ĐỘNG",
+        "description": "Các bạn trang trí hội trường, chuẩn bị đạo cụ",
+        "panels": [
+            "Panel 1: Wide shot - Hội trường rộng, các bạn đang trang trí",
+            "Panel 2: An và Chi treo băng rôn 'Chào mừng Quốc khánh'",
+            "Panel 3: Bình treo cờ đỏ sao vàng trên cột",
+            "Panel 4: Dũng sắp xếp ghế, poster lịch sử trên tường"
+        ],
+        "mood": "Tất bật, vui vẻ, công việc đang triển khai"
+    },
+    3: {
+        "title": "TRANG 3 - LỄ CHÀO CỜ",
+        "description": "Buổi lễ chào cờ trang trọng sáng 2/9",
+        "panels": [
+            "Panel 1: Wide shot - Sân trường đông học sinh xếp hàng ngay ngắn",
+            "Panel 2: Cột cờ, quốc kỳ đỏ sao vàng tung bay",
+            "Panel 3: Close-up nhóm 4 bạn hát Quốc ca, nghiêm trang",
+            "Panel 4: Cận cảnh mặt An, cảm xúc, ánh mắt tự hào"
+        ],
+        "mood": "Trang trọng, xúc động, tinh thần yêu nước"
+    },
+    4: {
+        "title": "TRANG 4 - TRIỂN LÃM LỊCH SỬ",
+        "description": "Triển lãm ảnh về lịch sử dựng nước",
+        "panels": [
+            "Panel 1: Khu triển lãm với các khung ảnh lịch sử trên tường",
+            "Panel 2: Chi giới thiệu ảnh Bác Hồ đọc Tuyên ngôn độc lập",
+            "Panel 3: Học sinh khác lắng nghe, tò mò, ghi chú",
+            "Panel 4: Bình chụp ảnh kỷ niệm trước bảng triển lãm"
+        ],
+        "mood": "Giáo dục, tìm hiểu lịch sử, tôn trọng"
+    },
+    5: {
+        "title": "TRANG 5 - VĂN NGHỆ CHÀO MỪNG",
+        "description": "Biểu diễn văn nghệ, flashmob cờ đỏ sao vàng",
+        "panels": [
+            "Panel 1: Sân khấu - An múa áo dài, tay cầm cờ nhỏ",
+            "Panel 2: Bình và nhóm hát ca khúc 'Tiến quân ca'",
+            "Panel 3: Wide shot - Flashmob giữa sân trường, hàng chục học sinh cầm cờ",
+            "Panel 4: Cảnh từ trên cao - Hình ngôi sao 5 cánh bằng người"
+        ],
+        "mood": "Sôi động, vui tươi, tràn đầy năng lượng"
+    },
+    6: {
+        "title": "TRANG 6 - Ý NGHĨA QUỐC KHÁNH",
+        "description": "Kết thúc - Cảm nhận và quyết tâm của các bạn",
+        "panels": [
+            "Panel 1: 4 bạn đứng trước cột cờ, hoàng hôn, cờ đỏ sao vàng phấp phới",
+            "Panel 2: Close-up Dũng nói: 'Chúng mình sẽ học tập thật tốt'",
+            "Panel 3: Các bạn cười, chạm tay vào nhau (teamwork gesture)",
+            "Panel 4: Wide shot - Trường học lúc chiều tà, cờ đỏ sao vàng tung bay"
+        ],
+        "mood": "Cảm động, quyết tâm, hy vọng tương lai"
+    }
+}
+# 🎨 LAYOUTS (4-6 khung/trang)
+LAYOUTS = {
+    "layout_1": [  # 4 khung đều, chia 2x2
+        (MARGIN, MARGIN, (PAGE_W//2)-GAP, 1400),
+        ((PAGE_W//2)+GAP, MARGIN, (PAGE_W//2)-GAP*2, 1400),
+        (MARGIN, 1450, (PAGE_W//2)-GAP, 1400),
+        ((PAGE_W//2)+GAP, 1450, (PAGE_W//2)-GAP*2, 1400),
+    ],
+    "layout_2": [  # 5 khung, 1 to + 4 nhỏ
+        (MARGIN, MARGIN, PAGE_W - 2*MARGIN, 900),
+        (MARGIN, 950, (PAGE_W//2)-GAP, 950),
+        ((PAGE_W//2)+GAP, 950, (PAGE_W//2)-GAP*2, 950),
+        (MARGIN, 1950, (PAGE_W//2)-GAP, 950),
+        ((PAGE_W//2)+GAP, 1950, (PAGE_W//2)-GAP*2, 950),
+    ],

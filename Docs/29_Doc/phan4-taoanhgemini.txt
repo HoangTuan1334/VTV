@@ -1,0 +1,98 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# PHẦN 4: TẠO ẢNH VỚI GEMINI IMAGE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def generate_image_with_gemini(prompt, width, height):
+    """Tạo ảnh với Gemini 2.5 Flash Image"""
+    print(f"   [Gemini] Tạo ảnh {width}x{height}px...")
+    
+    try:
+        aspect_ratio = width / height
+        
+        if aspect_ratio > 1.5:
+            orientation = "wide landscape"
+        elif aspect_ratio > 1.1:
+            orientation = "landscape"
+        elif aspect_ratio > 0.9:
+            orientation = "square"
+        elif aspect_ratio > 0.6:
+            orientation = "portrait"
+        else:
+            orientation = "tall portrait"
+        
+        full_prompt = f"""Create a {orientation} comic panel image for Vietnamese Independence Day celebration.
+
+REQUIREMENTS:
+- Dimensions: {width}x{height}px, aspect {aspect_ratio:.2f}:1
+- {orientation.upper()} format
+
+Content: {prompt}
+
+Style:
+- Modern manhwa comic art style
+- Vietnamese cultural elements (áo dài, Vietnamese flag colors)
+- Bright, patriotic atmosphere
+- Clean composition for comic panel
+- NO TEXT/DIALOGUE in image (will be added separately)
+- High quality illustration
+
+IMPORTANT: Vietnamese context - red flag with yellow star, school setting, patriotic theme
+"""
+        
+        # Thử SDK trước
+        if image_model:
+            try:
+                response = image_model.generate_content([full_prompt])
+                
+                if hasattr(response, 'candidates') and len(response.candidates) > 0:
+                    for part in response.candidates[0].content.parts:
+                        if hasattr(part, 'inline_data') and part.inline_data:
+                            image_bytes = part.inline_data.data
+                            img = Image.open(BytesIO(image_bytes))
+                            
+                            if img.size != (width, height):
+                                print(f"   ⚠️ Resize {img.size} → {width}x{height}")
+                                img = img.resize((width, height), Image.Resampling.LANCZOS)
+                            else:
+                                print(f"   ✅ Đúng kích thước!")
+                            
+                            return img
+            except Exception as e:
+                print(f"   ⚠️ SDK lỗi: {e}")
+        
+        # Fallback: REST API
+        print(f"   → Dùng REST API...")
+        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key={GEMINI_API_KEY}"
+        
+        payload = {
+            "contents": [{"parts": [{"text": full_prompt}]}],
+            "generationConfig": {
+                "temperature": 0.8,
+                "topP": 0.95,
+                "topK": 40
+            }
+        }
+        
+        response = requests.post(api_url, json=payload, timeout=120)
+        
+        if response.status_code == 200:
+            result = response.json()
+            
+            if 'candidates' in result:
+                for candidate in result['candidates']:
+                    if 'content' in candidate:
+                        for part in candidate['content'].get('parts', []):
+                            if 'inlineData' in part:
+                                image_data = base64.b64decode(part['inlineData']['data'])
+                                img = Image.open(BytesIO(image_data))
+                                
+                                if img.size != (width, height):
+                                    print(f"   ⚠️ Resize {img.size} → {width}x{height}")
+                                    img = img.resize((width, height), Image.Resampling.LANCZOS)
+                                
+                                return img
+        
+        raise Exception(f"API trả về status {response.status_code}")
+        
+    except Exception as e:
+        raise Exception(f"Lỗi tạo ảnh: {str(e)}")

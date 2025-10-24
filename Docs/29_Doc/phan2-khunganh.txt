@@ -1,0 +1,56 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# PHẦN 2: HÀM TIỆN ÍCH
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def create_layout_preview(layout_name, panels, save_dir="layout_previews"):
+    """Tạo ảnh preview cho layout"""
+    os.makedirs(save_dir, exist_ok=True)
+    
+    img = Image.new("RGB", (PAGE_W, PAGE_H), "white")
+    draw = ImageDraw.Draw(img)
+    
+    for i, (x, y, w, h) in enumerate(panels):
+        draw.rectangle([x, y, x+w, y+h], outline="black", width=8)
+        center_x = x + w // 2
+        center_y = y + h // 2
+        try:
+            font = ImageFont.truetype("arial.ttf", 100)
+        except:
+            font = None
+        
+        if font:
+            draw.text((center_x, center_y), str(i+1), fill="red", anchor="mm", font=font)
+        else:
+            draw.text((center_x, center_y), str(i+1), fill="red")
+    
+    img_path = os.path.join(save_dir, f"{layout_name}.png")
+    img.save(img_path)
+    return img_path
+
+
+def select_layouts(num_pages):
+    """Chọn layouts cho các trang"""
+    layout_names = [name for name in LAYOUTS.keys() if name != "layout_intro"]
+    selected_layouts = []
+    
+    # Trang 0: Demo/Reference
+    selected_layouts.append({
+        "page_num": 0,
+        "layout_name": "layout_intro",
+        "panels": LAYOUTS["layout_intro"],
+        "is_intro": True,
+        "is_demo": True
+    })
+    
+    # Các trang truyện
+    for i in range(num_pages):
+        layout_name = random.choice(layout_names)
+        selected_layouts.append({
+            "page_num": i + 1,
+            "layout_name": layout_name,
+            "panels": LAYOUTS[layout_name],
+            "is_intro": False,
+            "is_demo": False
+        })
+    
+    return selected_layouts

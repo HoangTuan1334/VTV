@@ -1,0 +1,193 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# PHẦN 3: SINH KỊCH BẢN VỚI GEMINI AI
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def generate_story_script(requirement, pages_info):
+    """Sinh kịch bản chi tiết cho từng trang, từng khung"""
+    
+    demo_page = [p for p in pages_info if p.get('is_demo')]
+    story_pages = [p for p in pages_info if not p.get('is_demo')]
+    
+    prompt = f"""
+Bạn là chuyên gia viết kịch bản truyện tranh về chủ đề lịch sử Việt Nam.
+
+YÊU CẦU TRUYỆN: {requirement}
+
+CẤU TRÚC: {len(pages_info)} trang
+- Trang 0: {len(demo_page[0]['panels'])} khung [DEMO - GIỚI THIỆU NHÂN VẬT]
+{chr(10).join([f'- Trang {p["page_num"]}: {len(p["panels"])} khung [NỘI DUNG]' for p in story_pages])}
+
+Tạo kịch bản JSON:
+{{
+  "title": "Kỷ Niệm 80 Năm Quốc Khánh 2/9",
+  "characters": [
+    {{
+      "name": "An",
+      "description": "Vietnamese high school girl, age 16, long black hair in ponytail, bright brown eyes, 160cm tall, wearing white áo dài with red details, friendly smile, energetic pose"
+    }},
+    {{
+      "name": "Bình", 
+      "description": "Vietnamese high school boy, age 16, short black hair, brown eyes, 165cm tall, wearing white shirt and dark blue pants, confident expression, holding notebook"
+    }},
+    {{
+      "name": "Chi",
+      "description": "Vietnamese high school girl, age 16, shoulder-length wavy black hair, brown eyes, 158cm tall, wearing white áo dài, gentle smile, artistic personality"
+    }},
+    {{
+      "name": "Dũng",
+      "description": "Vietnamese high school boy, age 17, black hair with side part, brown eyes, 170cm tall, wearing white shirt and dark pants, leader personality, thoughtful expression"
+    }}
+  ],
+  "art_style": "Modern manhwa style with Vietnamese cultural elements, bright patriotic colors (red, yellow), clean lines, expressive characters",
+  "pages": [
+    {{
+      "page_num": 0,
+      "is_intro": true,
+      "is_demo": true,
+      "scene_description": "Character reference sheet - Independence Day theme",
+      "panels": [
+        {{
+          "panel_num": 1,
+          "dialogue": "Kỷ niệm 80 năm Quốc khánh Việt Nam 2/9/1945 - 2/9/2025",
+          "visual_prompt": "Title banner with Vietnamese flag colors (red background, yellow star), patriotic decorations, historical significance",
+          "characters_in_panel": [],
+          "purpose": "title_card"
+        }},
+        {{
+          "panel_num": 2,
+          "dialogue": "An - Trưởng ban tổ chức",
+          "visual_prompt": "Character reference: An, Vietnamese high school girl with long black ponytail, wearing white áo dài with red details, energetic pose, holding Vietnamese flag",
+          "characters_in_panel": ["An"],
+          "purpose": "character_reference"
+        }},
+        // ... 6 panels total
+      ]
+    }},
+    {{
+      "page_num": 1,
+      "is_intro": false,
+      "scene_description": "Planning meeting for Independence Day celebration",
+      "panels": [
+        {{
+          "panel_num": 1,
+          "dialogues": [
+            {{"character": "An", "text": "Chào mọi người! Hôm nay chúng ta sẽ lên kế hoạch cho lễ kỷ niệm Quốc khánh nhé!", "position": "left"}},
+            {{"character": "Dũng", "text": "Ý tưởng hay đấy An! Chúng ta nên làm gì?", "position": "right"}}
+          ],
+          "visual_prompt": "Four Vietnamese high school students sitting around table in classroom, An on LEFT side standing presenting, Dung on RIGHT side, others listening attentively, notebooks and pens on table",
+          "characters_in_panel": ["An", "Bình", "Chi", "Dũng"]
+        }},
+        {{
+          "panel_num": 2,
+          "dialogues": [
+            {{"character": "Bình", "text": "Em nghĩ chúng ta có thể tổ chức triển lãm ảnh lịch sử!", "position": "left"}},
+            {{"character": "Chi", "text": "Còn văn nghệ nữa! Múa, hát ca khúc yêu nước!", "position": "right"}}
+          ],
+          "visual_prompt": "Close-up of Bình on LEFT and Chi on RIGHT talking excitedly, expressing ideas with hand gestures",
+          "characters_in_panel": ["Bình", "Chi"]
+        }}
+      ]
+    }}
+  ]
+}}
+
+⭐ LƯU Ý CỰC KỲ QUAN TRỌNG - FORMAT HỘI THOẠI:
+
+1. **MỖI PANEL CÓ "dialogues"** (số nhiều): Array của nhiều nhân vật nói chuyện
+   Format: "dialogues": [
+     {{"character": "Tên nhân vật", "text": "Lời nói tiếng Việt", "position": "left"}},
+     {{"character": "Tên khác", "text": "Câu trả lời", "position": "right"}}
+   ]
+
+2. **VỊ TRÍ NHÂN VẬT & BUBBLE** - "character_position" và "bubble_position" CỰC KỲ QUAN TRỌNG:
+   
+   **NGUYÊN TẮC VÀNG: Bubble đặt ở vị trí NGƯỢC LẠI với nhân vật để KHÔNG CHE MẶT**
+   
+   - Nhân vật "top-left" → Bubble "top-right" hoặc "center-top" (đuôi chỉ sang trái)
+   - Nhân vật "top-right" → Bubble "top-left" hoặc "center-top" (đuôi chỉ sang phải)
+   - Nhân vật "bottom-left" → Bubble "top-left" hoặc "center-top" (đuôi chỉ xuống trái)
+   - Nhân vật "bottom-right" → Bubble "top-right" hoặc "center-top" (đuôi chỉ xuống phải)
+   - Nhân vật "left" → Bubble "right" hoặc "center" (đuôi chỉ sang trái)
+   - Nhân vật "right" → Bubble "left" hoặc "center" (đuôi chỉ sang phải)
+   - Nhân vật "center-bottom" → Bubble "center-top" (đuôi chỉ xuống)
+   
+   **Format JSON dialogue:**
+   {{{{
+     "character": "An",
+     "text": "Chào mọi người!",
+     "character_position": "bottom-left",
+     "bubble_position": "top-right",
+     "tail_direction": "bottom-left"
+   }}}}
+   
+   - Trong visual_prompt PHẢI mô tả: "character An at BOTTOM-LEFT corner"
+
+3. **KHÔNG dùng "dialogue"** (số ít) - đó là format cũ
+
+3. **HỘI THOẠI TƯƠNG TÁC**:
+   - Các nhân vật NÓI CHUYỆN với nhau, KHÔNG kể chuyện
+   - Mỗi panel có 1-3 câu thoại từ các nhân vật khác nhau
+   - Tạo sự tương tác tự nhiên: Hỏi - đáp, đề xuất - phản hồi
+   - Nhân vật nói trước thường ở LEFT/BOTTOM-LEFT, nhân vật trả lời ở RIGHT/BOTTOM-RIGHT
+
+4. Các quy tắc khác:
+   - MỖI TRANG có ĐÚNG số panels đã chỉ định
+   - TRANG 0: Giới thiệu nhân vật, mô tả TIẾNG ANH
+   - visual_prompt: TIẾNG ANH
+   - dialogues[].text: TIẾNG VIỆT
+   - Nội dung tích cực, giáo dục
+
+VÍ DỤ PANEL TỐT (FORMAT MỚI - KHÔNG CHE MẶT):
+{{
+  "panel_num": 3,
+  "dialogues": [
+    {{
+      "character": "An", 
+      "text": "Chúng ta cùng chuẩn bị nhé!", 
+      "character_position": "bottom-left",
+      "bubble_position": "top-right",
+      "tail_direction": "bottom-left"
+    }},
+    {{
+      "character": "Bình", 
+      "text": "Để anh lo phần trang trí!", 
+      "character_position": "bottom-right",
+      "bubble_position": "top-left",
+      "tail_direction": "bottom-right"
+    }}
+  ],
+  "visual_prompt": "An standing at BOTTOM-LEFT corner smiling, Bình at BOTTOM-RIGHT corner giving thumbs up, speech bubbles at top corners not covering faces",
+  "characters_in_panel": ["An", "Bình"]
+}}
+
+HOẶC FORMAT CŨ (tương thích):
+{{
+  "panel_num": 3,
+  "dialogues": [
+    {{"character": "An", "text": "Chúng ta cùng chuẩn bị nhé!", "position": "left"}},
+    {{"character": "Bình", "text": "Để anh lo phần trang trí!", "position": "right"}}
+  ],
+  "visual_prompt": "An standing on LEFT side, Bình on RIGHT side, both smiling and giving thumbs up",
+  "characters_in_panel": ["An", "Bình"]
+}}
+
+Chỉ trả về JSON, không giải thích thêm.
+"""
+    
+    response = text_model.generate_content(prompt)
+    
+    try:
+        text = response.text.strip()
+        if text.startswith("```json"):
+            text = text[7:]
+        if text.startswith("```"):
+            text = text[3:]
+        if text.endswith("```"):
+            text = text[:-3]
+        
+        script = json.loads(text.strip())
+        return script
+    except json.JSONDecodeError as e:
+        print(f"❌ Lỗi parse JSON: {e}")
+        print(f"Response: {response.text[:500]}")
+        return None

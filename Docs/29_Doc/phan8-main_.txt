@@ -1,0 +1,366 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# PHẦN 8 MAIN WORKFLOW
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def export_prompts_to_file()
+    Xuất tất cả prompts tổng quan ra file text
+    output = []
+    output.append(=  100)
+    output.append(📝 PROMPTS TỔNG QUAN - TRUYỆN TRANH KỶ NIỆM 80 NĂM QUỐC KHÁNH 29)
+    output.append(=  100)
+    output.append()
+    
+    for page_num in sorted(PAGE_PROMPTS.keys())
+        page_info = PAGE_PROMPTS[page_num]
+        output.append(fn{'='  100})
+        output.append(f🎨 {page_info['title']})
+        output.append(f{'='  100})
+        output.append(fn📖 MÔ TẢ {page_info['description']})
+        output.append(f🎭 TÂM TRẠNG {page_info['mood']})
+        output.append(fn📐 CÁC PANELS)
+        
+        for i, panel_desc in enumerate(page_info['panels'], 1)
+            output.append(f  {i}. {panel_desc})
+        
+        output.append()
+    
+    output.append(n + =  100)
+    output.append(💡 HƯỚNG DẪN SỬ DỤNG)
+    output.append(=  100)
+    output.append(
+- Mỗi trang có mô tả tổng quan và chi tiết từng panel
+- Prompts được viết sẵn phù hợp với chủ đề Quốc khánh Việt Nam
+- Nhân vật An, Bình, Chi, Dũng - 4 học sinh THPT
+- Phong cách Manhwa hiện đại, màu sắc tươi sáng
+- Bối cảnh Trường học Việt Nam, cờ đỏ sao vàng
+
+🎯 MỤC ĐÍCH
+- Giáo dục ý nghĩa ngày Quốc khánh 291945
+- Thể hiện tinh thần yêu nước của thế hệ trẻ
+- Các hoạt động kỷ niệm Chào cờ, triển lãm, văn nghệ
+- Truyền cảm hứng học tập và đóng góp cho đất nước
+
+🇻🇳 Kỷ niệm 80 năm Quốc khánh Việt Nam 291945 - 292025
+)
+    
+    prompt_file = PROMPTS_TONG_QUAN_QUOC_KHANH.txt
+    with open(prompt_file, w, encoding=utf-8) as f
+        f.write(n.join(output))
+    
+    print(fn✅ Đã xuất prompts ra file {prompt_file})
+    return prompt_file
+
+
+def main()
+    Quy trình chính tạo truyện tranh
+    print(=  80)
+    print(🇻🇳 HỆ THỐNG TẠO TRUYỆN TRANH - KỶ NIỆM 80 NĂM QUỐC KHÁNH 29)
+    print(=  80)
+    
+    # ✨ KIỂM TRA RESUME - Có file tạm không
+    temp_script_file = story_script_TEMP.json
+    structure_file = comic_structure.json
+    
+    story_script = None
+    selected_layouts = None
+    resume_mode = False
+    
+    if os.path.exists(temp_script_file) and os.path.exists(structure_file)
+        print(n🔄 PHÁT HIỆN SESSION TRƯỚC ĐÓ)
+        print(f   📄 Kịch bản {temp_script_file})
+        print(f   📐 Layouts {structure_file})
+        
+        resume_choice = input(n❓ Tiếp tục từ chỗ cũ (y=Cón=Bắt đầu mới) ).strip().lower()
+        
+        if resume_choice == 'y'
+            # Load dữ liệu cũ
+            try
+                with open(temp_script_file, r, encoding=utf-8) as f
+                    story_script = json.load(f)
+                with open(structure_file, r, encoding=utf-8) as f
+                    selected_layouts = json.load(f)
+                
+                print(✅ Đã tải session trước!)
+                print(f   📚 Truyện {story_script.get('title', 'NA')})
+                print(f   📄 Số trang {len(story_script.get('pages', []))})
+                print(f   📐 Layouts {len(selected_layouts)} trang)
+                
+                resume_mode = True
+                
+            except Exception as e
+                print(f❌ Lỗi load file {e})
+                print(⚠️ Sẽ bắt đầu session mới...)
+                resume_mode = False
+    
+    if not resume_mode
+        # Bước 0 Xuất prompts tổng quan
+        print(n📝 Đang xuất prompts tổng quan...)
+        prompt_file = export_prompts_to_file()
+        print(f📄 Xem file '{prompt_file}' để biết chi tiết từng trangpanel)
+        print(f📄 Xem file '{prompt_file}' để biết chi tiết từng trangpanel)
+    
+        # Bước 1 Nhập số trang
+        try
+            num_pages_input = input(n📖 Nhập số trang truyện (khuyến nghị 3-5 trang) )
+            num_pages = int(num_pages_input)
+            if num_pages  1 or num_pages  10
+                print(⚠️ Số trang nên từ 1-10. Đặt mặc định = 5)
+                num_pages = 5
+        except
+            print(⚠️ Nhập không hợp lệ. Đặt mặc định = 5 trang)
+            num_pages = 5
+        
+        # Bước 2 Chọn layouts
+        print(fn📐 Chọn layouts cho {num_pages + 1} trang (bao gồm trang demo)...)
+        selected_layouts = select_layouts(num_pages)
+        
+        print(f✅ Đã chọn layouts)
+        for page in selected_layouts
+            tag =  [DEMO] if page.get('is_demo') else 
+            print(f   Trang {page['page_num']} {page['layout_name']} ({len(page['panels'])} khung){tag})
+        
+        # Lưu structure
+        with open(structure_file, w, encoding=utf-8) as f
+            json.dump(selected_layouts, f, indent=2, ensure_ascii=False)
+        
+        # Bước 3 Sinh kịch bản
+        print(fn🤖 Đang sinh kịch bản với Gemini AI...)
+        print(📝 Sử dụng kịch bản mặc định về Quốc khánh...)
+        
+        script_accepted = False
+        
+        while not script_accepted
+            # Sinh kịch bản
+            story_script = generate_story_script(DEFAULT_STORY, selected_layouts)
+            
+            if not story_script
+                print(❌ Không thể sinh kịch bản. Dừng chương trình.)
+                return
+            
+            # Lưu kịch bản tạm
+            with open(temp_script_file, w, encoding=utf-8) as f
+                json.dump(story_script, f, indent=2, ensure_ascii=False)
+            
+            # Hiển thị tóm tắt kịch bản
+            print(n + =  80)
+            print(📖 KỊCH BẢN VỪA SINH)
+            print(=  80)
+            print(f📚 Tên truyện {story_script['title']})
+            print(f🎨 Phong cách {story_script['art_style']})
+            print(f👥 Nhân vật {len(story_script['characters'])} nhân vật)
+            print(fn👤 Danh sách nhân vật)
+            for char in story_script['characters']
+                print(f   - {char['name']} {char['description'][80]}...)
+            
+            print(fn📄 Tổng quan các trang)
+            for page in story_script['pages']
+                page_tag =  [DEMO] if page.get('is_demo') else 
+                print(fn   📖 Trang {page['page_num']}{page_tag} {page.get('scene_description', 'NA')})
+                print(f      Số panels {len(page['panels'])})
+                
+                # Hiển thị 2 panel đầu tiên
+                for i, panel in enumerate(page['panels'][2])
+                    dialogue = panel.get('dialogue', 'Không có lời thoại')
+                    visual = panel.get('visual_prompt', 'NA')[60]
+                    print(f      • Panel {panel['panel_num']} {dialogue})
+                    print(f        Visual {visual}...)
+                
+                if len(page['panels'])  2
+                    print(f      • ... và {len(page['panels']) - 2} panels khác)
+            
+            print(n + =  80)
+            print(f📁 Kịch bản chi tiết đã lưu tại {os.path.abspath(temp_script_file)})
+            print(=  80)
+            
+            # Hỏi người dùng
+            print(n📝 BẠN CÓ THỂ)
+            print(   1. Nhấn 'y' - Chấp nhận kịch bản này và bắt đầu tạo ảnh)
+            print(   2. Nhấn 'e' - Mở file JSON để CHỈNH SỬA kịch bản)
+            print(   3. Nhấn 'r' - TẠO LẠI kịch bản hoàn toàn mới)
+            print(   4. Nhấn 'q' - Thoát chương trình)
+            
+            while True
+                choice = input(n❓ Lựa chọn của bạn (yerq) ).strip().lower()
+                
+                if choice == 'y'
+                    # Chấp nhận - lưu vĩnh viễn
+                    final_script_file = story_script.json
+                    with open(final_script_file, w, encoding=utf-8) as f
+                        json.dump(story_script, f, indent=2, ensure_ascii=False)
+                    print(f✅ Đã chấp nhận kịch bản! Lưu tại {final_script_file})
+                    script_accepted = True
+                    break
+                    
+                elif choice == 'e'
+                    # Chỉnh sửa
+                    print(fn📝 HƯỚNG DẪN CHỈNH SỬA)
+                    print(f   1. Mở file {os.path.abspath(temp_script_file)})
+                    print(f   2. Chỉnh sửa nội dung theo ý muốn)
+                    print(f      - Thay đổi 'dialogue' để sửa lời thoại)
+                    print(f      - Thay đổi 'visual_prompt' để sửa mô tả hình ảnh)
+                    print(f      - Thay đổi 'scene_description' để sửa mô tả cảnh)
+                    print(f   3. LƯU FILE (Ctrl+S))
+                    print(f   4. Quay lại đây và nhấn Enter để tiếp tục)
+                    
+                    input(n⏸️  Nhấn Enter sau khi đã CHỈNH SỬA và LƯU file...)
+                    
+                    # Đọc lại file đã chỉnh sửa
+                    try
+                        with open(temp_script_file, r, encoding=utf-8) as f
+                            story_script = json.load(f)
+                        
+                        print(✅ Đã tải lại kịch bản đã chỉnh sửa!)
+                        
+                        # Lưu vào file chính thức
+                        final_script_file = story_script.json
+                        with open(final_script_file, w, encoding=utf-8) as f
+                            json.dump(story_script, f, indent=2, ensure_ascii=False)
+                        
+                        script_accepted = True
+                        break
+                        
+                    except json.JSONDecodeError as e
+                        print(f❌ Lỗi File JSON không hợp lệ - {e})
+                        print(⚠️  Vui lòng kiểm tra lại cú pháp JSON)
+                        retry = input(Nhấn 'r' để thử lại, 'c' để hủy chỉnh sửa ).strip().lower()
+                        if retry == 'c'
+                            print(⏪ Quay lại kịch bản gốc...)
+                            break
+                        # Nếu 'r' thì tiếp tục vòng lặp để người dùng sửa lại
+                        
+                elif choice == 'r'
+                    # Tạo lại
+                    print(🔄 Đang tạo lại kịch bản mới...)
+                    break
+                    
+                elif choice == 'q'
+                    print(👋 Thoát chương trình.)
+                    return
+                    
+                else
+                    print(⚠️  Vui lòng nhập 'y', 'e', 'r', hoặc 'q')
+    
+    # ✨ VALIDATION Nếu resume mode, bỏ qua phần script review
+    if not resume_mode
+        # Validation panels
+        print(n🔍 Kiểm tra số panels...)
+        for page in story_script['pages']
+            page_num = page['page_num']
+            
+            # Tìm layout tương ứng với page_num
+            layout_info = None
+            for layout in selected_layouts
+                if layout['page_num'] == page_num
+                    layout_info = layout
+                    break
+            
+            if not layout_info
+                print(f   ⚠️ Trang {page_num} Không tìm thấy layout!)
+                continue
+            
+            expected = len(layout_info['panels'])
+            actual = len(page['panels'])
+            
+            if actual != expected
+                print(f   ⚠️ Trang {page_num} {actual} → {expected} panels)
+                if actual  expected
+                    page['panels'] = page['panels'][expected]
+                else
+                    while len(page['panels'])  expected
+                        last_panel = page['panels'][-1].copy()
+                        last_panel['panel_num'] = len(page['panels']) + 1
+                        page['panels'].append(last_panel)
+            else
+                print(f   ✅ Trang {page_num} {actual} panels)
+    else
+        print(n♻️  Sử dụng kịch bản và layouts từ session trước...)
+    
+    # Lưu script
+    with open(story_script.json, w, encoding=utf-8) as f
+        json.dump(story_script, f, indent=2, ensure_ascii=False)
+    
+    print(fn✅ Kịch bản {story_script['title']})
+    print(f   Phong cách {story_script['art_style']})
+    print(f   Nhân vật {len(story_script['characters'])})
+    
+    # Bước 4 Tạo panel images
+    print(n + =  80)
+    print(🎨 TẠO ẢNH CHO TỪNG PANEL)
+    print(=  80)
+    
+    panel_images = create_panel_images(story_script, selected_layouts)
+    
+    total_panels = sum([len(p) for p in panel_images.values()])
+    print(fn✅ Đã tạo {total_panels} panels!)
+    
+    # Bước 5 Ghép trang
+    print(n📄 Ghép panels thành trang...)
+    os.makedirs(final_comic, exist_ok=True)
+    
+    final_pages = []
+    demo_page_path = None
+    
+    for page_num in sorted(panel_images.keys())
+        panels = panel_images[page_num]
+        print(f   Ghép trang {page_num}...)
+        
+        page_img = compose_page(page_num, panels)
+        
+        if page_num == 0
+            page_path = final_comicpage_00_DEMO_CHARACTER_REFERENCE.png
+            demo_page_path = page_path
+        else
+            page_path = ffinal_comicpage_{page_num02d}.png
+            final_pages.append(page_path)
+        
+        page_img.save(page_path, quality=95)
+        print(f   ✅ Lưu {page_path})
+    
+    # Bước 6 Tạo PDF
+    print(n📄 Tạo PDF...)
+    pdf_file = create_comic_pdf(final_pages)
+    
+    # Bước 7 Tạo README
+    if story_script and final_pages
+        readme_content = f# {story_script['title']}
+
+## Thông tin
+- Chủ đề Kỷ niệm 80 năm Quốc khánh Việt Nam 291945 - 292025
+- Phong cách {story_script['art_style']}
+- Số trang {len(final_pages)} trang
+- Nhân vật {', '.join([c['name'] for c in story_script['characters']])}
+- Tạo lúc {time.strftime(%Y-%m-%d %H%M%S)}
+
+## Nội dung
+Truyện tranh về nhóm học sinh chuẩn bị và tham gia các hoạt động kỷ niệm 80 năm Quốc khánh,
+thể hiện tinh thần yêu nước và tự hào dân tộc của thế hệ trẻ Việt Nam.
+
+## Files
+- `QUOC_KHANH_80_NAM.pdf` - Truyện hoàn chỉnh (PDF)
+- `page_01.png` đến `page_{len(final_pages)02d}.png` - Từng trang
+- `page_00_DEMO_CHARACTER_REFERENCE.png` - Trang giới thiệu nhân vật
+- `story_script.json` - Kịch bản chi tiết
+- `comic_structure.json` - Cấu trúc layouts
+
+---
+Tạo bởi Quốc Khánh Comic Generator
+Chủ đề 80 năm Quốc khánh Việt Nam 🇻🇳
+
+        
+        with open(final_comicREADME.md, w, encoding=utf-8) as f
+            f.write(readme_content)
+    
+    # Kết thúc
+    print(n + =  80)
+    print(🎉 HOÀN THÀNH!)
+    print(=  80)
+    print(fn📚 Truyện {story_script['title']})
+    print(f📁 Folder final_comic)
+    print(f📄 PDF {pdf_file if pdf_file else 'Không tạo được'})
+    print(f🖼️ Trang {len(final_pages)} trang truyện)
+    print(n🇻🇳 Chủ đề Kỷ niệm 80 năm Quốc khánh 291945 - 292025)
+    print(=  80)
+
+
+if __name__ == __main__
+    main()
