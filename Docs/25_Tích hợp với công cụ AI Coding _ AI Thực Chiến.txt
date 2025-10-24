@@ -1,0 +1,24 @@
+=== Tích hợp với công cụ AI Coding | AI Thực Chiến ===
+URL: https://docs.thucchien.ai/docs/using-google-genai/vibe-coding
+Crawled: 2025-10-23 00:20:26
+============================================================
+
+MAIN CONTENT:
+----------------------------------------
+Sử dụng với Google GenAITích hợp với công cụ AI Coding
+Tích hợp với công cụ AI Coding
+Sử dụng GEMINI_API_KEY để tích hợp với Gemini CLI, Github Copilot, Cursor, Cline, KiloCode, Trae, v.v.
+Previous
+Sử dụng với Gemini/Vertex AI
+Next
+Quy định & Hướng dẫn kỹ thuật
+
+FULL CONTENT:
+----------------------------------------
+Sử dụng với Google GenAITích hợp với công cụ AI Coding
+Tích hợp với công cụ AI Coding
+Sử dụng GEMINI_API_KEY để tích hợp với Gemini CLI, Github Copilot, Cursor, Cline, KiloCode, Trae, v.v.
+Previous
+Sử dụng với Gemini/Vertex AI
+Next
+Quy định & Hướng dẫn kỹ thuật

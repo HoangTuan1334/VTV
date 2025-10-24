@@ -1,0 +1,32 @@
+=== Sử dụng với Google GenAI | AI Thực Chiến ===
+URL: https://docs.thucchien.ai/docs/using-google-genai
+Crawled: 2025-10-23 00:21:37
+============================================================
+
+MAIN CONTENT:
+----------------------------------------
+Sử dụng với Google GenAI
+Sử dụng với Google GenAI
+Hướng dẫn sử dụng với Google Gemini/Vertex AI.
+📄️ Sử dụng với Gemini/Vertex AI
+## Xác thực (Authentication)
+📄️ Tích hợp với công cụ AI Coding
+Sử dụng GEMINIAPIKEY để tích hợp với Gemini CLI, Github Copilot, Cursor, Cline, KiloCode, Trae, v.v.
+Previous
+Đồng Nhất Nhân Vật và Bối Cảnh Trong Video AI
+Next
+Sử dụng với Gemini/Vertex AI
+
+FULL CONTENT:
+----------------------------------------
+Sử dụng với Google GenAI
+Sử dụng với Google GenAI
+Hướng dẫn sử dụng với Google Gemini/Vertex AI.
+📄️ Sử dụng với Gemini/Vertex AI
+## Xác thực (Authentication)
+📄️ Tích hợp với công cụ AI Coding
+Sử dụng GEMINIAPIKEY để tích hợp với Gemini CLI, Github Copilot, Cursor, Cline, KiloCode, Trae, v.v.
+Previous
+Đồng Nhất Nhân Vật và Bối Cảnh Trong Video AI
+Next
+Sử dụng với Gemini/Vertex AI

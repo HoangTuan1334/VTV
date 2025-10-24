@@ -1,0 +1,127 @@
+=== Hướng Dẫn Sửa Lỗi Tiếng Việt Của AI Tạo Ảnh | AI Thực Chiến ===
+URL: https://docs.thucchien.ai/docs/tips-and-tricks/handling-gibberish
+Crawled: 2025-10-23 00:17:40
+============================================================
+
+MAIN CONTENT:
+----------------------------------------
+Tips và Tricks Thực ChiếnHướng Dẫn Sửa Lỗi Tiếng Việt Của AI Tạo Ảnh
+Hướng Dẫn Sửa Lỗi Tiếng Việt Của AI Tạo Ảnh
+Hầu hết các Model AI tạo ảnh hiện tại đều chưa "hiểu" được tiếng Việt (cách tạo chữ tiếng Việt đúng chuẩn), do đó thường tạo ra các văn bản bị lỗi font, sai chính tả hoặc vô nghĩa. Điều này khiến ảnh AI chỉ dừng lại ở mức "nguyên liệu" thô. Dưới đây là 2 tips giúp bạn khắc phục vấn đề này:
+1. Tạo ảnh không bị lỗi font với mô hình đa phương thức
+Mục tiêu: Tạo ảnh nền với không gian trống để chèn chữ tiếng Việt sau này.
+Ví dụ ảnh bìa truyện
+Prompt gốc:
+Comic book cover illustration titled "Ký Ức Cuối". A girl stands alone on a rooftop at sunset, wind blowing through her hair, holding an old fading photograph. The city skyline glows under the orange and purple sky. Soft lighting, emotional atmosphere, cinematic composition. Semi-realistic manga style, A4 vertical (3:4 ratio).
+Vấn đề: AI sẽ tạo chữ "Ký Ức Cuối" bị lỗi hoặc không đẹp.
+Giải pháp: Tạo ảnh với Nano-banana
+Bước 1: Tạo ảnh không có chữ
+Chỉ tạo ảnh mà không có chữ, yêu cầu AI tạo ra khung chứa chữ tương ứng.
+Nếu đang trong cùng phiên chat với prompt tạo ảnh trên, bạn chỉ cần thêm:
+Prompt:
+Do not include any text. Leave a clear, empty space or subtle placeholder area at the top center of the cover for the title text.
+Hoặc nếu là phiên chat mới, dùng prompt mô tả ảnh bìa (gốc) và thêm yêu cầu không có text:
+Prompt:
+(Mô tả ảnh bìa y hệt trên). Do not include any text. Leave a clear, empty space or subtle placeholder area at the top center of the cover for the title text.
+Kết quả: Ảnh bìa đẹp, có không gian trống để chèn chữ.
+Bước 2: Tạo ảnh chứa dòng chữ tiếng Việt
+Sử dụng bất kỳ công cụ chỉnh sửa ảnh nào (Canva, Photoshop, Word...) để tạo một file ảnh (PNG/JPG) với nền trắng và dòng chữ "Ký Ức Cuối" với font và màu sắc mong muốn.
+Bước 3: Chèn chữ vào ảnh bìa bằng AI
+Đính kèm ảnh bìa không chữ và ảnh chữ, sau đó, nhập prompt sau:
+Prompt:
+Add the text from this image onto the cover image, keeping its original font, and style, just change color to yellow light. Place it in a visually fitting position.
+LƯU Ý
+Prompt này muốn giữ lại font... của chữ. Bạn có thể thay đổi yêu cầu để AI tạo style chữ khác nếu muốn, miễn là không bị lỗi font tiếng Việt.
+Kết quả: Ảnh bìa hoàn chỉnh với chữ "Ký Ức Cuối" không lỗi font, được chèn đẹp mắt.
+2. Sửa ảnh bằng các công cụ chỉnh sửa ảnh
+Mục tiêu: Sử dụng công cụ bên ngoài để thay thế hoặc chèn chữ tiếng Việt vào ảnh AI đã có.
+Previous
+Tips và Tricks Thực Chiến
+Next
+Đồng nhất nhân vật khi Generate nhiều ảnh
+1. Tạo ảnh không bị lỗi font với mô hình đa phương thức
+Ví dụ ảnh bìa truyện
+Giải pháp: Tạo ảnh với Nano-banana
+2. Sửa ảnh bằng các công cụ chỉnh sửa ảnh
+
+CODE BLOCKS:
+----------------------------------------
+
+[CODE: unknown_code_1]
+```
+Comic book cover illustration titled "Ký Ức Cuối". A girl stands alone on a rooftop at sunset, wind blowing through her hair, holding an old fading photograph. The city skyline glows under the orange and purple sky. Soft lighting, emotional atmosphere, cinematic composition. Semi-realistic manga style, A4 vertical (3:4 ratio).
+```
+..............................
+
+[CODE: unknown_code_2]
+```
+Do not include any text. Leave a clear, empty space or subtle placeholder area at the top center of the cover for the title text.
+```
+..............................
+
+[CODE: unknown_code_3]
+```
+(Mô tả ảnh bìa y hệt trên). Do not include any text. Leave a clear, empty space or subtle placeholder area at the top center of the cover for the title text.
+```
+..............................
+
+[CODE: unknown_code_4]
+```
+Add the text from this image onto the cover image, keeping its original font, and style, just change color to yellow light. Place it in a visually fitting position.
+```
+..............................
+
+FULL CONTENT:
+----------------------------------------
+Tips và Tricks Thực ChiếnHướng Dẫn Sửa Lỗi Tiếng Việt Của AI Tạo Ảnh
+Hướng Dẫn Sửa Lỗi Tiếng Việt Của AI Tạo Ảnh
+Hầu hết các Model AI tạo ảnh hiện tại đều chưa "hiểu" được tiếng Việt (cách tạo chữ tiếng Việt đúng chuẩn), do đó thường tạo ra các văn bản bị lỗi font, sai chính tả hoặc vô nghĩa. Điều này khiến ảnh AI chỉ dừng lại ở mức "nguyên liệu" thô. Dưới đây là 2 tips giúp bạn khắc phục vấn đề này:
+1. Tạo ảnh không bị lỗi font với mô hình đa phương thức
+Mục tiêu: Tạo ảnh nền với không gian trống để chèn chữ tiếng Việt sau này.
+Ví dụ ảnh bìa truyện
+Prompt gốc:
+Comic book cover illustration titled "Ký Ức Cuối". A girl stands alone on a rooftop at sunset, wind blowing through her hair, holding an old fading photograph. The city skyline glows under the orange and purple sky. Soft lighting, emotional atmosphere, cinematic composition. Semi-realistic manga style, A4 vertical (3:4 ratio).
+Vấn đề: AI sẽ tạo chữ "Ký Ức Cuối" bị lỗi hoặc không đẹp.
+Giải pháp: Tạo ảnh với Nano-banana
+Bước 1: Tạo ảnh không có chữ
+Chỉ tạo ảnh mà không có chữ, yêu cầu AI tạo ra khung chứa chữ tương ứng.
+Nếu đang trong cùng phiên chat với prompt tạo ảnh trên, bạn chỉ cần thêm:
+Prompt:
+Do not include any text. Leave a clear, empty space or subtle placeholder area at the top center of the cover for the title text.
+Hoặc nếu là phiên chat mới, dùng prompt mô tả ảnh bìa (gốc) và thêm yêu cầu không có text:
+Prompt:
+(Mô tả ảnh bìa y hệt trên). Do not include any text. Leave a clear, empty space or subtle placeholder area at the top center of the cover for the title text.
+Kết quả: Ảnh bìa đẹp, có không gian trống để chèn chữ.
+Bước 2: Tạo ảnh chứa dòng chữ tiếng Việt
+Sử dụng bất kỳ công cụ chỉnh sửa ảnh nào (Canva, Photoshop, Word...) để tạo một file ảnh (PNG/JPG) với nền trắng và dòng chữ "Ký Ức Cuối" với font và màu sắc mong muốn.
+Bước 3: Chèn chữ vào ảnh bìa bằng AI
+Đính kèm ảnh bìa không chữ và ảnh chữ, sau đó, nhập prompt sau:
+Prompt:
+Add the text from this image onto the cover image, keeping its original font, and style, just change color to yellow light. Place it in a visually fitting position.
+LƯU Ý
+Prompt này muốn giữ lại font... của chữ. Bạn có thể thay đổi yêu cầu để AI tạo style chữ khác nếu muốn, miễn là không bị lỗi font tiếng Việt.
+Kết quả: Ảnh bìa hoàn chỉnh với chữ "Ký Ức Cuối" không lỗi font, được chèn đẹp mắt.
+2. Sửa ảnh bằng các công cụ chỉnh sửa ảnh
+Mục tiêu: Sử dụng công cụ bên ngoài để thay thế hoặc chèn chữ tiếng Việt vào ảnh AI đã có.
+Previous
+Tips và Tricks Thực Chiến
+Next
+Đồng nhất nhân vật khi Generate nhiều ảnh
+1. Tạo ảnh không bị lỗi font với mô hình đa phương thức
+Ví dụ ảnh bìa truyện
+Giải pháp: Tạo ảnh với Nano-banana
+2. Sửa ảnh bằng các công cụ chỉnh sửa ảnh
+
+=== CODE BLOCKS ===
+
+--- unknown_code_1 ---
+Comic book cover illustration titled "Ký Ức Cuối". A girl stands alone on a rooftop at sunset, wind blowing through her hair, holding an old fading photograph. The city skyline glows under the orange and purple sky. Soft lighting, emotional atmosphere, cinematic composition. Semi-realistic manga style, A4 vertical (3:4 ratio).
+
+--- unknown_code_2 ---
+Do not include any text. Leave a clear, empty space or subtle placeholder area at the top center of the cover for the title text.
+
+--- unknown_code_3 ---
+(Mô tả ảnh bìa y hệt trên). Do not include any text. Leave a clear, empty space or subtle placeholder area at the top center of the cover for the title text.
+
+--- unknown_code_4 ---
+Add the text from this image onto the cover image, keeping its original font, and style, just change color to yellow light. Place it in a visually fitting position.

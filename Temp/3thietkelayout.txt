@@ -1,0 +1,126 @@
+# 🎨 Cấu hình trang và layouts - SỬ DỤNG KÍCH THƯỚC CHUẨN GEMINI
+PAGE_W, PAGE_H = 2100, 2970  # A4 portrait (300 DPI)
+MARGIN = 50
+GAP = 20
+
+# ⭐ KÍCH THƯỚC CHUẨN GEMINI (không cần resize)
+GEMINI_SIZES = {
+    "1:1": (1024, 1024),
+    "2:3": (832, 1248),
+    "3:2": (1248, 832),
+    "3:4": (864, 1152),
+    "4:3": (1152, 864),
+    "4:5": (896, 1152),
+    "5:4": (1152, 896),
+    "9:16": (768, 1344),
+    "16:9": (1344, 768),
+    "21:9": (1536, 672),
+}
+
+# ⭐ LAYOUTS MỚI: CHỈ DÙNG KÍCH THƯỚC CHUẨN GEMINI - CÂN ĐỐI & HÀI HÒA
+# Mỗi layout: 4-6 panels, kích thước chính xác từ GEMINI_SIZES
+# Các panel được bố trí cân đối, dễ nhìn, vừa khít trong trang A4 (2100×2970)
+layouts = {
+    # "layout_1": [  # 4 panels - 2x2 grid vuông đều (1:1)
+    #     (MARGIN, MARGIN, 1024, 1024),
+    #     (MARGIN + 1024 + GAP, MARGIN, 1024, 1024),
+    #     (MARGIN, MARGIN + 1024 + GAP, 1024, 1024),
+    #     (MARGIN + 1024 + GAP, MARGIN + 1024 + GAP, 1024, 1024),
+    # ],
+    
+    "layout_2": [  # 5 panels - 1 wide + 2 middle + 2 bottom
+        (MARGIN, MARGIN, 2000, 880),                    # Panel 1: wide cinematic (16:9)
+        (MARGIN, MARGIN + 870 + GAP, 1000, 1000),       # Panel 2: left middle (1:1)
+        (MARGIN + 1000 + GAP, MARGIN + 870 + GAP, 1000, 1000),  # Panel 3: right middle (1:1)
+        (MARGIN, MARGIN + 870 + 1000 + 2*GAP, 1000, 1000),      # Panel 4: bottom left (1:1)
+        (MARGIN + 1000 + GAP, MARGIN + 870 + 1000 + 2*GAP, 1000, 1000),  # Panel 5: bottom right (1:1)
+    ],
+    
+    "layout_5": [  # 6 panels - 1 wide + 2 big + 3 bottom taller
+        (MARGIN, MARGIN, 2000, 850),  # 1️⃣ top wide (16:9)
+
+        # Hàng giữa: 2 khung lớn
+        (MARGIN, MARGIN + 850 + GAP, 980, 1050),  # 2️⃣ large left (1:1)
+        (MARGIN + 980 + GAP, MARGIN + 850 + GAP, 980, 1050),  # 3️⃣ large right (1:1)
+
+        # Hàng cuối: 3 khung dài hơn để cân A4
+        (MARGIN, MARGIN + 850 + 1050 + 2*GAP, 640, 900),  # 4️⃣ bottom-left (1:1.4)
+        (MARGIN + 640 + GAP, MARGIN + 850 + 1050 + 2*GAP, 640, 900),  # 5️⃣ bottom-mid
+        (MARGIN + 2*(640 + GAP), MARGIN + 850 + 1050 + 2*GAP, 640, 900),  # 6️⃣ bottom-right
+    ],
+
+
+
+
+        
+    "layout_4": [  # 6 panels - 1 wide + 3 mid + 2 bottom
+        (MARGIN, MARGIN, 2000, 850),  # 1️⃣ wide cinematic
+        (MARGIN, MARGIN + 850 + GAP, 640, 980),  # 2️⃣ mid-left
+        (MARGIN + 640 + GAP, MARGIN + 850 + GAP, 640, 980),  # 3️⃣ mid-center
+        (MARGIN + 2*(640 + GAP), MARGIN + 850 + GAP, 640, 980),  # 4️⃣ mid-right
+        (MARGIN, MARGIN + 850 + 980 + 2*GAP, 980, 980),  # 5️⃣ bottom-left
+        (MARGIN + 980 + GAP, MARGIN + 850 + 980 + 2*GAP, 980, 980),  # 6️⃣ bottom-right
+    ],
+        
+    "layout_6": [  # 3 panels - ultra cinematic top + 2 bottom deep
+        (MARGIN, MARGIN, 2000, 1200),  # 1️⃣ top cinematic (3:2 - chiếm ~40%)
+        (MARGIN, MARGIN + 1200 + GAP, 990, 1650),  # 2️⃣ bottom-left (rất dài)
+        (MARGIN + 980 + GAP, MARGIN + 1200 + GAP, 990, 1650),  # 3️⃣ bottom-right (rất dài)
+    ],
+
+
+    "layout_7": [  # 4 panels - artistic overlap & dynamic layout
+        (MARGIN, MARGIN, 2000, 900),  # 1️⃣ top cinematic (16:9)
+        (MARGIN, MARGIN + 920 + GAP, 980, 1020),  # 2️⃣ middle-left (vuông)
+        (MARGIN + 970 + GAP, MARGIN + 940, 1020, 1020),  # 3️⃣ middle-right (trồi lên, đè nhẹ khung 1)
+        (MARGIN, MARGIN + 900 + 1090 + 2*GAP, 2000, 850),  # 4️⃣ bottom-wide (21:9, phủ toàn trang)
+    ],
+
+
+}
+
+print("=" * 70)
+print("✅ LAYOUTS MỚI - DÙNG KÍCH THƯỚC CHUẨN GEMINI")
+print("=" * 70)
+print(f"📌 Tất cả {len(layouts)} layouts đều dùng kích thước chuẩn")
+print(f"📌 KHÔNG CẦN RESIZE - Gemini sinh đúng kích thước ngay từ đầu")
+print("=" * 70)
+for name, panels in layouts.items():
+    print(f"   {name}: {len(panels)} panels")
+    for i, (x, y, w, h) in enumerate(panels):
+        ratio = f"{w}×{h}"
+        print(f"      Panel {i+1}: {ratio}px")
+print("=" * 70)
+
+
+
+
+
+# 🖼️ Tạo preview layouts
+def create_layout_preview(layout_name, panels, save_dir="layout_previews"):
+    """Tạo ảnh preview cho layout"""
+    os.makedirs(save_dir, exist_ok=True)
+    
+    img = Image.new("RGB", (PAGE_W, PAGE_H), "white")
+    draw = ImageDraw.Draw(img)
+    
+    # Vẽ các khung
+    for i, (x, y, w, h) in enumerate(panels):
+        # Vẽ viền khung
+        draw.rectangle([x, y, x+w, y+h], outline="black", width=8)
+        
+        # Vẽ số thứ tự
+        center_x = x + w // 2
+        center_y = y + h // 2
+        draw.text((center_x, center_y), str(i+1), fill="red", anchor="mm", font_size=100)
+    
+    # Lưu ảnh
+    img_path = os.path.join(save_dir, f"{layout_name}.png")
+    img.save(img_path)
+    return img_path
+
+# Tạo preview cho tất cả layouts
+for name, panels in layouts.items():
+    create_layout_preview(name, panels)
+
+print("✅ Đã tạo preview cho tất cả layouts trong folder 'layout_previews'")

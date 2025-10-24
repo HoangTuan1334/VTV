@@ -1,0 +1,1506 @@
+import google.generativeai as genai
+import requests
+from PIL import Image
+import io
+import base64
+
+# Cấu hình API Key
+GEMINI_API_KEY = "AIzaSyDi-soBuW5bmVCncY2ImjtmSONR2AukSng"
+genai.configure(api_key=GEMINI_API_KEY)
+
+# Test text generation
+print("🧪 TEST 1: Kiểm tra Text Generation...")
+try:
+    text_model = genai.GenerativeModel('gemini-2.0-flash-exp')
+    response = text_model.generate_content("Say hello in 3 words")
+    print(f"✅ Text Generation: OK")
+    print(f"   Response: {response.text}")
+except Exception as e:
+    print(f"❌ Text Generation lỗi: {e}")
+    raise
+
+# Test image generation model
+print("\n🧪 TEST 2: Kiểm tra Image Model...")
+try:
+    image_model = genai.GenerativeModel('gemini-2.5-flash-image')
+    print(f"✅ Image Model: gemini-2.5-flash-image được khởi tạo")
+    print(f"   Sẽ thử tạo ảnh khi chạy workflow")
+except Exception as e:
+    print(f"⚠️ Image Model lỗi: {e}")
+    print(f"   Có thể model này chưa khả dụng")
+
+print("\n✅ API Key hoạt động tốt!")
+print("📌 Text generation sẵn sàng")
+print("📌 Image model: gemini-2.5-flash-image")
+
+
+
+# 📚 Import thư viện
+import json
+import os
+import random
+import base64
+import time
+from PIL import Image, ImageDraw, ImageFont
+from pathlib import Path
+import google.generativeai as genai
+import requests
+from io import BytesIO
+
+
+
+
+# ⚙️ Cấu hình API Keys
+GEMINI_API_KEY = "AIzaSyCwhqIs7GrVi1G6wgtejD_w_niFFQws6mo"
+
+# Khởi tạo Gemini
+genai.configure(api_key=GEMINI_API_KEY)
+
+# Model cho sinh kịch bản (text)
+text_model = genai.GenerativeModel('gemini-2.0-flash-exp')
+
+# Model cho sinh ảnh
+try:
+    image_model = genai.GenerativeModel('gemini-2.5-flash-image')
+    print("✅ Đã cấu hình Gemini API")
+    print(f"   - API Key: {'✓' if GEMINI_API_KEY else '✗'}")
+    print(f"   - Text Model: gemini-2.0-flash-exp ✓")
+    print(f"   - Image Model: gemini-2.5-flash-image ✓")
+except Exception as e:
+    print(f"⚠️ Lỗi khởi tạo image model: {e}")
+    print("   Sẽ thử gọi API trực tiếp khi tạo ảnh")
+    image_model = None
+
+
+
+# 🎨 Cấu hình trang và layouts - SỬ DỤNG KÍCH THƯỚC CHUẨN GEMINI
+PAGE_W, PAGE_H = 2100, 2970  # A4 portrait (300 DPI)
+MARGIN = 50
+GAP = 20
+
+# ⭐ KÍCH THƯỚC CHUẨN GEMINI (không cần resize)
+GEMINI_SIZES = {
+    "1:1": (1024, 1024),
+    "2:3": (832, 1248),
+    "3:2": (1248, 832),
+    "3:4": (864, 1152),
+    "4:3": (1152, 864),
+    "4:5": (896, 1152),
+    "5:4": (1152, 896),
+    "9:16": (768, 1344),
+    "16:9": (1344, 768),
+    "21:9": (1536, 672),
+}
+
+# ⭐ LAYOUTS MỚI: CHỈ DÙNG KÍCH THƯỚC CHUẨN GEMINI - CÂN ĐỐI & HÀI HÒA
+# Mỗi layout: 4-6 panels, kích thước chính xác từ GEMINI_SIZES
+# Các panel được bố trí cân đối, dễ nhìn, vừa khít trong trang A4 (2100×2970)
+layouts = {
+    # "layout_1": [  # 4 panels - 2x2 grid vuông đều (1:1)
+    #     (MARGIN, MARGIN, 1024, 1024),
+    #     (MARGIN + 1024 + GAP, MARGIN, 1024, 1024),
+    #     (MARGIN, MARGIN + 1024 + GAP, 1024, 1024),
+    #     (MARGIN + 1024 + GAP, MARGIN + 1024 + GAP, 1024, 1024),
+    # ],
+    
+    "layout_2": [  # 5 panels - 1 wide + 2 middle + 2 bottom
+        (MARGIN, MARGIN, 2000, 880),                    # Panel 1: wide cinematic (16:9)
+        (MARGIN, MARGIN + 870 + GAP, 1000, 1000),       # Panel 2: left middle (1:1)
+        (MARGIN + 1000 + GAP, MARGIN + 870 + GAP, 1000, 1000),  # Panel 3: right middle (1:1)
+        (MARGIN, MARGIN + 870 + 1000 + 2*GAP, 1000, 1000),      # Panel 4: bottom left (1:1)
+        (MARGIN + 1000 + GAP, MARGIN + 870 + 1000 + 2*GAP, 1000, 1000),  # Panel 5: bottom right (1:1)
+    ],
+    
+    "layout_5": [  # 6 panels - 1 wide + 2 big + 3 bottom taller
+        (MARGIN, MARGIN, 2000, 850),  # 1️⃣ top wide (16:9)
+
+        # Hàng giữa: 2 khung lớn
+        (MARGIN, MARGIN + 850 + GAP, 980, 1050),  # 2️⃣ large left (1:1)
+        (MARGIN + 980 + GAP, MARGIN + 850 + GAP, 980, 1050),  # 3️⃣ large right (1:1)
+
+        # Hàng cuối: 3 khung dài hơn để cân A4
+        (MARGIN, MARGIN + 850 + 1050 + 2*GAP, 640, 900),  # 4️⃣ bottom-left (1:1.4)
+        (MARGIN + 640 + GAP, MARGIN + 850 + 1050 + 2*GAP, 640, 900),  # 5️⃣ bottom-mid
+        (MARGIN + 2*(640 + GAP), MARGIN + 850 + 1050 + 2*GAP, 640, 900),  # 6️⃣ bottom-right
+    ],
+
+
+
+
+        
+    "layout_4": [  # 6 panels - 1 wide + 3 mid + 2 bottom
+        (MARGIN, MARGIN, 2000, 850),  # 1️⃣ wide cinematic
+        (MARGIN, MARGIN + 850 + GAP, 640, 980),  # 2️⃣ mid-left
+        (MARGIN + 640 + GAP, MARGIN + 850 + GAP, 640, 980),  # 3️⃣ mid-center
+        (MARGIN + 2*(640 + GAP), MARGIN + 850 + GAP, 640, 980),  # 4️⃣ mid-right
+        (MARGIN, MARGIN + 850 + 980 + 2*GAP, 980, 980),  # 5️⃣ bottom-left
+        (MARGIN + 980 + GAP, MARGIN + 850 + 980 + 2*GAP, 980, 980),  # 6️⃣ bottom-right
+    ],
+        
+    "layout_6": [  # 3 panels - ultra cinematic top + 2 bottom deep
+        (MARGIN, MARGIN, 2000, 1200),  # 1️⃣ top cinematic (3:2 - chiếm ~40%)
+        (MARGIN, MARGIN + 1200 + GAP, 990, 1650),  # 2️⃣ bottom-left (rất dài)
+        (MARGIN + 980 + GAP, MARGIN + 1200 + GAP, 990, 1650),  # 3️⃣ bottom-right (rất dài)
+    ],
+
+
+    "layout_7": [  # 4 panels - artistic overlap & dynamic layout
+        (MARGIN, MARGIN, 2000, 900),  # 1️⃣ top cinematic (16:9)
+        (MARGIN, MARGIN + 920 + GAP, 980, 1020),  # 2️⃣ middle-left (vuông)
+        (MARGIN + 970 + GAP, MARGIN + 940, 1020, 1020),  # 3️⃣ middle-right (trồi lên, đè nhẹ khung 1)
+        (MARGIN, MARGIN + 900 + 1090 + 2*GAP, 2000, 850),  # 4️⃣ bottom-wide (21:9, phủ toàn trang)
+    ],
+
+
+}
+
+print("=" * 70)
+print("✅ LAYOUTS MỚI - DÙNG KÍCH THƯỚC CHUẨN GEMINI")
+print("=" * 70)
+print(f"📌 Tất cả {len(layouts)} layouts đều dùng kích thước chuẩn")
+print(f"📌 KHÔNG CẦN RESIZE - Gemini sinh đúng kích thước ngay từ đầu")
+print("=" * 70)
+for name, panels in layouts.items():
+    print(f"   {name}: {len(panels)} panels")
+    for i, (x, y, w, h) in enumerate(panels):
+        ratio = f"{w}×{h}"
+        print(f"      Panel {i+1}: {ratio}px")
+print("=" * 70)
+
+
+# 🖼️ Tạo preview layouts
+def create_layout_preview(layout_name, panels, save_dir="layout_previews"):
+    """Tạo ảnh preview cho layout"""
+    os.makedirs(save_dir, exist_ok=True)
+    
+    img = Image.new("RGB", (PAGE_W, PAGE_H), "white")
+    draw = ImageDraw.Draw(img)
+    
+    # Vẽ các khung
+    for i, (x, y, w, h) in enumerate(panels):
+        # Vẽ viền khung
+        draw.rectangle([x, y, x+w, y+h], outline="black", width=8)
+        
+        # Vẽ số thứ tự
+        center_x = x + w // 2
+        center_y = y + h // 2
+        draw.text((center_x, center_y), str(i+1), fill="red", anchor="mm", font_size=100)
+    
+    # Lưu ảnh
+    img_path = os.path.join(save_dir, f"{layout_name}.png")
+    img.save(img_path)
+    return img_path
+
+# Tạo preview cho tất cả layouts
+for name, panels in layouts.items():
+    create_layout_preview(name, panels)
+
+print("✅ Đã tạo preview cho tất cả layouts trong folder 'layout_previews'")
+
+
+
+# 🎲 Nhập số trang và random layouts
+num_pages = int(input("📖 Nhập số trang truyện muốn tạo: "))
+
+# Random layouts cho tất cả các trang
+layout_names = list(layouts.keys())
+selected_layouts = []
+
+# Tạo tất cả các trang truyện
+for i in range(num_pages):
+    layout_name = random.choice(layout_names)
+    selected_layouts.append({
+        "page_num": i + 1,  # Trang 1, 2, 3...
+        "layout_name": layout_name,
+        "panels": layouts[layout_name]
+    })
+
+print(f"\n✅ Đã chọn {len(selected_layouts)} trang truyện:")
+for page in selected_layouts:
+    print(f"   Trang {page['page_num']}: {page['layout_name']} ({len(page['panels'])} khung)")
+
+# Lưu cấu trúc layouts
+with open("comic_structure.json", "w", encoding="utf-8") as f:
+    json.dump(selected_layouts, f, indent=2, ensure_ascii=False)
+
+
+
+# 📝 Nhập yêu cầu truyện
+story_requirement = input("nhập")
+
+print(f"\n✅ Đã nhận yêu cầu: {story_requirement}")
+
+
+# 🤖 Sinh kịch bản với Gemini
+def generate_story_script(requirement, pages_info):
+    """Sinh kịch bản chi tiết cho từng trang, từng khung - KHÔNG CÓ DEMO PAGE"""
+    
+    prompt = f"""
+You are a professional comic book scriptwriter who has worked for companies like Shonen Jump, Webtoon, and Marvel. You have the ability to build engaging stories, vivid characters, natural dialogue, clear conflicts, and logical climaxes. Create a detailed and cinematic comic script with a natural style, emotional depth, and suitable for the genre requested by the user.
+
+====================
+🔒 CONSISTENT CONTEXT AND COHESION GUIDELINES (Based on Best Practices for Building Compelling, Inspirational, Coherent, and Cohesive Stories):
+- Always maintain the main context of the story based on {requirement} (e.g., if it's about war, all pages must take place in war-related environments like battlefields, ruined villages, or refugee camps – no jumping to modern or unrelated fictional settings without seamless integration).
+- Ensure every element reinforces this context through setting descriptions, mood, and actions to create unity and avoid deviations in genre or theme.
+- Build a cohesive narrative arc: Use a 3-act structure (Act 1: Setup with initial conflict and emotional stakes; Act 2: Confrontation with rising obstacles for character growth; Act 3: Resolution with inspirational transformation and message). Characters develop from introduction (establish initial emotional conflict and stakes), development (build tension and emotional growth via obstacles), climax (peak emotional moment with inspiration or transformation), to resolution (end with a profound message, leaving lasting emotional resonance).
+- Draw from storytelling best practices: 
+  - Cohesion: Every part (characters, plot, setting) serves a purpose in a unified whole; simplify elements to reduce complexity while maintaining emotional depth.
+  - Structure: Start with a one-sentence storyline, expand to 3-act structure (setup, confrontation, resolution) for coherence; include specific, vivid events with emotional ups and downs.
+  - Character Development: Make characters vivid, relatable with personal struggles, authentic motivations, backstories, and growth arcs that inspire empathy; include relations between characters for deeper links.
+  - Plot: Use clear structure, consistent pacing, and tone for smooth transitions; foreshadow any shifts (e.g., flashbacks or visions) with subtle hints to avoid mismatches; add obstacles that build inspiration through empathy and positive change.
+  - Inspiration: Cultivate empathy, show positive transformation amid challenges, and convey authentic, relatable messages; use wordless or reflective moments to engage readers profoundly.
+  - Overall Coherence: Organize ideas logically, ensure vivid visuals and emotional hooks to absorb readers; if including non-core elements like visions, integrate them as part of character arcs (e.g., a war soldier's hallucination tied to motivation).
+
+====================
+🎯 STORY REQUIREMENT:
+{requirement}
+
+====================
+📘 STORY STRUCTURE:
+Total {len(pages_info)} pages
+
+{chr(10).join([f'- Page {p["page_num"]}: {len(p["panels"])} panels' for p in pages_info])}
+
+====================
+🎨 OUTPUT REQUIREMENTS (JSON FORMAT):
+{{
+  "title": "Story title (short, impactful, evocative)",
+  "genre": "Genre (e.g.: action, fantasy, sci-fi, slice of life, adventure, drama, historical, romance, psychological, horror, comedy...)", 
+  "tone": "Main emotional tone (e.g.: inspiring, dark, melancholic, humorous...)",
+  "theme": "Philosophical theme or main message of the story (must be profound, tightly linked to the context and character arcs, e.g.: loss in war leading to hope and rebirth through ancestral inspiration)",
+  "art_style": "Art style (e.g.: manga noir, modern webtoon, semi-realistic watercolor...)",
+  "story_outline": "High-level 3-act summary (Act 1: Setup; Act 2: Confrontation with obstacles; Act 3: Resolution with transformation; keep concise but ensure coherence and inspiration)",
+
+  "characters": [
+    {{
+      "name": "Character name",
+      "role": "main / supporting / antagonist / mentor",
+      "appearance": {{
+        "age": "Age (e.g.: teen, young adult, middle-aged...)",
+        "gender": "male/female/other",
+        "height": "Height (e.g.: tall, average, short)",
+        "build": "Build (e.g.: athletic, slim, muscular, petite...)",
+        "hair": "Hair color and style in detail (e.g.: long silver hair in ponytail, spiky red hair...)",
+        "eyes": "Eye color and features (e.g.: bright blue eyes, sharp golden eyes...)",
+        "skin": "Skin tone (e.g.: pale, tan, dark...)",
+        "clothing": "Clothing in detail (e.g.: black leather jacket with red scarf, school uniform...)",
+        "distinctive_features": "Distinctive features (e.g.: scar on left cheek, always wears glasses, mechanical arm...)"
+      }},
+      "personality": "Personality (e.g.: brave but reckless, quiet and observant...; make it vivid and tied to their arc for emotional depth)",
+      "backstory": "Brief backstory (e.g.: grew up in a war-torn village, lost family to conflict; link to context for cohesion)",
+      "relations": "Relations to other characters (e.g.: brother to Main Character, rival to Antagonist; build emotional links)",
+      "motivation": "Deep motivation or pain driving their actions (must link to the context, create emotional depth, e.g.: losing family in war fuels revenge or redemption; ensure it evolves for inspiration)"
+    }}
+  ],
+
+  "pages": [
+    {{
+      "page_num": 1,
+      "scene_description": "Opening scene - establish setting, tone, and first emotional hook (introduce main context, initial conflict, and foreshadow key elements for cohesion)",
+      "mood": "Mood/atmosphere of the page (e.g.: tense, peaceful, action-packed...; must be consistent with overall context)",
+      "panels": [
+        {{
+          "panel_num": 1,
+          "dialogue": "Dialogue in Vietnamese (short, natural, evocative of emotions, reflecting inner thoughts)",
+          "action": "Action taking place (tightly linked to context, character arc, and obstacles)",
+          "shot_type": "Shot type (wide/establishing, medium, close-up, extreme close-up...)",
+          "characters_in_panel": ["Character name 1", "Character name 2"],
+          "basic_visual": "Short visual description (to be expanded later; include context details for cohesion and foreshadowing)"
+        }}
+      ]
+    }},
+    {{
+      "page_num": 2,
+      "scene_description": "Conflict rising - introduce dilemma or surprise element (build emotional tension and obstacles within the main context; foreshadow resolutions)",
+      "mood": "...",
+      "panels": [...]
+    }}
+  ]
+}}
+
+====================
+⚙️ GENRE-SPECIFIC GUIDELINES:
+
+Customize plot progression, emotions, and action scenes based on the genre, but always maintain context consistency and build deeper emotions through character arcs, inspirational moments (e.g., reflection, sacrifice, realization), cohesive elements, and 3-act integration:
+
+- **Action:** Include fight scenes, strong movements, violent sounds, close-ups of fists, weapons, speed, sweat, wounds, flashes, and determination.  
+  → Create “moment of impact” in some panels (e.g.: punch breaking through frame, exploding dust). Add emotion: Characters fight with inner pain, overcoming obstacles for inspirational growth.
+
+- **Romance:** Slower pace, heavy internal emotions, authentic dialogue, eye contact, hand touches, or kisses – tears, soft smiles, or separations.  
+  → Panels show “tension” between characters, soft lighting, close angles, open emotions. Add depth: Romantic conflicts tied to context (e.g.: love in wartime), with obstacles leading to transformation.
+
+- **Drama / Slice of Life:** Focus on daily life, relationships, memories, growth journeys, quiet or poignant moments.  
+  → Panels with intimate layouts, natural lighting, environmental details. Add emotion: Reflective moments, inner changes via obstacles for inspiration.
+
+- **Fantasy / Adventure:** Vast worlds, magic, mythical creatures, special weapons, fantastical battles, vibrant settings.  
+  → Add wide panels (establishing shots) to show world scale. Maintain consistency: Fantasy context doesn't mix with reality; foreshadow any shifts.
+
+- **Horror / Psychological:** Gloomy atmosphere, tension, contrasting lights, distorted faces, bizarre behaviors, cold laughs.  
+  → Use light descriptions, sounds, and close angles for pressure. Add emotion: Inner fears linked to context, resolved through inspirational realization.
+
+- **Comedy:** Fast pace, exaggerated expressions, humorous reactions, ironic situations.  
+  → Panels with sudden transitions, funny sounds (“BOING!”, “!?!”). Add depth: Humor masking true emotions, with obstacles for growth.
+
+- **Sci-Fi:** Focus on technology, future, AI, space, or robots.  
+  → Visuals with neon lights, machinery, holograms, futuristic cities. Maintain consistency: Future context doesn't mix with present; build inspiration through tech-driven transformations.
+
+====================
+⚠️ STRICT RULES:
+
+1. **PANEL COUNTS**
+{chr(10).join([f'   - PAGE {p["page_num"]}: EXACTLY {len(p["panels"])} panels' for p in pages_info])}
+
+2. **CHARACTERS - EXTREMELY DETAILED DESCRIPTIONS**
+   - Each character needs extremely specific appearance descriptions.
+   - Include: age, gender, height, build, hair (color + style), eyes (color), skin, clothing, distinctive_features.
+   - Detailed enough for AI to draw the character accurately.
+   - Consistent throughout (same character = same description) and linked to context (e.g.: clothing suitable for war); tie to backstory and relations.
+
+3. **PLOT**
+   - Logical rhythm (introduction → development → climax → resolution) following 3-act structure.
+   - Each page has unique mood and atmosphere but consistent with overall context.
+   - Dialogue natural, short, and deeply emotional; foreshadow key elements.
+
+4. **PANELS**
+   - Each panel has: dialogue, action, shot_type, characters_in_panel, basic_visual.
+   - Diverse shot types (wide, medium, close-up...).
+   - Basic visual short but reinforces context, foreshadowing, and emotional arcs.
+
+5. **OUTPUT**
+   - Return only valid JSON.
+   - NO explanations or other text.
+   - NO markdown code blocks.
+
+6. **LANGUAGE**
+    - All dialogue must be in Vietnamese.
+"""
+
+
+
+    
+    response = text_model.generate_content(prompt)
+    
+    # Parse JSON từ response
+    try:
+        # Loại bỏ markdown code block nếu có
+        text = response.text.strip()
+        if text.startswith("```json"):
+            text = text[7:]
+        if text.startswith("```"):
+            text = text[3:]
+        if text.endswith("```"):
+            text = text[:-3]
+        
+        script = json.loads(text.strip())
+        return script
+    except json.JSONDecodeError as e:
+        print(f"❌ Lỗi parse JSON: {e}")
+        print(f"Response: {response.text}")
+        return None
+
+print("🤖 Đang sinh kịch bản với Gemini AI...")
+story_script = generate_story_script(story_requirement, selected_layouts)
+
+if story_script:
+    # ✅ VALIDATION: Kiểm tra và sửa số lượng panels
+    print("\n🔍 Kiểm tra số lượng panels...")
+    for i, page in enumerate(story_script['pages']):
+        expected_panels = len(selected_layouts[i]['panels'])
+        actual_panels = len(page['panels'])
+        
+        if actual_panels != expected_panels:
+            print(f"   ⚠️ Trang {page['page_num']}: Có {actual_panels} panels, cần {expected_panels}")
+            
+            if actual_panels > expected_panels:
+                # Cắt bớt panels thừa
+                page['panels'] = page['panels'][:expected_panels]
+                print(f"      → Đã cắt bớt xuống {expected_panels} panels")
+            else:
+                # Thêm panels thiếu (duplicate panel cuối)
+                while len(page['panels']) < expected_panels:
+                    last_panel = page['panels'][-1].copy()
+                    last_panel['panel_num'] = len(page['panels']) + 1
+                    page['panels'].append(last_panel)
+                print(f"      → Đã thêm panels lên {expected_panels}")
+        else:
+            print(f"   ✅ Trang {page['page_num']}: {actual_panels} panels - Đúng!")
+    
+    # Lưu kịch bản đã sửa
+    with open("story_script.json", "w", encoding="utf-8") as f:
+        json.dump(story_script, f, indent=2, ensure_ascii=False)
+    
+    print(f"\n✅ Đã sinh kịch bản truyện: {story_script['title']}")
+    print(f"   Phong cách: {story_script['art_style']}")
+    print(f"   Số nhân vật: {len(story_script['characters'])}")
+    print(f"   Số trang: {len(story_script['pages'])}")
+else:
+    print("❌ Không thể sinh kịch bản. Vui lòng thử lại.")
+
+
+
+
+# 🎨 Hàm sinh prompt CHI TIẾT cho từng panel
+def generate_detailed_prompts(story_script):
+    """
+    Gọi Gemini để sinh prompt CỰC KỲ CHI TIẾT cho từng panel
+    
+    - Mô tả nhân vật CHÍNH XÁC theo appearance đã định
+    - Background và setting cụ thể
+    - Lighting, mood, camera angle
+    - Đảm bảo consistency giữa các panels
+    
+    Returns:
+        story_script với thêm trường "detailed_prompt" cho mỗi panel
+    """
+    
+    print("\n🎨 Đang sinh prompt chi tiết cho từng panel...")
+    print("=" * 70)
+    
+    # Chuẩn bị thông tin nhân vật CỰC KỲ CHI TIẾT
+    character_profiles = []
+    for char in story_script['characters']:
+        app = char['appearance']
+        profile = f"""
+CHARACTER: {char['name']} ({char['role']})
+Physical Description (MUST BE EXACT IN ALL PANELS):
+- Age: {app['age']}, Gender: {app['gender']}
+- Height: {app['height']}, Build: {app['build']}
+- Hair: {app['hair']} (EXACT same style in all panels)
+- Eyes: {app['eyes']} (EXACT same color in all panels)
+- Skin: {app['skin']}
+- Clothing: {app['clothing']} (CONSISTENT outfit)
+- Distinctive Features: {app['distinctive_features']}
+Personality: {char['personality']}
+"""
+        character_profiles.append(profile)
+    
+    character_reference = "\n".join(character_profiles)
+    
+    # Duyệt qua từng trang, từng panel
+    for page in story_script['pages']:
+        page_num = page['page_num']
+        print(f"\n📄 Trang {page_num}: Đang xử lý {len(page['panels'])} panels...")
+        
+        for panel in page['panels']:
+            panel_num = panel['panel_num']
+            
+            # Tạo prompt chi tiết cho panel này
+            prompt = f"""
+You are an expert comic book art director and prompt engineer. Your job is to create EXTREMELY DETAILED image generation prompts for a comic panel.
+
+====================
+🔒 CONSISTENT CONTEXT AND COHESION GUIDELINES:
+- Always maintain the main story context in every description (e.g.: if war-themed, include details like ruined battlefields, smoke, or war sounds – no adding unrelated elements like modern tech unless sci-fi; integrate any visions/flashbacks with visual cues like faded edges or tied to character expressions).
+- Reinforce emotions through visuals: Add details evoking deep emotions (e.g.: pained expressions, dim lighting reflecting inner turmoil, or inspirational moments tied to character arcs and obstacles).
+- Ensure cohesion with 3-act arc: Visuals should support setup, confrontation, or resolution phases.
+
+====================
+📚 STORY CONTEXT:
+Title: {story_script['title']}
+Genre: {story_script['genre']}
+Art Style: {story_script['art_style']}
+Tone: {story_script['tone']}
+
+====================
+👥 CHARACTER REFERENCE (MUST MAINTAIN EXACT CONSISTENCY):
+{character_reference}
+
+====================
+📄 PAGE {page_num} CONTEXT:
+Scene: {page['scene_description']} (keep consistent with overall story context, including foreshadowing for coherence)
+Mood: {page['mood']} (add deep emotional details, linked to theme and inspirational arc)
+
+====================
+🎬 THIS PANEL ({panel_num}):
+Shot Type: {panel['shot_type']}
+Action: {panel['action']} (tightly linked to context, emotional arc, and obstacles)
+Characters: {', '.join(panel['characters_in_panel'])}
+Basic Visual: {panel['basic_visual']} (expand to reinforce context, cohesion, and foreshadowing)
+
+====================
+✍️ YOUR TASK:
+Create an EXTREMELY DETAILED English prompt for Gemini image generation that includes:
+
+1. **Art Style & Medium**: Specify the exact art style from the story (manga, webtoon, etc.) and adjust for context (e.g.: gritty realism for war, with inspirational highlights).
+
+2. **Characters** (IF ANY IN SCENE):
+   - For EACH character in the panel, use their EXACT physical description from the character reference above.
+   - Copy the appearance details WORD FOR WORD to ensure consistency.
+   - Include: hair, eyes, height, build, clothing, distinctive features.
+   - Example: "tall athletic man with spiky red hair, bright blue eyes, wearing black leather jacket with red scarf, scar on left cheek".
+   - Add emotional expressions: Describe poses and faces to reflect inner emotions, backstory relations, and arc progress (e.g.: eyes teary from grief in war, showing inspirational resolve).
+
+3. **Composition & Camera**:
+   - Shot type: {panel['shot_type']}.
+   - Camera angle (eye-level, high angle, low angle, dutch angle, etc.) (choose to heighten emotional tension or inspiration, e.g.: low angle for heroic transformation).
+   - Framing and positioning of elements for cohesion.
+
+4. **Background & Setting**:
+   - Specific location details (must be consistent with story context, describe in detail for cohesion, e.g.: battlefield with tank wreckage, bombing rain; integrate any shifts smoothly).
+   - Environmental elements that tie to theme.
+   - Depth and perspective.
+
+5. **Lighting & Atmosphere**:
+   - Light source and direction.
+   - Shadows and highlights.
+   - Color temperature (warm/cool).
+   - Mood: {page['mood']} (add effects evoking emotions and inspiration, e.g.: red-tinted light for war tension, golden glow for hopeful resolution).
+
+6. **Action & Motion**:
+   - What's happening: {panel['action']}.
+   - Motion lines or effects if needed (add for emotional impact, e.g.: blur for sacrificial moment or obstacle confrontation).
+   - Character poses and expressions (focus on inner emotions, relations, and arc development).
+
+7. **Technical Requirements**:
+   - High quality comic book illustration.
+   - Clean linework.
+   - Professional composition.
+   - NO TEXT, NO DIALOGUE, NO SPEECH BUBBLES in the image (text will be added separately).
+   - Add: High emotional impact, visual storytelling that conveys theme, consistency, and inspirational elements.
+
+====================
+⚠️ CRITICAL RULES:
+- Use EXACT character descriptions from the reference (copy-paste their appearance details).
+- Maintain consistency with previous panels (same characters = same appearance) and overall context; foreshadow shifts.
+- Be specific about every visual element to create deeper emotions and cohesion.
+- Write in clear English.
+- Do NOT include any text/dialogue in the image description.
+- Focus on visual storytelling and evoking emotions through imagery.
+
+====================
+OUTPUT FORMAT (plain text, no JSON)
+Just output the detailed prompt in English, nothing else.".
+
+
+6. **LANGUAGE**
+    - All dialogue must be in Vietnamese.
+"""
+            
+            # Gọi Gemini
+            try:
+                response = text_model.generate_content(prompt)
+                detailed_prompt = response.text.strip()
+                
+                # Thêm detailed_prompt vào panel
+                panel['detailed_prompt'] = detailed_prompt
+                
+                print(f"   ✅ Panel {panel_num}: {len(detailed_prompt)} ký tự")
+                
+                # Delay nhỏ để tránh rate limit
+                time.sleep(0.5)
+                
+            except Exception as e:
+                print(f"   ❌ Panel {panel_num} lỗi: {e}")
+                # Fallback: dùng basic visual
+                panel['detailed_prompt'] = f"{story_script['art_style']} comic art. {panel['basic_visual']}. Characters: {', '.join(panel['characters_in_panel'])}. {panel['shot_type']} shot. NO TEXT in image."
+    
+    print("\n" + "=" * 70)
+    print("✅ Hoàn thành sinh prompt chi tiết!")
+    print("=" * 70)
+    
+    return story_script
+
+
+print("✅ Đã định nghĩa hàm generate_detailed_prompts")
+print("📌 Sẽ gọi Gemini lần 2 sau khi có story_script")
+print("📌 Tạo prompt CỰC KỲ chi tiết cho từng panel")
+
+
+
+
+# 🔄 Gọi hàm sinh prompt chi tiết
+if story_script:
+    print("\n" + "=" * 70)
+    print("🎨 BƯỚC 3.5: SINH PROMPT CHI TIẾT CHO TỪNG PANEL")
+    print("=" * 70)
+    
+    story_script = generate_detailed_prompts(story_script)
+    
+    # Lưu lại story_script đã có detailed prompts
+    with open("story_script_with_prompts.json", "w", encoding="utf-8") as f:
+        json.dump(story_script, f, indent=2, ensure_ascii=False)
+    
+    print("\n✅ Đã sinh xong prompt chi tiết cho TẤT CẢ panels!")
+    print(f"   Đã lưu: story_script_with_prompts.json")
+    
+    # Hiển thị sample
+    print("\n📝 Sample prompt chi tiết (Panel 1, Trang 1):")
+    print("=" * 70)
+    sample_prompt = story_script['pages'][0]['panels'][0]['detailed_prompt']
+    print(sample_prompt[:500] + "...")
+    print("=" * 70)
+else:
+    print("❌ Chưa có story_script. Vui lòng chạy cell sinh kịch bản trước.")
+
+
+
+
+# 🔍 Test: Kiểm tra số panels
+if 'story_script' in locals() and 'selected_layouts' in locals():
+    print("=" * 70)
+    print("🔍 KIỂM TRA SỐ LƯỢNG PANELS")
+    print("=" * 70)
+    
+    all_match = True
+    for i, page in enumerate(story_script['pages']):
+        layout_panels = len(selected_layouts[i]['panels'])
+        script_panels = len(page['panels'])
+        
+        status = "✅" if layout_panels == script_panels else "❌"
+        print(f"{status} Trang {page['page_num']}: Layout có {layout_panels} khung, Script có {script_panels} panels")
+        
+        if layout_panels != script_panels:
+            all_match = False
+    
+    print("=" * 70)
+    if all_match:
+        print("✅ TẤT CẢ ĐỀU KHỚP! Sẵn sàng tạo ảnh!")
+    else:
+        print("⚠️ CÓ TRANG KHÔNG KHỚP!")
+        print("📌 Hãy chạy lại cell sinh kịch bản để tự động sửa")
+    print("=" * 70)
+else:
+    print("❌ Chưa có story_script hoặc selected_layouts")
+
+
+
+# 🎨 Hàm tạo ảnh ĐÚNG KÍCH THƯỚC với Gemini 2.5 Flash Image
+def generate_image_with_gemini(prompt, width, height):
+    """
+    Tạo ảnh với Gemini 2.5 Flash Image - ĐÚNG KÍCH THƯỚC NGAY TỪ ĐẦU
+    
+    ⚠️ KHÔNG RESIZE - Gemini phải sinh đúng kích thước
+    
+    Args:
+        prompt: Mô tả ảnh (tiếng Anh)
+        width: Chiều rộng CHÍNH XÁC (px)
+        height: Chiều cao CHÍNH XÁC (px)
+    
+    Returns:
+        PIL.Image với kích thước CHÍNH XÁC width x height
+    """
+    print(f"   [Gemini] Yêu cầu ảnh {width}x{height}px")
+    print(f"   Prompt: {prompt[:80]}...")
+    
+    try:
+        # Tạo prompt YÊU CẦU ĐÚNG KÍCH THƯỚC
+        aspect_ratio = width / height
+        
+        # Xác định orientation
+        if aspect_ratio > 1.5:
+            orientation = "wide landscape"
+        elif aspect_ratio > 1.1:
+            orientation = "landscape"
+        elif aspect_ratio > 0.9:
+            orientation = "square"
+        elif aspect_ratio > 0.6:
+            orientation = "portrait"
+        else:
+            orientation = "tall portrait"
+        
+        full_prompt = f"""Create a {orientation} comic panel image.
+
+CRITICAL REQUIREMENTS:
+- Exact dimensions: {width} x {height} pixels
+- Aspect ratio: {aspect_ratio:.2f}:1
+- {orientation.upper()} FORMAT ONLY
+
+Content:
+{prompt}
+
+Style:
+- Professional comic book artwork
+- Clean composition
+- High quality illustration
+- Suitable for comic panel
+- NO TEXT OR DIALOGUE IN IMAGE (text will be added separately)
+
+Output must be EXACTLY {width}x{height} pixels."""
+        
+        # Gọi image_model
+        if image_model:
+            try:
+                response = image_model.generate_content([full_prompt])
+                
+                if hasattr(response, 'candidates') and len(response.candidates) > 0:
+                    for part in response.candidates[0].content.parts:
+                        if hasattr(part, 'inline_data') and part.inline_data:
+                            image_bytes = part.inline_data.data
+                            img = Image.open(io.BytesIO(image_bytes))
+                            
+                            original_size = img.size
+                            print(f"   📐 Gemini sinh: {original_size[0]}x{original_size[1]}px")
+                            
+                            # ⚠️ CHỈ RESIZE NẾU SAI KÍCH THƯỚC
+                            if img.size != (width, height):
+                                print(f"   ⚠️ SAI KÍCH THƯỚC! Đang resize {original_size} → {width}x{height}")
+                                img = img.resize((width, height), Image.Resampling.LANCZOS)
+                            else:
+                                print(f"   ✅ ĐÚNG KÍCH THƯỚC!")
+                            
+                            return img
+            except Exception as e:
+                print(f"   ⚠️ Lỗi SDK: {e}")
+        
+        # Gọi REST API
+        print(f"   → Gọi REST API...")
+        
+        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key={GEMINI_API_KEY}"
+        
+        payload = {
+            "contents": [{
+                "parts": [{
+                    "text": full_prompt
+                }]
+            }],
+            "generationConfig": {
+                "temperature": 0.8,
+                "topP": 0.95,
+                "topK": 40
+            }
+        }
+        
+        response = requests.post(api_url, json=payload, timeout=90)
+        
+        if response.status_code == 200:
+            result = response.json()
+            
+            if 'candidates' in result:
+                for candidate in result['candidates']:
+                    if 'content' in candidate:
+                        for part in candidate['content'].get('parts', []):
+                            if 'inlineData' in part:
+                                image_data = base64.b64decode(part['inlineData']['data'])
+                                img = Image.open(io.BytesIO(image_data))
+                                
+                                original_size = img.size
+                                print(f"   📐 Gemini sinh: {original_size[0]}x{original_size[1]}px")
+                                
+                                # ⚠️ CHỈ RESIZE NẾU SAI
+                                if img.size != (width, height):
+                                    print(f"   ⚠️ SAI KÍCH THƯỚC! Resize {original_size} → {width}x{height}")
+                                    img = img.resize((width, height), Image.Resampling.LANCZOS)
+                                else:
+                                    print(f"   ✅ ĐÚNG KÍCH THƯỚC!")
+                                
+                                return img
+        
+        raise Exception(f"Không tìm thấy ảnh. Status: {response.status_code}")
+        
+    except Exception as e:
+        raise Exception(f"Lỗi tạo ảnh: {str(e)}")
+
+
+print("=" * 70)
+print("✅ Đã cấu hình hàm tạo ảnh ĐÚNG KÍCH THƯỚC")
+print("=" * 70)
+print("📌 Gemini sẽ nhận yêu cầu CHÍNH XÁC về kích thước")
+print("📌 Nếu Gemini sinh sai size → sẽ cảnh báo và resize")
+print("📌 Lời thoại sẽ được thêm SAU với font ĐẸP")
+print("=" * 70)
+
+
+
+
+
+# 💬 Hàm vẽ lời thoại ĐẸP cho comic
+def draw_dialogue_bubble(img, dialogue_text, position="top"):
+    """
+    Vẽ lời thoại bubble ĐẸP lên ảnh panel
+    
+    Args:
+        img: PIL Image object
+        dialogue_text: Lời thoại tiếng Việt
+        position: "top" hoặc "bottom"
+    
+    Returns:
+        PIL Image với bubble đã vẽ
+    """
+    from PIL import ImageDraw, ImageFont
+    
+    # Tạo copy để không làm hỏng ảnh gốc
+    img_copy = img.copy()
+    draw = ImageDraw.Draw(img_copy, 'RGBA')
+    w, h = img.size
+    
+    # Tính toán kích thước bubble
+    padding = 20
+    bubble_width = w - padding * 2
+    
+    # Font size tự động theo kích thước panel
+    font_size = max(28, min(56, int(w / 18)))
+    
+    # Thử load font đẹp (Windows fonts)
+    try:
+        font = ImageFont.truetype("C:\Windows\Fonts\TIMESBD.TTF", font_size)
+    except:
+        try:
+            font = ImageFont.truetype("C:\Windows\Fonts\TIMESBD.TTF", font_size)
+        except:
+            try:
+                font = ImageFont.truetype(r"C:\Windows\Fonts\TIMESBD.TTF", font_size)
+            except:
+                print(f"   ⚠️ Không load được font, dùng default")
+                font = ImageFont.load_default()
+    
+    # Wrap text thông minh
+    words = dialogue_text.split()
+    lines = []
+    current_line = ""
+    max_line_width = bubble_width - padding * 2
+    
+    for word in words:
+        test_line = current_line + word + " "
+        try:
+            bbox = draw.textbbox((0, 0), test_line, font=font)
+            line_width = bbox[2] - bbox[0]
+        except:
+            # Fallback nếu textbbox không hoạt động
+            line_width = len(test_line) * (font_size // 2)
+        
+        if line_width <= max_line_width:
+            current_line = test_line
+        else:
+            if current_line:
+                lines.append(current_line.strip())
+            current_line = word + " "
+    
+    if current_line:
+        lines.append(current_line.strip())
+    
+    # Giới hạn 3 dòng
+    lines = lines[:3]
+    
+    # Tính toán kích thước bubble
+    line_height = font_size + 12
+    bubble_height = len(lines) * line_height + padding * 2 + 10
+    
+    # Vị trí bubble
+    if position == "top":
+        bubble_y = padding
+    else:  # bottom
+        bubble_y = h - bubble_height - padding
+    
+    bubble_x = padding
+    
+    # Vẽ SHADOW cho bubble
+    shadow_offset = 5
+    draw.rounded_rectangle(
+        [bubble_x + shadow_offset, bubble_y + shadow_offset, 
+         bubble_x + bubble_width + shadow_offset, bubble_y + bubble_height + shadow_offset],
+        radius=20,
+        fill=(0, 0, 0, 120)  # Bóng đen mờ
+    )
+    
+    # Vẽ BUBBLE chính (trắng)
+    draw.rounded_rectangle(
+        [bubble_x, bubble_y, bubble_x + bubble_width, bubble_y + bubble_height],
+        radius=20,
+        fill=(255, 255, 255, 250),  # Trắng gần đục
+        outline=(0, 0, 0, 255),  # Viền đen
+        width=4
+    )
+    
+    # Vẽ TEXT
+    text_y = bubble_y + padding + 5
+    for line in lines:
+        # Tính toán để CENTER text
+        try:
+            bbox = draw.textbbox((0, 0), line, font=font)
+            text_width = bbox[2] - bbox[0]
+        except:
+            text_width = len(line) * (font_size // 2)
+        
+        text_x = bubble_x + (bubble_width - text_width) // 2
+        
+        # Vẽ TEXT SHADOW (nhạt)
+        draw.text(
+            (text_x + 2, text_y + 2),
+            line,
+            fill=(120, 120, 120, 200),
+            font=font
+        )
+        
+        # Vẽ TEXT chính (đen đậm)
+        draw.text(
+            (text_x, text_y),
+            line,
+            fill=(0, 0, 0, 255),
+            font=font
+        )
+        
+        text_y += line_height
+    
+    return img_copy
+
+
+print("✅ Đã định nghĩa hàm vẽ lời thoại ĐẸP")
+print("📌 Font lớn tự động theo kích thước panel")
+print("📌 Bubble tròn với shadow đẹp")
+print("📌 Text được căn giữa và wrap thông minh")
+
+
+
+# 🧪 TEST HOÀN CHỈNH - Tạo ảnh + Lời thoại ĐẸP
+print("🧪 TEST: Tạo ảnh 620x520px với lời thoại ĐẸP")
+print("=" * 70)
+
+test_prompt = "A cute anime girl with blue hair smiling happily in a sunny park, manga art style, detailed illustration"
+test_dialogue = "Chào bạn! Hôm nay trời đẹp quá nhỉ?"
+
+try:
+    # 1. TẠO ẢNH
+    print("\n📸 Bước 1: Tạo ảnh...")
+    test_image = generate_image_with_gemini(test_prompt, 620, 520)
+    
+    print(f"\n✅ Ảnh đã tạo!")
+    print(f"   Kích thước: {test_image.size}")
+    
+    # Kiểm tra xem có bị cắt không
+    if test_image.size == (620, 520):
+        print(f"   ✅ ĐÚNG KÍCH THƯỚC - KHÔNG BỊ CẮT!")
+    else:
+        print(f"   ⚠️ SAI KÍCH THƯỚC - Gemini sinh ra {test_image.size}")
+    
+    # 2. THÊM LỜI THOẠI ĐẸP
+    print(f"\n💬 Bước 2: Thêm lời thoại...")
+    print(f"   Nội dung: '{test_dialogue}'")
+    test_image_with_dialogue = draw_dialogue_bubble(test_image.copy(), test_dialogue, "top")
+    
+    # 3. HIỂN THỊ VÀ LƯU
+    print(f"\n🖼️ Kết quả:")
+    display(test_image_with_dialogue)
+    
+    test_image_with_dialogue.save("test_final_620x520.png", quality=100)
+    print(f"\n✅ HOÀN THÀNH!")
+    print(f"   Đã lưu: test_final_620x520.png")
+    print(f"   Kích thước: {test_image_with_dialogue.size}")
+    print(f"   Lời thoại: Font ĐẸP, bubble tròn, shadow")
+    
+except Exception as e:
+    print(f"\n❌ LỖI: {str(e)[:300]}...")
+
+
+
+# ⭐ BỎ QUA BƯỚC TẠO DEMO - TRANG 1 SẼ LÀM REFERENCE
+print("=" * 70)
+print("⭐ LOGIC MỚI: KHÔNG CẦN DEMO IMAGES")
+print("=" * 70)
+print("📌 Trang 1 (8 khung) sẽ giới thiệu nhân vật chi tiết")
+print("📌 Các trang sau sử dụng mô tả từ trang 1 làm reference")
+print("📌 Đảm bảo nhân vật NHẤT QUÁN qua toàn bộ truyện")
+print("=" * 70)
+
+
+
+# 🎯 Tạo ảnh cho từng panel với DETAILED PROMPT
+def create_panel_images_v2(story_script, selected_layouts):
+    """
+    Tạo ảnh cho từng panel - SỬ DỤNG DETAILED PROMPT ĐÃ SINH
+    
+    ⭐ LOGIC MỚI:
+    - Không cần demo page
+    - Mỗi panel dùng detailed_prompt đã được Gemini tạo
+    - Detailed prompt đã bao gồm character consistency
+    """
+    panel_images = {}
+    os.makedirs("panel_images", exist_ok=True)
+    
+    for i, page_data in enumerate(story_script['pages']):
+        page_num = page_data['page_num']
+        layout_info = selected_layouts[i]
+        
+        # ⚠️ KIỂM TRA: Số panel trong script vs layout
+        num_panels_in_layout = len(layout_info['panels'])
+        num_panels_in_script = len(page_data['panels'])
+        
+        if num_panels_in_script > num_panels_in_layout:
+            print(f"\n⚠️ CẢNH BÁO: Trang {page_num} có {num_panels_in_script} panels trong script")
+            print(f"   nhưng layout chỉ có {num_panels_in_layout} khung!")
+            print(f"   → Chỉ tạo {num_panels_in_layout} panels đầu tiên")
+            # Cắt bớt panels trong script để khớp với layout
+            page_data['panels'] = page_data['panels'][:num_panels_in_layout]
+        
+        print(f"\n📄 Trang {page_num}: Tạo {len(page_data['panels'])} panels...")
+        
+        page_panels = []
+        
+        for j, panel_data in enumerate(page_data['panels']):
+            panel_num = panel_data['panel_num']
+            
+            # Lấy kích thước CHÍNH XÁC từ layout
+            x, y, w, h = layout_info['panels'][j]
+            aspect_ratio = w / h 
+            print(f"\n   🎨 Panel {panel_num}:")
+            print(f"      Kích thước: {w}x{h}px ({aspect_ratio})")
+            
+            # ⭐ SỬ DỤNG DETAILED PROMPT ĐÃ SINH
+            if 'detailed_prompt' in panel_data:
+                panel_prompt = panel_data['detailed_prompt']
+                print(f"      ✅ Sử dụng detailed prompt ({len(panel_prompt)} chars)")
+            else:
+                # Fallback nếu không có detailed_prompt
+                print(f"      ⚠️ Không có detailed_prompt, dùng basic visual")
+                panel_prompt = f"{story_script['art_style']} comic art. {panel_data.get('basic_visual', '')}. {panel_data.get('shot_type', 'medium')} shot. NO TEXT in image."
+            
+            # TẠO ẢNH với kích thước CHÍNH XÁC
+            try:
+                panel_img = generate_image_with_gemini(panel_prompt, w, h)
+                
+                # Kiểm tra kích thước
+                actual_size = panel_img.size
+                if actual_size != (w, h):
+                    print(f"      ⚠️ CẢNH BÁO: Ảnh sinh ra {actual_size} khác yêu cầu {w}x{h}")
+                else:
+                    print(f"      ✅ Kích thước CHÍNH XÁC!")
+                
+                # THÊM LỜI THOẠI ĐẸP (nếu có)
+                if panel_data.get('dialogue'):
+                    dialogue_text = panel_data['dialogue']
+                    print(f"      💬 Thêm lời thoại: {dialogue_text[:40]}...")
+                    
+                    # Vẽ bubble lời thoại ĐẸP
+                    panel_img = draw_dialogue_bubble(panel_img, dialogue_text, position="top")
+                
+                # LƯU ẢNH
+                panel_path = f"panel_images/page_{page_num:02d}_panel_{panel_num:02d}.png"
+                panel_img.save(panel_path, quality=100)  # Quality 100 - KHÔNG NÉN
+                
+                page_panels.append({
+                    "panel_num": panel_num,
+                    "image": panel_img,
+                    "path": panel_path,
+                    "position": (x, y, w, h)
+                })
+                
+                print(f"      ✅ Đã lưu: {panel_path}")
+                
+            except Exception as e:
+                print(f"      ❌ LỖI tạo ảnh: {str(e)[:200]}")
+                # Tạo ảnh placeholder
+                panel_img = Image.new("RGB", (w, h), "lightgray")
+                draw = ImageDraw.Draw(panel_img)
+                draw.text((w//2, h//2), f"Error\nPanel {panel_num}", fill="red", anchor="mm")
+                
+                panel_path = f"panel_images/page_{page_num:02d}_panel_{panel_num:02d}_ERROR.png"
+                panel_img.save(panel_path)
+                
+                page_panels.append({
+                    "panel_num": panel_num,
+                    "image": panel_img,
+                    "path": panel_path,
+                    "position": (x, y, w, h)
+                })
+        
+        panel_images[page_num] = page_panels
+        print(f"\n   ✅ Hoàn thành trang {page_num}")
+    
+    return panel_images
+
+
+print("✅ Đã định nghĩa create_panel_images_v2")
+print("📌 Sử dụng detailed_prompt cho mỗi panel")
+print("📌 Không cần demo page nữa")
+
+
+
+# 🎯 Hàm vẽ lời thoại ĐẸP cho comic
+def draw_dialogue_bubble(img, dialogue_text, position="top"):
+    """
+    Vẽ lời thoại bubble ĐẸP lên ảnh panel
+    
+    Args:
+        img: PIL Image object
+        dialogue_text: Lời thoại tiếng Việt
+        position: "top" hoặc "bottom"
+    """
+    from PIL import ImageDraw, ImageFont
+    
+    draw = ImageDraw.Draw(img, 'RGBA')
+    w, h = img.size
+    
+    # Tính toán kích thước bubble
+    padding = 20
+    bubble_width = w - padding * 2
+    
+    # Font size tự động theo kích thước panel
+    font_size = max(24, min(48, int(w / 20)))
+    
+    # Thử load font đẹp, fallback về default
+    try:
+        # Windows fonts
+        font = ImageFont.truetype(r"C:\Windows\Fonts\TIMESBD.TTF", font_size)
+        font_bold = ImageFont.truetype(r"C:\Windows\Fonts\TIMESBD.TTF", font_size + 4)
+    except:
+        try:
+            font = ImageFont.truetype(r"C:\Windows\Fonts\TIMESBD.TTF", font_size)
+            font_bold = font
+        except:
+            font = ImageFont.load_default()
+            font_bold = font
+    
+    # Wrap text thông minh
+    words = dialogue_text.split()
+    lines = []
+    current_line = ""
+    max_line_width = bubble_width - padding * 2
+    
+    for word in words:
+        test_line = current_line + word + " "
+        bbox = draw.textbbox((0, 0), test_line, font=font)
+        line_width = bbox[2] - bbox[0]
+        
+        if line_width <= max_line_width:
+            current_line = test_line
+        else:
+            if current_line:
+                lines.append(current_line.strip())
+            current_line = word + " "
+    
+    if current_line:
+        lines.append(current_line.strip())
+    
+    # Giới hạn 3 dòng
+    lines = lines[:3]
+    
+    # Tính toán kích thước bubble
+    line_height = font_size + 8
+    bubble_height = len(lines) * line_height + padding * 2
+    
+    # Vị trí bubble
+    if position == "top":
+        bubble_y = padding
+    else:  # bottom
+        bubble_y = h - bubble_height - padding
+    
+    bubble_x = padding
+    
+    # Vẽ SHADOW cho bubble
+    shadow_offset = 4
+    draw.rounded_rectangle(
+        [bubble_x + shadow_offset, bubble_y + shadow_offset, 
+         bubble_x + bubble_width + shadow_offset, bubble_y + bubble_height + shadow_offset],
+        radius=15,
+        fill=(0, 0, 0, 100)  # Bóng đen mờ
+    )
+    
+    # Vẽ BUBBLE chính (trắng với opacity)
+    draw.rounded_rectangle(
+        [bubble_x, bubble_y, bubble_x + bubble_width, bubble_y + bubble_height],
+        radius=15,
+        fill=(255, 255, 255, 240),  # Trắng gần như đục
+        outline=(0, 0, 0, 255),  # Viền đen
+        width=3
+    )
+    
+    # Vẽ TEXT
+    text_y = bubble_y + padding
+    for line in lines:
+        # Tính toán để CENTER text
+        bbox = draw.textbbox((0, 0), line, font=font)
+        text_width = bbox[2] - bbox[0]
+        text_x = bubble_x + (bubble_width - text_width) // 2
+        
+        # Vẽ TEXT SHADOW
+        draw.text(
+            (text_x + 2, text_y + 2),
+            line,
+            fill=(150, 150, 150, 180),
+            font=font
+        )
+        
+        # Vẽ TEXT chính
+        draw.text(
+            (text_x, text_y),
+            line,
+            fill=(0, 0, 0, 255),
+            font=font
+        )
+        
+        text_y += line_height
+    
+    return img
+
+
+# 🎯 Tạo tất cả ảnh panels với DETAILED PROMPTS
+# if story_script:
+#     print("\n" + "=" * 70)
+#     print("🎯 BẮT ĐẦU TẠO ẢNH CHO TỪNG PANEL")
+#     print("=" * 70)
+#     print("📌 Sử dụng DETAILED PROMPTS đã sinh")
+#     print("📌 Mỗi ảnh: KÍCH THƯỚC CHÍNH XÁC theo Gemini aspect ratios")
+#     print("📌 Nhân vật nhất quán qua detailed character descriptions")
+#     print("📌 Lời thoại: Font ĐẸP, bubble tròn, shadow")
+#     print("=" * 70)
+    
+#     # ⭐ SỬ DỤNG HÀM MỚI create_panel_images_v2
+#     panel_images = create_panel_images_v2(story_script, selected_layouts)
+    
+#     total_panels = sum([len(p) for p in panel_images.values()])
+#     print(f"\n✅ ĐÃ TẠO XONG {total_panels} PANELS!")
+#     print(f"   📖 Tất cả trang: Nhân vật nhất quán nhờ detailed prompts")
+# else:
+#     print("❌ Thiếu dữ liệu. Vui lòng chạy lại các bước trước.")
+
+
+
+# 🎯 Tạo tất cả ảnh panels với DETAILED PROMPTS
+if story_script:
+    print("\n" + "=" * 70)
+    print("🎯 BẮT ĐẦU TẠO ẢNH CHO TỪNG PANEL")
+    print("=" * 70)
+    print("📌 Sử dụng detailed prompts đã sinh")
+    print("📌 Mỗi ảnh: KÍCH THƯỚC CHÍNH XÁC theo Gemini aspect ratios")
+    print("📌 Nhân vật nhất quán qua detailed character descriptions")
+    print("📌 Lời thoại: Font ĐẸP, bubble tròn, shadow")
+    print("=" * 70)
+    
+    panel_images = create_panel_images_v2(story_script, selected_layouts)
+    
+    total_panels = sum([len(p) for p in panel_images.values()])
+    print(f"\n✅ ĐÃ TẠO XONG {total_panels} PANELS!")
+    print(f"   📖 Tất cả trang: Nhân vật nhất quán nhờ detailed prompts")
+else:
+    print("❌ Thiếu dữ liệu. Vui lòng chạy lại các bước trước.")
+
+
+# 📄 Ghép các panel thành trang hoàn chỉnh
+def compose_page(page_num, panels):
+    """
+    Ghép các panel thành một trang A4 hoàn chỉnh
+    """
+    # Tạo canvas trắng A4
+    page_img = Image.new("RGB", (PAGE_W, PAGE_H), "white")
+    
+    # Dán từng panel vào vị trí của nó
+    for panel in panels:
+        x, y, w, h = panel['position']
+        page_img.paste(panel['image'], (x, y))
+    
+    # Vẽ viền cho các panel
+    draw = ImageDraw.Draw(page_img)
+    for panel in panels:
+        x, y, w, h = panel['position']
+        draw.rectangle([x, y, x+w, y+h], outline="black", width=5)
+    
+    return page_img
+
+# Ghép tất cả các trang (BỎ QUA TRANG 0 - DEMO)
+final_pages = []
+demo_page_path = None
+os.makedirs("final_comic", exist_ok=True)
+
+if 'panel_images' in locals():
+    print("\n📄 Đang ghép các panel thành trang...")
+    
+    for page_num in sorted(panel_images.keys()):
+        panels = panel_images[page_num]
+        
+        print(f"   Trang {page_num}: Ghép {len(panels)} panels...")
+        
+        page_img = compose_page(page_num, panels)
+        
+        # Lưu trang
+        if page_num == 0:
+            # TRANG 0: Lưu riêng vào demo
+            page_path = f"final_comic/page_00_DEMO_CHARACTER_REFERENCE.png"
+            demo_page_path = page_path
+            print(f"   📌 DEMO PAGE - Không tính vào truyện chính")
+        else:
+            # TRANG 1+: Trang truyện thật
+            page_path = f"final_comic/page_{page_num:02d}.png"
+            final_pages.append(page_path)
+        
+        page_img.save(page_path, quality=95)
+        print(f"   ✅ Đã lưu: {page_path}")
+    
+    print(f"\n✅ Hoàn thành ghép {len(panel_images)} trang!")
+    print(f"   📌 Trang DEMO: {demo_page_path if demo_page_path else 'Không có'}")
+    print(f"   📖 Trang truyện: {len(final_pages)} trang")
+else:
+    print("❌ Chưa có dữ liệu panel. Vui lòng chạy lại bước 5.")
+
+
+
+
+
+# 📦 Tạo báo cáo và thông tin truyện
+if story_script and 'final_pages' in locals():
+    # Tạo file info
+    comic_info = {
+        "title": story_script['title'],
+        "art_style": story_script['art_style'],
+        "num_pages": len(final_pages),
+        "characters": story_script['characters'],
+        "created_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "pages": []
+    }
+    
+    for i, page_path in enumerate(final_pages):
+        page_num = i + 1
+        comic_info['pages'].append({
+            "page_num": page_num,
+            "file": page_path,
+            "layout": selected_layouts[i]['layout_name'],
+            "num_panels": len(panel_images[page_num])
+        })
+    
+    # Lưu thông tin truyện
+    with open("final_comic/comic_info.json", "w", encoding="utf-8") as f:
+        json.dump(comic_info, f, indent=2, ensure_ascii=False)
+    
+    # Tạo README - Xử lý character appearance
+    character_descriptions = []
+    for c in story_script['characters']:
+        if 'appearance' in c:
+            app = c['appearance']
+            desc = f"{app.get('age', 'unknown age')}, {app.get('hair', 'unknown hair')}, {app.get('eyes', 'unknown eyes')}"
+        elif 'description' in c:
+            # Fallback cho format cũ
+            desc = c['description']
+        else:
+            desc = "No description available"
+        character_descriptions.append(f'- **{c["name"]}** ({c.get("role", "unknown")}): {desc}')
+    
+    readme_content = f"""
+# {story_script['title']}
+
+## Thông tin truyện
+- **Phong cách**: {story_script['art_style']}
+- **Thể loại**: {story_script.get('genre', 'N/A')}
+- **Số trang**: {len(final_pages)}
+- **Số nhân vật**: {len(story_script['characters'])}
+- **Ngày tạo**: {time.strftime("%Y-%m-%d %H:%M:%S")}
+
+## Nhân vật
+{chr(10).join(character_descriptions)}
+
+## Cấu trúc
+{chr(10).join([f'- Trang {p["page_num"]}: {p["layout"]} ({p["num_panels"]} panels)' for p in comic_info['pages']])}
+
+## Files
+- `comic_info.json`: Thông tin chi tiết truyện
+- `page_01.png` - `page_{len(final_pages):02d}.png`: Các trang truyện
+
+---
+Tạo bởi Comic Auto Creator với Gemini AI
+"""
+    
+    with open("final_comic/README.md", "w", encoding="utf-8") as f:
+        f.write(readme_content)
+    
+    print("\n" + "="*60)
+    print("🎉 HOÀN THÀNH TẠO TRUYỆN!")
+    print("="*60)
+    print(f"\n📚 Tên truyện: {story_script['title']}")
+    print(f"📄 Số trang: {len(final_pages)}")
+    print(f"🎨 Phong cách: {story_script['art_style']}")
+    print(f"\n📁 Truyện đã được lưu trong folder: final_comic/")
+    print(f"\nCác file:")
+    print(f"  - comic_info.json (thông tin truyện)")
+    print(f"  - README.md (hướng dẫn)")
+    for page_path in final_pages:
+        print(f"  - {os.path.basename(page_path)}")
+    print("\n" + "="*60)
+else:
+    print("❌ Chưa đủ dữ liệu để hoàn thành. Vui lòng chạy lại các bước trước.")
+
+
+
+# 📄 Gộp tất cả trang thành 1 file PDF
+def create_comic_pdf(final_pages, output_filename="final_comic/TRUYEN_TRANH.pdf"):
+    """
+    Gộp tất cả trang PNG thành 1 file PDF duy nhất
+    """
+    try:
+        from PIL import Image
+        
+        if not final_pages:
+            print("❌ Không có trang nào để tạo PDF")
+            return None
+        
+        print(f"\n📄 Đang tạo PDF từ {len(final_pages)} trang...")
+        
+        # Đọc tất cả trang
+        images = []
+        for i, page_path in enumerate(final_pages):
+            print(f"   Đọc trang {i+1}/{len(final_pages)}: {page_path}")
+            img = Image.open(page_path)
+            
+            # Convert sang RGB nếu cần (PDF không hỗ trợ RGBA)
+            if img.mode != 'RGB':
+                img = img.convert('RGB')
+            
+            images.append(img)
+        
+        # Lưu thành PDF (trang đầu tiên làm gốc, các trang còn lại append vào)
+        if len(images) > 0:
+            print(f"\n💾 Đang lưu PDF: {output_filename}")
+            images[0].save(
+                output_filename,
+                save_all=True,
+                append_images=images[1:] if len(images) > 1 else [],
+                resolution=300.0,  # 300 DPI
+                quality=95,
+                optimize=False
+            )
+            
+            # Kiểm tra file size
+            import os
+            file_size = os.path.getsize(output_filename) / (1024 * 1024)  # MB
+            
+            print(f"\n✅ ĐÃ TẠO PDF THÀNH CÔNG!")
+            print(f"   📁 File: {output_filename}")
+            print(f"   📊 Kích thước: {file_size:.2f} MB")
+            print(f"   📄 Số trang: {len(images)}")
+            
+            return output_filename
+        else:
+            print("❌ Không có ảnh nào để tạo PDF")
+            return None
+            
+    except Exception as e:
+        print(f"\n❌ Lỗi tạo PDF: {e}")
+        print("💡 Thử cài đặt: pip install Pillow")
+        return None
+
+
+# Tạo PDF nếu đã có final_pages
+if 'final_pages' in locals() and final_pages:
+    print("\n" + "=" * 70)
+    print("📄 BƯỚC CUỐI: TẠO FILE PDF")
+    print("=" * 70)
+    
+    pdf_file = create_comic_pdf(final_pages)
+    
+    if pdf_file:
+        print("\n" + "=" * 70)
+        print("🎉 HOÀN THÀNH TOÀN BỘ QUY TRÌNH!")
+        print("=" * 70)
+        print(f"\n📚 Truyện của bạn:")
+        print(f"   - Các trang PNG: final_comic/page_*.png")
+        print(f"   - File PDF hoàn chỉnh: {pdf_file}")
+        print(f"\n📖 Bạn có thể đọc truyện bằng:")
+        print(f"   - Mở file PDF bằng trình đọc PDF")
+        print(f"   - Hoặc xem từng trang PNG")
+        print("=" * 70)
+else:
+    print("❌ Chưa có dữ liệu trang. Vui lòng chạy lại các bước trước.")
+
+
+
+# 👁️ Hiển thị preview các trang (nếu chạy trong notebook)
+if 'final_pages' in locals():
+    from IPython.display import display, Image as IPImage
+    
+    print("📖 Preview truyện:")
+    for i, page_path in enumerate(final_pages[:3]):  # Hiển thị 3 trang đầu
+        print(f"\n--- Trang {i+1} ---")
+        display(IPImage(filename=page_path, width=600))
+    
+    if len(final_pages) > 3:
+        print(f"\n... và {len(final_pages) - 3} trang nữa trong folder final_comic/")
+else:
+    print("❌ Chưa có trang nào để hiển thị.")
+
+

@@ -1,0 +1,734 @@
+=== Kiểm tra chi tiêu | AI Thực Chiến ===
+URL: https://docs.thucchien.ai/docs/api-reference/spend-checking
+Crawled: 2025-10-23 00:19:53
+============================================================
+
+MAIN CONTENT:
+----------------------------------------
+Tham chiếu APIKiểm tra chi tiêu
+Kiểm tra chi tiêu (Spend Checking)
+GET /key/info
+Lấy thông tin chi tiết về API key và mức độ sử dụng hiện tại.
+Headers
+Authorization
+string
+Required
+Bearer token với API key của bạn. Format: Bearer <your_api_key>
+accept
+string
+Loại nội dung phản hồi mong muốn. Mặc định: application/json
+Cấu trúc Phản hồi (Response Body)
+API sẽ trả về một đối tượng JSON với thông tin chi tiết về API key và mức sử dụng.
+Đối tượng Root
+key
+string
+Mã định danh duy nhất của API key.
+info
+object
+Đối tượng chứa thông tin chi tiết về API key.
+Đối tượng info
+key_name
+string
+Tên hiển thị của API key (có thể được che một phần).
+key_alias
+string
+Tên bí danh của API key để dễ nhận diện.
+spend
+number
+Tổng số tiền đã chi tiêu bằng API key này (tính bằng USD).
+max_budget
+number
+Ngân sách tối đa được phép cho API key này. null nếu không giới hạn.
+max_parallel_requests
+number
+Số lượng yêu cầu đồng thời tối đa được phép cho API key này. Giới hạn này kiểm soát số lượng request có thể xử lý song song cùng một lúc. Trường hợp vượt quá giới hạn này, các yêu cầu bổ sung sẽ bị từ chối trả lỗi 429 (Too Many Requests).
+metadata
+object
+Metadata tùy chỉnh được gán cho API key.
+metadata.model_rpm_limit
+object
+Giới hạn số lượng request per minute (RPM) cho từng mô hình cụ thể. Đây là giới hạn tần suất gọi API theo phút cho mỗi model. Xem thêm Google AI Rate Limits để biết chi tiết về các giới hạn.
+metadata.model_tpm_limit
+object
+Giới hạn số lượng token per minute (TPM) cho từng mô hình cụ thể. Đây là tổng số token (input) có thể xử lý trong một phút cho mỗi model. Xem thêm Google AI Rate Limits để biết chi tiết về quota và giới hạn token.
+tpm_limit
+number
+Giới hạn tokens per minute chung cho API Key. null nếu không giới hạn.
+rpm_limit
+number
+Giới hạn requests per minute chung cho API Key. null nếu không giới hạn.
+expires
+string
+Thời gian hết hạn của API key. null nếu không hết hạn.
+models
+array
+Danh sách các mô hình được phép sử dụng với API key này.
+user_id
+string
+ID của người dùng sở hữu API key.
+team_id
+string
+ID của nhóm sở hữu API key.
+blocked
+boolean
+Trạng thái khóa của API key. true nếu bị khóa, null hoặc false nếu hoạt động.
+budget_duration
+string
+Khoảng thời gian tính ngân sách (ví dụ: 1d, 1w, 1m). null nếu không có chu kỳ.
+budget_reset_at
+string
+Thời điểm reset ngân sách tiếp theo (ISO 8601). null nếu không có chu kỳ.
+model_spend
+object
+Chi tiêu chi tiết theo từng mô hình.
+model_max_budget
+object
+Ngân sách tối đa theo từng mô hình.
+created_at
+string
+Thời gian tạo API key (định dạng ISO 8601).
+updated_at
+string
+Thời gian cập nhật cuối cùng của API key (định dạng ISO 8601).
+permissions
+object
+Các quyền hạn được cấp cho API key.
+curl
+Python (requests)
+Node.js (fetch)
+curl -X 'GET' \
+'https://api.thucchien.ai/key/info' \
+-H 'accept: application/json' \
+-H 'Authorization: Bearer '
+Try It!
+Example Response
+{
+  "key": "b1ba143c164e66c912677762a7a0b0a2d5bd686b59999823e5fd2ccb3c71731f",
+  "info": {
+    "key_name": "sk-...gHQK",
+    "key_alias": "official-01@key",
+    "soft_budget_cooldown": false,
+    "spend": 0.5,
+    "expires": null,
+    "models": [
+      "all-team-models"
+    ],
+    "aliases": {},
+    "config": {},
+    "user_id": "f52b3ad4-986e-4c62-9bbd-79e80e221d0b",
+    "team_id": "5b4c20e9-1ff9-4ac0-bec6-0b00a25a31ab",
+    "permissions": {},
+    "max_parallel_requests": 200,
+    "metadata": {
+      "model_rpm_limit": {
+        "imagen-4": 20,
+        "gemini-2.5-pro": 2000,
+        "gemini-2.5-flash": 10000,
+        "veo-2.0-generate-001": 2,
+        "veo-2.0-generate-exp": 2,
+        "veo-3.0-generate-001": 10,
+        "gemini-2.5-flash-image": 5000,
+        "veo-2.0-generate-preview": 2,
+        "veo-3.1-generate-preview": 10,
+        "veo-3.0-fast-generate-001": 10,
+        "gemini-2.5-pro-preview-tts": 100,
+        "gemini-2.5-flash-preview-tts": 1000,
+        "veo-3.1-fast-generate-preview": 10,
+        "gemini-2.5-flash-image-preview": 5000
+      },
+      "model_tpm_limit": {
+        "gemini-2.5-pro": 8000000,
+        "gemini-2.5-flash": 8000000,
+        "gemini-2.5-flash-image": 5000000,
+        "gemini-2.5-pro-preview-tts": 1000000,
+        "gemini-2.5-flash-preview-tts": 1000000,
+        "gemini-2.5-flash-image-preview": 5000000
+      }
+    },
+    "blocked": null,
+    "tpm_limit": 800000,
+    "rpm_limit": 200,
+    "max_budget": 50,
+    "budget_duration": null,
+    "budget_reset_at": null,
+    "allowed_cache_controls": [],
+    "allowed_routes": [],
+    "model_spend": {},
+    "model_max_budget": {},
+    "budget_id": null,
+    "organization_id": null,
+    "object_permission_id": null,
+    "created_at": "2025-10-21T07:12:36.122000+00:00",
+    "created_by": "default_user_id",
+    "updated_at": "2025-10-21T07:24:39.726000+00:00",
+    "updated_by": "default_user_id",
+    "rotation_count": 0,
+    "auto_rotate": false,
+    "rotation_interval": null,
+    "last_rotation_at": null,
+    "key_rotation_at": null,
+    "litellm_budget_table": null,
+    "litellm_organization_table": null,
+    "object_permission": null
+  }
+}
+Copy full
+Previous
+Chuyển văn bản thành giọng nói (với Google Gemini)
+Next
+Tips và Tricks Thực Chiến
+
+CODE BLOCKS:
+----------------------------------------
+
+[CODE: unknown_code_1]
+```
+curl -X 'GET' \
+'https://api.thucchien.ai/key/info' \
+-H 'accept: application/json' \
+-H 'Authorization: Bearer '
+```
+..............................
+
+[CODE: unknown_code_2]
+```
+{
+  "key": "b1ba143c164e66c912677762a7a0b0a2d5bd686b59999823e5fd2ccb3c71731f",
+  "info": {
+    "key_name": "sk-...gHQK",
+    "key_alias": "official-01@key",
+    "soft_budget_cooldown": false,
+    "spend": 0.5,
+    "expires": null,
+    "models": [
+      "all-team-models"
+    ],
+    "aliases": {},
+    "config": {},
+    "user_id": "f52b3ad4-986e-4c62-9bbd-79e80e221d0b",
+    "team_id": "5b4c20e9-1ff9-4ac0-bec6-0b00a25a31ab",
+    "permissions": {},
+    "max_parallel_requests": 200,
+    "metadata": {
+      "model_rpm_limit": {
+        "imagen-4": 20,
+        "gemini-2.5-pro": 2000,
+        "gemini-2.5-flash": 10000,
+        "veo-2.0-generate-001": 2,
+        "veo-2.0-generate-exp": 2,
+        "veo-3.0-generate-001": 10,
+        "gemini-2.5-flash-image": 5000,
+        "veo-2.0-generate-preview": 2,
+        "veo-3.1-generate-preview": 10,
+        "veo-3.0-fast-generate-001": 10,
+        "gemini-2.5-pro-preview-tts": 100,
+        "gemini-2.5-flash-preview-tts": 1000,
+        "veo-3.1-fast-generate-preview": 10,
+        "gemini-2.5-flash-image-preview": 5000
+      },
+      "model_tpm_limit": {
+        "gemini-2.5-pro": 8000000,
+        "gemini-2.5-flash": 8000000,
+        "gemini-2.5-flash-image": 5000000,
+        "gemini-2.5-pro-preview-tts": 1000000,
+        "gemini-2.5-flash-preview-tts": 1000000,
+        "gemini-2.5-flash-image-preview": 5000000
+      }
+    },
+    "blocked": null,
+    "tpm_limit": 800000,
+    "rpm_limit": 200,
+    "max_budget": 50,
+    "budget_duration": null,
+    "budget_reset_at": null,
+    "allowed_cache_controls": [],
+    "allowed_routes": [],
+    "model_spend": {},
+    "model_max_budget": {},
+    "budget_id": null,
+    "organization_id": null,
+    "object_permission_id": null,
+    "created_at": "2025-10-21T07:12:36.122000+00:00",
+    "created_by": "default_user_id",
+    "updated_at": "2025-10-21T07:24:39.726000+00:00",
+    "updated_by": "default_user_id",
+    "rotation_count": 0,
+    "auto_rotate": false,
+    "rotation_interval": null,
+    "last_rotation_at": null,
+    "key_rotation_at": null,
+    "litellm_budget_table": null,
+    "litellm_organization_table": null,
+    "object_permission": null
+  }
+}
+```
+..............................
+
+[CODE: bash_code_1]
+```
+curl -X 'GET' \
+'https://api.thucchien.ai/key/info' \
+-H 'accept: application/json' \
+-H 'Authorization: Bearer '
+```
+..............................
+
+[CODE: unknown_code_3]
+```
+Bearer <your_api_key>
+```
+..............................
+
+[CODE: unknown_code_14]
+```
+max_parallel_requests
+```
+..............................
+
+[CODE: unknown_code_16]
+```
+metadata.model_rpm_limit
+```
+..............................
+
+[CODE: unknown_code_17]
+```
+metadata.model_tpm_limit
+```
+..............................
+
+[CODE: unknown_code_43]
+```
+curl -X 'GET' \
+'https://api.thucchien.ai/key/info' \
+-H 'accept: application/json' \
+-H 'Authorization: Bearer '
+```
+..............................
+
+[CODE: unknown_code_44]
+```
+{
+  "key": "b1ba143c164e66c912677762a7a0b0a2d5bd686b59999823e5fd2ccb3c71731f",
+  "info": {
+    "key_name": "sk-...gHQK",
+    "key_alias": "official-01@key",
+    "soft_budget_cooldown": false,
+    "spend": 0.5,
+    "expires": null,
+    "models": [
+      "all-team-models"
+    ],
+    "aliases": {},
+    "config": {},
+    "user_id": "f52b3ad4-986e-4c62-9bbd-79e80e221d0b",
+    "team_id": "5b4c20e9-1ff9-4ac0-bec6-0b00a25a31ab",
+    "permissions": {},
+    "max_parallel_requests": 200,
+    "metadata": {
+      "model_rpm_limit": {
+        "imagen-4": 20,
+        "gemini-2.5-pro": 2000,
+        "gemini-2.5-flash": 10000,
+        "veo-2.0-generate-001": 2,
+        "veo-2.0-generate-exp": 2,
+        "veo-3.0-generate-001": 10,
+        "gemini-2.5-flash-image": 5000,
+        "veo-2.0-generate-preview": 2,
+        "veo-3.1-generate-preview": 10,
+        "veo-3.0-fast-generate-001": 10,
+        "gemini-2.5-pro-preview-tts": 100,
+        "gemini-2.5-flash-preview-tts": 1000,
+        "veo-3.1-fast-generate-preview": 10,
+        "gemini-2.5-flash-image-preview": 5000
+      },
+      "model_tpm_limit": {
+        "gemini-2.5-pro": 8000000,
+        "gemini-2.5-flash": 8000000,
+        "gemini-2.5-flash-image": 5000000,
+        "gemini-2.5-pro-preview-tts": 1000000,
+        "gemini-2.5-flash-preview-tts": 1000000,
+        "gemini-2.5-flash-image-preview": 5000000
+      }
+    },
+    "blocked": null,
+    "tpm_limit": 800000,
+    "rpm_limit": 200,
+    "max_budget": 50,
+    "budget_duration": null,
+    "budget_reset_at": null,
+    "allowed_cache_controls": [],
+    "allowed_routes": [],
+    "model_spend": {},
+    "model_max_budget": {},
+    "budget_id": null,
+    "organization_id": null,
+    "object_permission_id": null,
+    "created_at": "2025-10-21T07:12:36.122000+00:00",
+    "created_by": "default_user_id",
+    "updated_at": "2025-10-21T07:24:39.726000+00:00",
+    "updated_by": "default_user_id",
+    "rotation_count": 0,
+    "auto_rotate": false,
+    "rotation_interval": null,
+    "last_rotation_at": null,
+    "key_rotation_at": null,
+    "litellm_budget_table": null,
+    "litellm_organization_table": null,
+    "object_permission": null
+  }
+}
+```
+..............................
+
+FULL CONTENT:
+----------------------------------------
+Tham chiếu APIKiểm tra chi tiêu
+Kiểm tra chi tiêu (Spend Checking)
+GET /key/info
+Lấy thông tin chi tiết về API key và mức độ sử dụng hiện tại.
+Headers
+Authorization
+string
+Required
+Bearer token với API key của bạn. Format: Bearer <your_api_key>
+accept
+string
+Loại nội dung phản hồi mong muốn. Mặc định: application/json
+Cấu trúc Phản hồi (Response Body)
+API sẽ trả về một đối tượng JSON với thông tin chi tiết về API key và mức sử dụng.
+Đối tượng Root
+key
+string
+Mã định danh duy nhất của API key.
+info
+object
+Đối tượng chứa thông tin chi tiết về API key.
+Đối tượng info
+key_name
+string
+Tên hiển thị của API key (có thể được che một phần).
+key_alias
+string
+Tên bí danh của API key để dễ nhận diện.
+spend
+number
+Tổng số tiền đã chi tiêu bằng API key này (tính bằng USD).
+max_budget
+number
+Ngân sách tối đa được phép cho API key này. null nếu không giới hạn.
+max_parallel_requests
+number
+Số lượng yêu cầu đồng thời tối đa được phép cho API key này. Giới hạn này kiểm soát số lượng request có thể xử lý song song cùng một lúc. Trường hợp vượt quá giới hạn này, các yêu cầu bổ sung sẽ bị từ chối trả lỗi 429 (Too Many Requests).
+metadata
+object
+Metadata tùy chỉnh được gán cho API key.
+metadata.model_rpm_limit
+object
+Giới hạn số lượng request per minute (RPM) cho từng mô hình cụ thể. Đây là giới hạn tần suất gọi API theo phút cho mỗi model. Xem thêm Google AI Rate Limits để biết chi tiết về các giới hạn.
+metadata.model_tpm_limit
+object
+Giới hạn số lượng token per minute (TPM) cho từng mô hình cụ thể. Đây là tổng số token (input) có thể xử lý trong một phút cho mỗi model. Xem thêm Google AI Rate Limits để biết chi tiết về quota và giới hạn token.
+tpm_limit
+number
+Giới hạn tokens per minute chung cho API Key. null nếu không giới hạn.
+rpm_limit
+number
+Giới hạn requests per minute chung cho API Key. null nếu không giới hạn.
+expires
+string
+Thời gian hết hạn của API key. null nếu không hết hạn.
+models
+array
+Danh sách các mô hình được phép sử dụng với API key này.
+user_id
+string
+ID của người dùng sở hữu API key.
+team_id
+string
+ID của nhóm sở hữu API key.
+blocked
+boolean
+Trạng thái khóa của API key. true nếu bị khóa, null hoặc false nếu hoạt động.
+budget_duration
+string
+Khoảng thời gian tính ngân sách (ví dụ: 1d, 1w, 1m). null nếu không có chu kỳ.
+budget_reset_at
+string
+Thời điểm reset ngân sách tiếp theo (ISO 8601). null nếu không có chu kỳ.
+model_spend
+object
+Chi tiêu chi tiết theo từng mô hình.
+model_max_budget
+object
+Ngân sách tối đa theo từng mô hình.
+created_at
+string
+Thời gian tạo API key (định dạng ISO 8601).
+updated_at
+string
+Thời gian cập nhật cuối cùng của API key (định dạng ISO 8601).
+permissions
+object
+Các quyền hạn được cấp cho API key.
+curl
+Python (requests)
+Node.js (fetch)
+curl -X 'GET' \
+'https://api.thucchien.ai/key/info' \
+-H 'accept: application/json' \
+-H 'Authorization: Bearer '
+Try It!
+Example Response
+{
+  "key": "b1ba143c164e66c912677762a7a0b0a2d5bd686b59999823e5fd2ccb3c71731f",
+  "info": {
+    "key_name": "sk-...gHQK",
+    "key_alias": "official-01@key",
+    "soft_budget_cooldown": false,
+    "spend": 0.5,
+    "expires": null,
+    "models": [
+      "all-team-models"
+    ],
+    "aliases": {},
+    "config": {},
+    "user_id": "f52b3ad4-986e-4c62-9bbd-79e80e221d0b",
+    "team_id": "5b4c20e9-1ff9-4ac0-bec6-0b00a25a31ab",
+    "permissions": {},
+    "max_parallel_requests": 200,
+    "metadata": {
+      "model_rpm_limit": {
+        "imagen-4": 20,
+        "gemini-2.5-pro": 2000,
+        "gemini-2.5-flash": 10000,
+        "veo-2.0-generate-001": 2,
+        "veo-2.0-generate-exp": 2,
+        "veo-3.0-generate-001": 10,
+        "gemini-2.5-flash-image": 5000,
+        "veo-2.0-generate-preview": 2,
+        "veo-3.1-generate-preview": 10,
+        "veo-3.0-fast-generate-001": 10,
+        "gemini-2.5-pro-preview-tts": 100,
+        "gemini-2.5-flash-preview-tts": 1000,
+        "veo-3.1-fast-generate-preview": 10,
+        "gemini-2.5-flash-image-preview": 5000
+      },
+      "model_tpm_limit": {
+        "gemini-2.5-pro": 8000000,
+        "gemini-2.5-flash": 8000000,
+        "gemini-2.5-flash-image": 5000000,
+        "gemini-2.5-pro-preview-tts": 1000000,
+        "gemini-2.5-flash-preview-tts": 1000000,
+        "gemini-2.5-flash-image-preview": 5000000
+      }
+    },
+    "blocked": null,
+    "tpm_limit": 800000,
+    "rpm_limit": 200,
+    "max_budget": 50,
+    "budget_duration": null,
+    "budget_reset_at": null,
+    "allowed_cache_controls": [],
+    "allowed_routes": [],
+    "model_spend": {},
+    "model_max_budget": {},
+    "budget_id": null,
+    "organization_id": null,
+    "object_permission_id": null,
+    "created_at": "2025-10-21T07:12:36.122000+00:00",
+    "created_by": "default_user_id",
+    "updated_at": "2025-10-21T07:24:39.726000+00:00",
+    "updated_by": "default_user_id",
+    "rotation_count": 0,
+    "auto_rotate": false,
+    "rotation_interval": null,
+    "last_rotation_at": null,
+    "key_rotation_at": null,
+    "litellm_budget_table": null,
+    "litellm_organization_table": null,
+    "object_permission": null
+  }
+}
+Copy full
+Previous
+Chuyển văn bản thành giọng nói (với Google Gemini)
+Next
+Tips và Tricks Thực Chiến
+
+=== CODE BLOCKS ===
+
+--- unknown_code_1 ---
+curl -X 'GET' \
+'https://api.thucchien.ai/key/info' \
+-H 'accept: application/json' \
+-H 'Authorization: Bearer '
+
+--- unknown_code_2 ---
+{
+  "key": "b1ba143c164e66c912677762a7a0b0a2d5bd686b59999823e5fd2ccb3c71731f",
+  "info": {
+    "key_name": "sk-...gHQK",
+    "key_alias": "official-01@key",
+    "soft_budget_cooldown": false,
+    "spend": 0.5,
+    "expires": null,
+    "models": [
+      "all-team-models"
+    ],
+    "aliases": {},
+    "config": {},
+    "user_id": "f52b3ad4-986e-4c62-9bbd-79e80e221d0b",
+    "team_id": "5b4c20e9-1ff9-4ac0-bec6-0b00a25a31ab",
+    "permissions": {},
+    "max_parallel_requests": 200,
+    "metadata": {
+      "model_rpm_limit": {
+        "imagen-4": 20,
+        "gemini-2.5-pro": 2000,
+        "gemini-2.5-flash": 10000,
+        "veo-2.0-generate-001": 2,
+        "veo-2.0-generate-exp": 2,
+        "veo-3.0-generate-001": 10,
+        "gemini-2.5-flash-image": 5000,
+        "veo-2.0-generate-preview": 2,
+        "veo-3.1-generate-preview": 10,
+        "veo-3.0-fast-generate-001": 10,
+        "gemini-2.5-pro-preview-tts": 100,
+        "gemini-2.5-flash-preview-tts": 1000,
+        "veo-3.1-fast-generate-preview": 10,
+        "gemini-2.5-flash-image-preview": 5000
+      },
+      "model_tpm_limit": {
+        "gemini-2.5-pro": 8000000,
+        "gemini-2.5-flash": 8000000,
+        "gemini-2.5-flash-image": 5000000,
+        "gemini-2.5-pro-preview-tts": 1000000,
+        "gemini-2.5-flash-preview-tts": 1000000,
+        "gemini-2.5-flash-image-preview": 5000000
+      }
+    },
+    "blocked": null,
+    "tpm_limit": 800000,
+    "rpm_limit": 200,
+    "max_budget": 50,
+    "budget_duration": null,
+    "budget_reset_at": null,
+    "allowed_cache_controls": [],
+    "allowed_routes": [],
+    "model_spend": {},
+    "model_max_budget": {},
+    "budget_id": null,
+    "organization_id": null,
+    "object_permission_id": null,
+    "created_at": "2025-10-21T07:12:36.122000+00:00",
+    "created_by": "default_user_id",
+    "updated_at": "2025-10-21T07:24:39.726000+00:00",
+    "updated_by": "default_user_id",
+    "rotation_count": 0,
+    "auto_rotate": false,
+    "rotation_interval": null,
+    "last_rotation_at": null,
+    "key_rotation_at": null,
+    "litellm_budget_table": null,
+    "litellm_organization_table": null,
+    "object_permission": null
+  }
+}
+
+--- bash_code_1 ---
+curl -X 'GET' \
+'https://api.thucchien.ai/key/info' \
+-H 'accept: application/json' \
+-H 'Authorization: Bearer '
+
+--- unknown_code_3 ---
+Bearer <your_api_key>
+
+--- unknown_code_14 ---
+max_parallel_requests
+
+--- unknown_code_16 ---
+metadata.model_rpm_limit
+
+--- unknown_code_17 ---
+metadata.model_tpm_limit
+
+--- unknown_code_43 ---
+curl -X 'GET' \
+'https://api.thucchien.ai/key/info' \
+-H 'accept: application/json' \
+-H 'Authorization: Bearer '
+
+--- unknown_code_44 ---
+{
+  "key": "b1ba143c164e66c912677762a7a0b0a2d5bd686b59999823e5fd2ccb3c71731f",
+  "info": {
+    "key_name": "sk-...gHQK",
+    "key_alias": "official-01@key",
+    "soft_budget_cooldown": false,
+    "spend": 0.5,
+    "expires": null,
+    "models": [
+      "all-team-models"
+    ],
+    "aliases": {},
+    "config": {},
+    "user_id": "f52b3ad4-986e-4c62-9bbd-79e80e221d0b",
+    "team_id": "5b4c20e9-1ff9-4ac0-bec6-0b00a25a31ab",
+    "permissions": {},
+    "max_parallel_requests": 200,
+    "metadata": {
+      "model_rpm_limit": {
+        "imagen-4": 20,
+        "gemini-2.5-pro": 2000,
+        "gemini-2.5-flash": 10000,
+        "veo-2.0-generate-001": 2,
+        "veo-2.0-generate-exp": 2,
+        "veo-3.0-generate-001": 10,
+        "gemini-2.5-flash-image": 5000,
+        "veo-2.0-generate-preview": 2,
+        "veo-3.1-generate-preview": 10,
+        "veo-3.0-fast-generate-001": 10,
+        "gemini-2.5-pro-preview-tts": 100,
+        "gemini-2.5-flash-preview-tts": 1000,
+        "veo-3.1-fast-generate-preview": 10,
+        "gemini-2.5-flash-image-preview": 5000
+      },
+      "model_tpm_limit": {
+        "gemini-2.5-pro": 8000000,
+        "gemini-2.5-flash": 8000000,
+        "gemini-2.5-flash-image": 5000000,
+        "gemini-2.5-pro-preview-tts": 1000000,
+        "gemini-2.5-flash-preview-tts": 1000000,
+        "gemini-2.5-flash-image-preview": 5000000
+      }
+    },
+    "blocked": null,
+    "tpm_limit": 800000,
+    "rpm_limit": 200,
+    "max_budget": 50,
+    "budget_duration": null,
+    "budget_reset_at": null,
+    "allowed_cache_controls": [],
+    "allowed_routes": [],
+    "model_spend": {},
+    "model_max_budget": {},
+    "budget_id": null,
+    "organization_id": null,
+    "object_permission_id": null,
+    "created_at": "2025-10-21T07:12:36.122000+00:00",
+    "created_by": "default_user_id",
+    "updated_at": "2025-10-21T07:24:39.726000+00:00",
+    "updated_by": "default_user_id",
+    "rotation_count": 0,
+    "auto_rotate": false,
+    "rotation_interval": null,
+    "last_rotation_at": null,
+    "key_rotation_at": null,
+    "litellm_budget_table": null,
+    "litellm_organization_table": null,
+    "object_permission": null
+  }
+}

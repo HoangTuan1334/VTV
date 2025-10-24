@@ -1,0 +1,435 @@
+# 📝 Nhập yêu cầu truyện
+story_requirement = input("nhập")
+
+print(f"\n✅ Đã nhận yêu cầu: {story_requirement}")
+
+
+
+# 🤖 Sinh kịch bản với Gemini
+def generate_story_script(requirement, pages_info):
+    """Sinh kịch bản chi tiết cho từng trang, từng khung - KHÔNG CÓ DEMO PAGE"""
+    
+    prompt = f"""
+You are a professional comic book scriptwriter who has worked for companies like Shonen Jump, Webtoon, and Marvel. You have the ability to build engaging stories, vivid characters, natural dialogue, clear conflicts, and logical climaxes. Create a detailed and cinematic comic script with a natural style, emotional depth, and suitable for the genre requested by the user.
+
+====================
+🔒 CONSISTENT CONTEXT AND COHESION GUIDELINES (Based on Best Practices for Building Compelling, Inspirational, Coherent, and Cohesive Stories):
+- Always maintain the main context of the story based on {requirement} (e.g., if it's about war, all pages must take place in war-related environments like battlefields, ruined villages, or refugee camps – no jumping to modern or unrelated fictional settings without seamless integration).
+- Ensure every element reinforces this context through setting descriptions, mood, and actions to create unity and avoid deviations in genre or theme.
+- Build a cohesive narrative arc: Use a 3-act structure (Act 1: Setup with initial conflict and emotional stakes; Act 2: Confrontation with rising obstacles for character growth; Act 3: Resolution with inspirational transformation and message). Characters develop from introduction (establish initial emotional conflict and stakes), development (build tension and emotional growth via obstacles), climax (peak emotional moment with inspiration or transformation), to resolution (end with a profound message, leaving lasting emotional resonance).
+- Draw from storytelling best practices: 
+  - Cohesion: Every part (characters, plot, setting) serves a purpose in a unified whole; simplify elements to reduce complexity while maintaining emotional depth.
+  - Structure: Start with a one-sentence storyline, expand to 3-act structure (setup, confrontation, resolution) for coherence; include specific, vivid events with emotional ups and downs.
+  - Character Development: Make characters vivid, relatable with personal struggles, authentic motivations, backstories, and growth arcs that inspire empathy; include relations between characters for deeper links.
+  - Plot: Use clear structure, consistent pacing, and tone for smooth transitions; foreshadow any shifts (e.g., flashbacks or visions) with subtle hints to avoid mismatches; add obstacles that build inspiration through empathy and positive change.
+  - Inspiration: Cultivate empathy, show positive transformation amid challenges, and convey authentic, relatable messages; use wordless or reflective moments to engage readers profoundly.
+  - Overall Coherence: Organize ideas logically, ensure vivid visuals and emotional hooks to absorb readers; if including non-core elements like visions, integrate them as part of character arcs (e.g., a war soldier's hallucination tied to motivation).
+
+====================
+🎯 STORY REQUIREMENT:
+{requirement}
+
+====================
+📘 STORY STRUCTURE:
+Total {len(pages_info)} pages
+
+{chr(10).join([f'- Page {p["page_num"]}: {len(p["panels"])} panels' for p in pages_info])}
+
+====================
+🎨 OUTPUT REQUIREMENTS (JSON FORMAT):
+{{
+  "title": "Story title (short, impactful, evocative)",
+  "genre": "Genre (e.g.: action, fantasy, sci-fi, slice of life, adventure, drama, historical, romance, psychological, horror, comedy...)", 
+  "tone": "Main emotional tone (e.g.: inspiring, dark, melancholic, humorous...)",
+  "theme": "Philosophical theme or main message of the story (must be profound, tightly linked to the context and character arcs, e.g.: loss in war leading to hope and rebirth through ancestral inspiration)",
+  "art_style": "Art style (e.g.: manga noir, modern webtoon, semi-realistic watercolor...)",
+  "story_outline": "High-level 3-act summary (Act 1: Setup; Act 2: Confrontation with obstacles; Act 3: Resolution with transformation; keep concise but ensure coherence and inspiration)",
+
+  "characters": [
+    {{
+      "name": "Character name",
+      "role": "main / supporting / antagonist / mentor",
+      "appearance": {{
+        "age": "Age (e.g.: teen, young adult, middle-aged...)",
+        "gender": "male/female/other",
+        "height": "Height (e.g.: tall, average, short)",
+        "build": "Build (e.g.: athletic, slim, muscular, petite...)",
+        "hair": "Hair color and style in detail (e.g.: long silver hair in ponytail, spiky red hair...)",
+        "eyes": "Eye color and features (e.g.: bright blue eyes, sharp golden eyes...)",
+        "skin": "Skin tone (e.g.: pale, tan, dark...)",
+        "clothing": "Clothing in detail (e.g.: black leather jacket with red scarf, school uniform...)",
+        "distinctive_features": "Distinctive features (e.g.: scar on left cheek, always wears glasses, mechanical arm...)"
+      }},
+      "personality": "Personality (e.g.: brave but reckless, quiet and observant...; make it vivid and tied to their arc for emotional depth)",
+      "backstory": "Brief backstory (e.g.: grew up in a war-torn village, lost family to conflict; link to context for cohesion)",
+      "relations": "Relations to other characters (e.g.: brother to Main Character, rival to Antagonist; build emotional links)",
+      "motivation": "Deep motivation or pain driving their actions (must link to the context, create emotional depth, e.g.: losing family in war fuels revenge or redemption; ensure it evolves for inspiration)"
+    }}
+  ],
+
+  "pages": [
+    {{
+      "page_num": 1,
+      "scene_description": "Opening scene - establish setting, tone, and first emotional hook (introduce main context, initial conflict, and foreshadow key elements for cohesion)",
+      "mood": "Mood/atmosphere of the page (e.g.: tense, peaceful, action-packed...; must be consistent with overall context)",
+      "panels": [
+        {{
+          "panel_num": 1,
+          "dialogue": "Dialogue in Vietnamese (short, natural, evocative of emotions, reflecting inner thoughts)",
+          "action": "Action taking place (tightly linked to context, character arc, and obstacles)",
+          "shot_type": "Shot type (wide/establishing, medium, close-up, extreme close-up...)",
+          "characters_in_panel": ["Character name 1", "Character name 2"],
+          "basic_visual": "Short visual description (to be expanded later; include context details for cohesion and foreshadowing)"
+        }}
+      ]
+    }},
+    {{
+      "page_num": 2,
+      "scene_description": "Conflict rising - introduce dilemma or surprise element (build emotional tension and obstacles within the main context; foreshadow resolutions)",
+      "mood": "...",
+      "panels": [...]
+    }}
+  ]
+}}
+
+====================
+⚙️ GENRE-SPECIFIC GUIDELINES:
+
+Customize plot progression, emotions, and action scenes based on the genre, but always maintain context consistency and build deeper emotions through character arcs, inspirational moments (e.g., reflection, sacrifice, realization), cohesive elements, and 3-act integration:
+
+- **Action:** Include fight scenes, strong movements, violent sounds, close-ups of fists, weapons, speed, sweat, wounds, flashes, and determination.  
+  → Create “moment of impact” in some panels (e.g.: punch breaking through frame, exploding dust). Add emotion: Characters fight with inner pain, overcoming obstacles for inspirational growth.
+
+- **Romance:** Slower pace, heavy internal emotions, authentic dialogue, eye contact, hand touches, or kisses – tears, soft smiles, or separations.  
+  → Panels show “tension” between characters, soft lighting, close angles, open emotions. Add depth: Romantic conflicts tied to context (e.g.: love in wartime), with obstacles leading to transformation.
+
+- **Drama / Slice of Life:** Focus on daily life, relationships, memories, growth journeys, quiet or poignant moments.  
+  → Panels with intimate layouts, natural lighting, environmental details. Add emotion: Reflective moments, inner changes via obstacles for inspiration.
+
+- **Fantasy / Adventure:** Vast worlds, magic, mythical creatures, special weapons, fantastical battles, vibrant settings.  
+  → Add wide panels (establishing shots) to show world scale. Maintain consistency: Fantasy context doesn't mix with reality; foreshadow any shifts.
+
+- **Horror / Psychological:** Gloomy atmosphere, tension, contrasting lights, distorted faces, bizarre behaviors, cold laughs.  
+  → Use light descriptions, sounds, and close angles for pressure. Add emotion: Inner fears linked to context, resolved through inspirational realization.
+
+- **Comedy:** Fast pace, exaggerated expressions, humorous reactions, ironic situations.  
+  → Panels with sudden transitions, funny sounds (“BOING!”, “!?!”). Add depth: Humor masking true emotions, with obstacles for growth.
+
+- **Sci-Fi:** Focus on technology, future, AI, space, or robots.  
+  → Visuals with neon lights, machinery, holograms, futuristic cities. Maintain consistency: Future context doesn't mix with present; build inspiration through tech-driven transformations.
+
+====================
+⚠️ STRICT RULES:
+
+1. **PANEL COUNTS**
+{chr(10).join([f'   - PAGE {p["page_num"]}: EXACTLY {len(p["panels"])} panels' for p in pages_info])}
+
+2. **CHARACTERS - EXTREMELY DETAILED DESCRIPTIONS**
+   - Each character needs extremely specific appearance descriptions.
+   - Include: age, gender, height, build, hair (color + style), eyes (color), skin, clothing, distinctive_features.
+   - Detailed enough for AI to draw the character accurately.
+   - Consistent throughout (same character = same description) and linked to context (e.g.: clothing suitable for war); tie to backstory and relations.
+
+3. **PLOT**
+   - Logical rhythm (introduction → development → climax → resolution) following 3-act structure.
+   - Each page has unique mood and atmosphere but consistent with overall context.
+   - Dialogue natural, short, and deeply emotional; foreshadow key elements.
+
+4. **PANELS**
+   - Each panel has: dialogue, action, shot_type, characters_in_panel, basic_visual.
+   - Diverse shot types (wide, medium, close-up...).
+   - Basic visual short but reinforces context, foreshadowing, and emotional arcs.
+
+5. **OUTPUT**
+   - Return only valid JSON.
+   - NO explanations or other text.
+   - NO markdown code blocks.
+
+6. **LANGUAGE**
+    - All dialogue must be in Vietnamese.
+"""
+
+
+
+    
+    response = text_model.generate_content(prompt)
+    
+    # Parse JSON từ response
+    try:
+        # Loại bỏ markdown code block nếu có
+        text = response.text.strip()
+        if text.startswith("```json"):
+            text = text[7:]
+        if text.startswith("```"):
+            text = text[3:]
+        if text.endswith("```"):
+            text = text[:-3]
+        
+        script = json.loads(text.strip())
+        return script
+    except json.JSONDecodeError as e:
+        print(f"❌ Lỗi parse JSON: {e}")
+        print(f"Response: {response.text}")
+        return None
+
+print("🤖 Đang sinh kịch bản với Gemini AI...")
+story_script = generate_story_script(story_requirement, selected_layouts)
+
+if story_script:
+    # ✅ VALIDATION: Kiểm tra và sửa số lượng panels
+    print("\n🔍 Kiểm tra số lượng panels...")
+    for i, page in enumerate(story_script['pages']):
+        expected_panels = len(selected_layouts[i]['panels'])
+        actual_panels = len(page['panels'])
+        
+        if actual_panels != expected_panels:
+            print(f"   ⚠️ Trang {page['page_num']}: Có {actual_panels} panels, cần {expected_panels}")
+            
+            if actual_panels > expected_panels:
+                # Cắt bớt panels thừa
+                page['panels'] = page['panels'][:expected_panels]
+                print(f"      → Đã cắt bớt xuống {expected_panels} panels")
+            else:
+                # Thêm panels thiếu (duplicate panel cuối)
+                while len(page['panels']) < expected_panels:
+                    last_panel = page['panels'][-1].copy()
+                    last_panel['panel_num'] = len(page['panels']) + 1
+                    page['panels'].append(last_panel)
+                print(f"      → Đã thêm panels lên {expected_panels}")
+        else:
+            print(f"   ✅ Trang {page['page_num']}: {actual_panels} panels - Đúng!")
+    
+    # Lưu kịch bản đã sửa
+    with open("story_script.json", "w", encoding="utf-8") as f:
+        json.dump(story_script, f, indent=2, ensure_ascii=False)
+    
+    print(f"\n✅ Đã sinh kịch bản truyện: {story_script['title']}")
+    print(f"   Phong cách: {story_script['art_style']}")
+    print(f"   Số nhân vật: {len(story_script['characters'])}")
+    print(f"   Số trang: {len(story_script['pages'])}")
+else:
+    print("❌ Không thể sinh kịch bản. Vui lòng thử lại.")
+
+
+
+
+# 🎨 Hàm sinh prompt CHI TIẾT cho từng panel
+def generate_detailed_prompts(story_script):
+    """
+    Gọi Gemini để sinh prompt CỰC KỲ CHI TIẾT cho từng panel
+    
+    - Mô tả nhân vật CHÍNH XÁC theo appearance đã định
+    - Background và setting cụ thể
+    - Lighting, mood, camera angle
+    - Đảm bảo consistency giữa các panels
+    
+    Returns:
+        story_script với thêm trường "detailed_prompt" cho mỗi panel
+    """
+    
+    print("\n🎨 Đang sinh prompt chi tiết cho từng panel...")
+    print("=" * 70)
+    
+    # Chuẩn bị thông tin nhân vật CỰC KỲ CHI TIẾT
+    character_profiles = []
+    for char in story_script['characters']:
+        app = char['appearance']
+        profile = f"""
+CHARACTER: {char['name']} ({char['role']})
+Physical Description (MUST BE EXACT IN ALL PANELS):
+- Age: {app['age']}, Gender: {app['gender']}
+- Height: {app['height']}, Build: {app['build']}
+- Hair: {app['hair']} (EXACT same style in all panels)
+- Eyes: {app['eyes']} (EXACT same color in all panels)
+- Skin: {app['skin']}
+- Clothing: {app['clothing']} (CONSISTENT outfit)
+- Distinctive Features: {app['distinctive_features']}
+Personality: {char['personality']}
+"""
+        character_profiles.append(profile)
+    
+    character_reference = "\n".join(character_profiles)
+    
+    # Duyệt qua từng trang, từng panel
+    for page in story_script['pages']:
+        page_num = page['page_num']
+        print(f"\n📄 Trang {page_num}: Đang xử lý {len(page['panels'])} panels...")
+        
+        for panel in page['panels']:
+            panel_num = panel['panel_num']
+            
+            # Tạo prompt chi tiết cho panel này
+            prompt = f"""
+You are an expert comic book art director and prompt engineer. Your job is to create EXTREMELY DETAILED image generation prompts for a comic panel.
+
+====================
+🔒 CONSISTENT CONTEXT AND COHESION GUIDELINES:
+- Always maintain the main story context in every description (e.g.: if war-themed, include details like ruined battlefields, smoke, or war sounds – no adding unrelated elements like modern tech unless sci-fi; integrate any visions/flashbacks with visual cues like faded edges or tied to character expressions).
+- Reinforce emotions through visuals: Add details evoking deep emotions (e.g.: pained expressions, dim lighting reflecting inner turmoil, or inspirational moments tied to character arcs and obstacles).
+- Ensure cohesion with 3-act arc: Visuals should support setup, confrontation, or resolution phases.
+
+====================
+📚 STORY CONTEXT:
+Title: {story_script['title']}
+Genre: {story_script['genre']}
+Art Style: {story_script['art_style']}
+Tone: {story_script['tone']}
+
+====================
+👥 CHARACTER REFERENCE (MUST MAINTAIN EXACT CONSISTENCY):
+{character_reference}
+
+====================
+📄 PAGE {page_num} CONTEXT:
+Scene: {page['scene_description']} (keep consistent with overall story context, including foreshadowing for coherence)
+Mood: {page['mood']} (add deep emotional details, linked to theme and inspirational arc)
+
+====================
+🎬 THIS PANEL ({panel_num}):
+Shot Type: {panel['shot_type']}
+Action: {panel['action']} (tightly linked to context, emotional arc, and obstacles)
+Characters: {', '.join(panel['characters_in_panel'])}
+Basic Visual: {panel['basic_visual']} (expand to reinforce context, cohesion, and foreshadowing)
+
+====================
+✍️ YOUR TASK:
+Create an EXTREMELY DETAILED English prompt for Gemini image generation that includes:
+
+1. **Art Style & Medium**: Specify the exact art style from the story (manga, webtoon, etc.) and adjust for context (e.g.: gritty realism for war, with inspirational highlights).
+
+2. **Characters** (IF ANY IN SCENE):
+   - For EACH character in the panel, use their EXACT physical description from the character reference above.
+   - Copy the appearance details WORD FOR WORD to ensure consistency.
+   - Include: hair, eyes, height, build, clothing, distinctive features.
+   - Example: "tall athletic man with spiky red hair, bright blue eyes, wearing black leather jacket with red scarf, scar on left cheek".
+   - Add emotional expressions: Describe poses and faces to reflect inner emotions, backstory relations, and arc progress (e.g.: eyes teary from grief in war, showing inspirational resolve).
+
+3. **Composition & Camera**:
+   - Shot type: {panel['shot_type']}.
+   - Camera angle (eye-level, high angle, low angle, dutch angle, etc.) (choose to heighten emotional tension or inspiration, e.g.: low angle for heroic transformation).
+   - Framing and positioning of elements for cohesion.
+
+4. **Background & Setting**:
+   - Specific location details (must be consistent with story context, describe in detail for cohesion, e.g.: battlefield with tank wreckage, bombing rain; integrate any shifts smoothly).
+   - Environmental elements that tie to theme.
+   - Depth and perspective.
+
+5. **Lighting & Atmosphere**:
+   - Light source and direction.
+   - Shadows and highlights.
+   - Color temperature (warm/cool).
+   - Mood: {page['mood']} (add effects evoking emotions and inspiration, e.g.: red-tinted light for war tension, golden glow for hopeful resolution).
+
+6. **Action & Motion**:
+   - What's happening: {panel['action']}.
+   - Motion lines or effects if needed (add for emotional impact, e.g.: blur for sacrificial moment or obstacle confrontation).
+   - Character poses and expressions (focus on inner emotions, relations, and arc development).
+
+7. **Technical Requirements**:
+   - High quality comic book illustration.
+   - Clean linework.
+   - Professional composition.
+   - NO TEXT, NO DIALOGUE, NO SPEECH BUBBLES in the image (text will be added separately).
+   - Add: High emotional impact, visual storytelling that conveys theme, consistency, and inspirational elements.
+
+====================
+⚠️ CRITICAL RULES:
+- Use EXACT character descriptions from the reference (copy-paste their appearance details).
+- Maintain consistency with previous panels (same characters = same appearance) and overall context; foreshadow shifts.
+- Be specific about every visual element to create deeper emotions and cohesion.
+- Write in clear English.
+- Do NOT include any text/dialogue in the image description.
+- Focus on visual storytelling and evoking emotions through imagery.
+
+====================
+OUTPUT FORMAT (plain text, no JSON)
+Just output the detailed prompt in English, nothing else.".
+
+
+6. **LANGUAGE**
+    - All dialogue must be in Vietnamese.
+"""
+            
+            # Gọi Gemini
+            try:
+                response = text_model.generate_content(prompt)
+                detailed_prompt = response.text.strip()
+                
+                # Thêm detailed_prompt vào panel
+                panel['detailed_prompt'] = detailed_prompt
+                
+                print(f"   ✅ Panel {panel_num}: {len(detailed_prompt)} ký tự")
+                
+                # Delay nhỏ để tránh rate limit
+                time.sleep(0.5)
+                
+            except Exception as e:
+                print(f"   ❌ Panel {panel_num} lỗi: {e}")
+                # Fallback: dùng basic visual
+                panel['detailed_prompt'] = f"{story_script['art_style']} comic art. {panel['basic_visual']}. Characters: {', '.join(panel['characters_in_panel'])}. {panel['shot_type']} shot. NO TEXT in image."
+    
+    print("\n" + "=" * 70)
+    print("✅ Hoàn thành sinh prompt chi tiết!")
+    print("=" * 70)
+    
+    return story_script
+
+
+print("✅ Đã định nghĩa hàm generate_detailed_prompts")
+print("📌 Sẽ gọi Gemini lần 2 sau khi có story_script")
+print("📌 Tạo prompt CỰC KỲ chi tiết cho từng panel")
+
+
+# 🔄 Gọi hàm sinh prompt chi tiết
+if story_script:
+    print("\n" + "=" * 70)
+    print("🎨 BƯỚC 3.5: SINH PROMPT CHI TIẾT CHO TỪNG PANEL")
+    print("=" * 70)
+    
+    story_script = generate_detailed_prompts(story_script)
+    
+    # Lưu lại story_script đã có detailed prompts
+    with open("story_script_with_prompts.json", "w", encoding="utf-8") as f:
+        json.dump(story_script, f, indent=2, ensure_ascii=False)
+    
+    print("\n✅ Đã sinh xong prompt chi tiết cho TẤT CẢ panels!")
+    print(f"   Đã lưu: story_script_with_prompts.json")
+    
+    # Hiển thị sample
+    print("\n📝 Sample prompt chi tiết (Panel 1, Trang 1):")
+    print("=" * 70)
+    sample_prompt = story_script['pages'][0]['panels'][0]['detailed_prompt']
+    print(sample_prompt[:500] + "...")
+    print("=" * 70)
+else:
+    print("❌ Chưa có story_script. Vui lòng chạy cell sinh kịch bản trước.")
+
+
+
+
+# 🔍 Test: Kiểm tra số panels
+if 'story_script' in locals() and 'selected_layouts' in locals():
+    print("=" * 70)
+    print("🔍 KIỂM TRA SỐ LƯỢNG PANELS")
+    print("=" * 70)
+    
+    all_match = True
+    for i, page in enumerate(story_script['pages']):
+        layout_panels = len(selected_layouts[i]['panels'])
+        script_panels = len(page['panels'])
+        
+        status = "✅" if layout_panels == script_panels else "❌"
+        print(f"{status} Trang {page['page_num']}: Layout có {layout_panels} khung, Script có {script_panels} panels")
+        
+        if layout_panels != script_panels:
+            all_match = False
+    
+    print("=" * 70)
+    if all_match:
+        print("✅ TẤT CẢ ĐỀU KHỚP! Sẵn sàng tạo ảnh!")
+    else:
+        print("⚠️ CÓ TRANG KHÔNG KHỚP!")
+        print("📌 Hãy chạy lại cell sinh kịch bản để tự động sửa")
+    print("=" * 70)
+else:
+    print("❌ Chưa có story_script hoặc selected_layouts")

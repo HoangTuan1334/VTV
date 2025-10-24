@@ -1,0 +1,23 @@
+# 🎲 Nhập số trang và random layouts
+num_pages = int(input("📖 Nhập số trang truyện muốn tạo: "))
+
+# Random layouts cho tất cả các trang
+layout_names = list(layouts.keys())
+selected_layouts = []
+
+# Tạo tất cả các trang truyện
+for i in range(num_pages):
+    layout_name = random.choice(layout_names)
+    selected_layouts.append({
+        "page_num": i + 1,  # Trang 1, 2, 3...
+        "layout_name": layout_name,
+        "panels": layouts[layout_name]
+    })
+
+print(f"\n✅ Đã chọn {len(selected_layouts)} trang truyện:")
+for page in selected_layouts:
+    print(f"   Trang {page['page_num']}: {page['layout_name']} ({len(page['panels'])} khung)")
+
+# Lưu cấu trúc layouts
+with open("comic_structure.json", "w", encoding="utf-8") as f:
+    json.dump(selected_layouts, f, indent=2, ensure_ascii=False)

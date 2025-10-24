@@ -1,0 +1,283 @@
+=== Sinh văn bản (Text Generation) | AI Thực Chiến ===
+URL: https://docs.thucchien.ai/docs/user-guide/text-generation
+Crawled: 2025-10-23 00:17:59
+============================================================
+
+MAIN CONTENT:
+----------------------------------------
+Hướng dẫn sử dụng APISinh văn bản (Text Generation)
+Sinh văn bản (Text Generation)
+Các mô hình sinh văn bản cho phép bạn thực hiện nhiều tác vụ như trả lời câu hỏi, viết nội dung, tóm tắt văn bản, và nhiều hơn nữa. API này tuân theo chuẩn của OpenAI, vì vậy bạn có thể sử dụng các thư viện client của OpenAI một cách trực tiếp.
+Các model được hỗ trợ:
+gemini-2.5-pro (Google Gemini)
+gemini-2.5-flash (Google Gemini)
+THAM KHẢO API CHI TIẾT
+Để xem danh sách đầy đủ các tham số request, response và các ví dụ chi tiết, vui lòng truy cập trang Tham chiếu API: Sinh văn bản.
+Ví dụ nhanh
+Dưới đây là một ví dụ nhanh sử dụng thư viện openai trong Python, là cách tiếp cận được khuyến khích vì sự tiện lợi và quen thuộc.
+from openai import OpenAI
+
+# --- Cấu hình ---
+# Thay <your_api_key> bằng API key của bạn
+client = OpenAI(
+  api_key="<your_api_key>",
+  base_url="https://api.thucchien.ai"
+)
+
+# --- Thực thi ---
+response = client.chat.completions.create(
+  model="gemini-2.5-pro", # Chọn model bạn muốn
+  messages=[
+      {
+          "role": "user",
+          "content": "Explain the concept of API gateway in simple terms."
+      }
+  ]
+)
+
+print(response.choices[0].message.content)
+Previous
+Các khái niệm cốt lõi
+Next
+Sinh hình ảnh (Image Generation)
+Ví dụ nhanh
+
+CODE BLOCKS:
+----------------------------------------
+
+[CODE: unknown_code_1]
+```
+from openai import OpenAI
+
+# --- Cấu hình ---
+# Thay <your_api_key> bằng API key của bạn
+client = OpenAI(
+  api_key="<your_api_key>",
+  base_url="https://api.thucchien.ai"
+)
+
+# --- Thực thi ---
+response = client.chat.completions.create(
+  model="gemini-2.5-pro", # Chọn model bạn muốn
+  messages=[
+      {
+          "role": "user",
+          "content": "Explain the concept of API gateway in simple terms."
+      }
+  ]
+)
+
+print(response.choices[0].message.content)
+```
+..............................
+
+[CODE: python_code_1]
+```
+from openai import OpenAI
+
+# --- Cấu hình ---
+# Thay <your_api_key> bằng API key của bạn
+client = OpenAI(
+  api_key="<your_api_key>",
+  base_url="https://api.thucchien.ai"
+)
+
+# --- Thực thi ---
+response = client.chat.completions.create(
+  model="gemini-2.5-pro", # Chọn model bạn muốn
+  messages=[
+      {
+          "role": "user",
+          "content": "Explain the concept of API gateway in simple terms."
+      }
+  ]
+)
+
+print(response.choices[0].message.content)
+```
+..............................
+
+[CODE: python_code_2]
+```
+from openai import OpenAI
+
+# --- Cấu hình ---
+# Thay <your_api_key> bằng API key của bạn
+client = OpenAI(
+  api_key="<your_api_key>",
+  base_url="https://api.thucchien.ai"
+)
+
+# --- Thực thi ---
+response = client.chat.completions.create(
+  model="gemini-2.5-pro", # Chọn model bạn muốn
+  messages=[
+      {
+          "role": "user",
+          "content": "Explain the concept of API gateway in simple terms."
+      }
+  ]
+)
+
+print(response.choices[0].message.content)
+```
+..............................
+
+[CODE: unknown_code_4]
+```
+from openai import OpenAI
+
+# --- Cấu hình ---
+# Thay <your_api_key> bằng API key của bạn
+client = OpenAI(
+  api_key="<your_api_key>",
+  base_url="https://api.thucchien.ai"
+)
+
+# --- Thực thi ---
+response = client.chat.completions.create(
+  model="gemini-2.5-pro", # Chọn model bạn muốn
+  messages=[
+      {
+          "role": "user",
+          "content": "Explain the concept of API gateway in simple terms."
+      }
+  ]
+)
+
+print(response.choices[0].message.content)
+```
+..............................
+
+FULL CONTENT:
+----------------------------------------
+Hướng dẫn sử dụng APISinh văn bản (Text Generation)
+Sinh văn bản (Text Generation)
+Các mô hình sinh văn bản cho phép bạn thực hiện nhiều tác vụ như trả lời câu hỏi, viết nội dung, tóm tắt văn bản, và nhiều hơn nữa. API này tuân theo chuẩn của OpenAI, vì vậy bạn có thể sử dụng các thư viện client của OpenAI một cách trực tiếp.
+Các model được hỗ trợ:
+gemini-2.5-pro (Google Gemini)
+gemini-2.5-flash (Google Gemini)
+THAM KHẢO API CHI TIẾT
+Để xem danh sách đầy đủ các tham số request, response và các ví dụ chi tiết, vui lòng truy cập trang Tham chiếu API: Sinh văn bản.
+Ví dụ nhanh
+Dưới đây là một ví dụ nhanh sử dụng thư viện openai trong Python, là cách tiếp cận được khuyến khích vì sự tiện lợi và quen thuộc.
+from openai import OpenAI
+
+# --- Cấu hình ---
+# Thay <your_api_key> bằng API key của bạn
+client = OpenAI(
+  api_key="<your_api_key>",
+  base_url="https://api.thucchien.ai"
+)
+
+# --- Thực thi ---
+response = client.chat.completions.create(
+  model="gemini-2.5-pro", # Chọn model bạn muốn
+  messages=[
+      {
+          "role": "user",
+          "content": "Explain the concept of API gateway in simple terms."
+      }
+  ]
+)
+
+print(response.choices[0].message.content)
+Previous
+Các khái niệm cốt lõi
+Next
+Sinh hình ảnh (Image Generation)
+Ví dụ nhanh
+
+=== CODE BLOCKS ===
+
+--- unknown_code_1 ---
+from openai import OpenAI
+
+# --- Cấu hình ---
+# Thay <your_api_key> bằng API key của bạn
+client = OpenAI(
+  api_key="<your_api_key>",
+  base_url="https://api.thucchien.ai"
+)
+
+# --- Thực thi ---
+response = client.chat.completions.create(
+  model="gemini-2.5-pro", # Chọn model bạn muốn
+  messages=[
+      {
+          "role": "user",
+          "content": "Explain the concept of API gateway in simple terms."
+      }
+  ]
+)
+
+print(response.choices[0].message.content)
+
+--- python_code_1 ---
+from openai import OpenAI
+
+# --- Cấu hình ---
+# Thay <your_api_key> bằng API key của bạn
+client = OpenAI(
+  api_key="<your_api_key>",
+  base_url="https://api.thucchien.ai"
+)
+
+# --- Thực thi ---
+response = client.chat.completions.create(
+  model="gemini-2.5-pro", # Chọn model bạn muốn
+  messages=[
+      {
+          "role": "user",
+          "content": "Explain the concept of API gateway in simple terms."
+      }
+  ]
+)
+
+print(response.choices[0].message.content)
+
+--- python_code_2 ---
+from openai import OpenAI
+
+# --- Cấu hình ---
+# Thay <your_api_key> bằng API key của bạn
+client = OpenAI(
+  api_key="<your_api_key>",
+  base_url="https://api.thucchien.ai"
+)
+
+# --- Thực thi ---
+response = client.chat.completions.create(
+  model="gemini-2.5-pro", # Chọn model bạn muốn
+  messages=[
+      {
+          "role": "user",
+          "content": "Explain the concept of API gateway in simple terms."
+      }
+  ]
+)
+
+print(response.choices[0].message.content)
+
+--- unknown_code_4 ---
+from openai import OpenAI
+
+# --- Cấu hình ---
+# Thay <your_api_key> bằng API key của bạn
+client = OpenAI(
+  api_key="<your_api_key>",
+  base_url="https://api.thucchien.ai"
+)
+
+# --- Thực thi ---
+response = client.chat.completions.create(
+  model="gemini-2.5-pro", # Chọn model bạn muốn
+  messages=[
+      {
+          "role": "user",
+          "content": "Explain the concept of API gateway in simple terms."
+      }
+  ]
+)
+
+print(response.choices[0].message.content)

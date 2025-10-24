@@ -1,0 +1,272 @@
+# 🎯 Tạo ảnh cho từng panel với DETAILED PROMPT
+def create_panel_images_v2(story_script, selected_layouts):
+    """
+    Tạo ảnh cho từng panel - SỬ DỤNG DETAILED PROMPT ĐÃ SINH
+    
+    ⭐ LOGIC MỚI:
+    - Không cần demo page
+    - Mỗi panel dùng detailed_prompt đã được Gemini tạo
+    - Detailed prompt đã bao gồm character consistency
+    """
+    panel_images = {}
+    os.makedirs("panel_images", exist_ok=True)
+    
+    for i, page_data in enumerate(story_script['pages']):
+        page_num = page_data['page_num']
+        layout_info = selected_layouts[i]
+        
+        # ⚠️ KIỂM TRA: Số panel trong script vs layout
+        num_panels_in_layout = len(layout_info['panels'])
+        num_panels_in_script = len(page_data['panels'])
+        
+        if num_panels_in_script > num_panels_in_layout:
+            print(f"\n⚠️ CẢNH BÁO: Trang {page_num} có {num_panels_in_script} panels trong script")
+            print(f"   nhưng layout chỉ có {num_panels_in_layout} khung!")
+            print(f"   → Chỉ tạo {num_panels_in_layout} panels đầu tiên")
+            # Cắt bớt panels trong script để khớp với layout
+            page_data['panels'] = page_data['panels'][:num_panels_in_layout]
+        
+        print(f"\n📄 Trang {page_num}: Tạo {len(page_data['panels'])} panels...")
+        
+        page_panels = []
+        
+        for j, panel_data in enumerate(page_data['panels']):
+            panel_num = panel_data['panel_num']
+            
+            # Lấy kích thước CHÍNH XÁC từ layout
+            x, y, w, h = layout_info['panels'][j]
+            aspect_ratio = w / h 
+            print(f"\n   🎨 Panel {panel_num}:")
+            print(f"      Kích thước: {w}x{h}px ({aspect_ratio})")
+            
+            # ⭐ SỬ DỤNG DETAILED PROMPT ĐÃ SINH
+            if 'detailed_prompt' in panel_data:
+                panel_prompt = panel_data['detailed_prompt']
+                print(f"      ✅ Sử dụng detailed prompt ({len(panel_prompt)} chars)")
+            else:
+                # Fallback nếu không có detailed_prompt
+                print(f"      ⚠️ Không có detailed_prompt, dùng basic visual")
+                panel_prompt = f"{story_script['art_style']} comic art. {panel_data.get('basic_visual', '')}. {panel_data.get('shot_type', 'medium')} shot. NO TEXT in image."
+            
+            # TẠO ẢNH với kích thước CHÍNH XÁC
+            try:
+                panel_img = generate_image_with_gemini(panel_prompt, w, h)
+                
+                # Kiểm tra kích thước
+                actual_size = panel_img.size
+                if actual_size != (w, h):
+                    print(f"      ⚠️ CẢNH BÁO: Ảnh sinh ra {actual_size} khác yêu cầu {w}x{h}")
+                else:
+                    print(f"      ✅ Kích thước CHÍNH XÁC!")
+                
+                # THÊM LỜI THOẠI ĐẸP (nếu có)
+                if panel_data.get('dialogue'):
+                    dialogue_text = panel_data['dialogue']
+                    print(f"      💬 Thêm lời thoại: {dialogue_text[:40]}...")
+                    
+                    # Vẽ bubble lời thoại ĐẸP
+                    panel_img = draw_dialogue_bubble(panel_img, dialogue_text, position="top")
+                
+                # LƯU ẢNH
+                panel_path = f"panel_images/page_{page_num:02d}_panel_{panel_num:02d}.png"
+                panel_img.save(panel_path, quality=100)  # Quality 100 - KHÔNG NÉN
+                
+                page_panels.append({
+                    "panel_num": panel_num,
+                    "image": panel_img,
+                    "path": panel_path,
+                    "position": (x, y, w, h)
+                })
+                
+                print(f"      ✅ Đã lưu: {panel_path}")
+                
+            except Exception as e:
+                print(f"      ❌ LỖI tạo ảnh: {str(e)[:200]}")
+                # Tạo ảnh placeholder
+                panel_img = Image.new("RGB", (w, h), "lightgray")
+                draw = ImageDraw.Draw(panel_img)
+                draw.text((w//2, h//2), f"Error\nPanel {panel_num}", fill="red", anchor="mm")
+                
+                panel_path = f"panel_images/page_{page_num:02d}_panel_{panel_num:02d}_ERROR.png"
+                panel_img.save(panel_path)
+                
+                page_panels.append({
+                    "panel_num": panel_num,
+                    "image": panel_img,
+                    "path": panel_path,
+                    "position": (x, y, w, h)
+                })
+        
+        panel_images[page_num] = page_panels
+        print(f"\n   ✅ Hoàn thành trang {page_num}")
+    
+    return panel_images
+
+
+print("✅ Đã định nghĩa create_panel_images_v2")
+print("📌 Sử dụng detailed_prompt cho mỗi panel")
+print("📌 Không cần demo page nữa")
+
+
+
+# 🎯 Hàm vẽ lời thoại ĐẸP cho comic
+def draw_dialogue_bubble(img, dialogue_text, position="top"):
+    """
+    Vẽ lời thoại bubble ĐẸP lên ảnh panel
+    
+    Args:
+        img: PIL Image object
+        dialogue_text: Lời thoại tiếng Việt
+        position: "top" hoặc "bottom"
+    """
+    from PIL import ImageDraw, ImageFont
+    
+    draw = ImageDraw.Draw(img, 'RGBA')
+    w, h = img.size
+    
+    # Tính toán kích thước bubble
+    padding = 20
+    bubble_width = w - padding * 2
+    
+    # Font size tự động theo kích thước panel
+    font_size = max(24, min(48, int(w / 20)))
+    
+    # Thử load font đẹp, fallback về default
+    try:
+        # Windows fonts
+        font = ImageFont.truetype(r"C:\Windows\Fonts\TIMESBD.TTF", font_size)
+        font_bold = ImageFont.truetype(r"C:\Windows\Fonts\TIMESBD.TTF", font_size + 4)
+    except:
+        try:
+            font = ImageFont.truetype(r"C:\Windows\Fonts\TIMESBD.TTF", font_size)
+            font_bold = font
+        except:
+            font = ImageFont.load_default()
+            font_bold = font
+    
+    # Wrap text thông minh
+    words = dialogue_text.split()
+    lines = []
+    current_line = ""
+    max_line_width = bubble_width - padding * 2
+    
+    for word in words:
+        test_line = current_line + word + " "
+        bbox = draw.textbbox((0, 0), test_line, font=font)
+        line_width = bbox[2] - bbox[0]
+        
+        if line_width <= max_line_width:
+            current_line = test_line
+        else:
+            if current_line:
+                lines.append(current_line.strip())
+            current_line = word + " "
+    
+    if current_line:
+        lines.append(current_line.strip())
+    
+    # Giới hạn 3 dòng
+    lines = lines[:3]
+    
+    # Tính toán kích thước bubble
+    line_height = font_size + 8
+    bubble_height = len(lines) * line_height + padding * 2
+    
+    # Vị trí bubble
+    if position == "top":
+        bubble_y = padding
+    else:  # bottom
+        bubble_y = h - bubble_height - padding
+    
+    bubble_x = padding
+    
+    # Vẽ SHADOW cho bubble
+    shadow_offset = 4
+    draw.rounded_rectangle(
+        [bubble_x + shadow_offset, bubble_y + shadow_offset, 
+         bubble_x + bubble_width + shadow_offset, bubble_y + bubble_height + shadow_offset],
+        radius=15,
+        fill=(0, 0, 0, 100)  # Bóng đen mờ
+    )
+    
+    # Vẽ BUBBLE chính (trắng với opacity)
+    draw.rounded_rectangle(
+        [bubble_x, bubble_y, bubble_x + bubble_width, bubble_y + bubble_height],
+        radius=15,
+        fill=(255, 255, 255, 240),  # Trắng gần như đục
+        outline=(0, 0, 0, 255),  # Viền đen
+        width=3
+    )
+    
+    # Vẽ TEXT
+    text_y = bubble_y + padding
+    for line in lines:
+        # Tính toán để CENTER text
+        bbox = draw.textbbox((0, 0), line, font=font)
+        text_width = bbox[2] - bbox[0]
+        text_x = bubble_x + (bubble_width - text_width) // 2
+        
+        # Vẽ TEXT SHADOW
+        draw.text(
+            (text_x + 2, text_y + 2),
+            line,
+            fill=(150, 150, 150, 180),
+            font=font
+        )
+        
+        # Vẽ TEXT chính
+        draw.text(
+            (text_x, text_y),
+            line,
+            fill=(0, 0, 0, 255),
+            font=font
+        )
+        
+        text_y += line_height
+    
+    return img
+
+
+# 🎯 Tạo tất cả ảnh panels với DETAILED PROMPTS
+# if story_script:
+#     print("\n" + "=" * 70)
+#     print("🎯 BẮT ĐẦU TẠO ẢNH CHO TỪNG PANEL")
+#     print("=" * 70)
+#     print("📌 Sử dụng DETAILED PROMPTS đã sinh")
+#     print("📌 Mỗi ảnh: KÍCH THƯỚC CHÍNH XÁC theo Gemini aspect ratios")
+#     print("📌 Nhân vật nhất quán qua detailed character descriptions")
+#     print("📌 Lời thoại: Font ĐẸP, bubble tròn, shadow")
+#     print("=" * 70)
+    
+#     # ⭐ SỬ DỤNG HÀM MỚI create_panel_images_v2
+#     panel_images = create_panel_images_v2(story_script, selected_layouts)
+    
+#     total_panels = sum([len(p) for p in panel_images.values()])
+#     print(f"\n✅ ĐÃ TẠO XONG {total_panels} PANELS!")
+#     print(f"   📖 Tất cả trang: Nhân vật nhất quán nhờ detailed prompts")
+# else:
+#     print("❌ Thiếu dữ liệu. Vui lòng chạy lại các bước trước.")
+
+
+
+# 🎯 Tạo tất cả ảnh panels với DETAILED PROMPTS
+if story_script:
+    print("\n" + "=" * 70)
+    print("🎯 BẮT ĐẦU TẠO ẢNH CHO TỪNG PANEL")
+    print("=" * 70)
+    print("📌 Sử dụng detailed prompts đã sinh")
+    print("📌 Mỗi ảnh: KÍCH THƯỚC CHÍNH XÁC theo Gemini aspect ratios")
+    print("📌 Nhân vật nhất quán qua detailed character descriptions")
+    print("📌 Lời thoại: Font ĐẸP, bubble tròn, shadow")
+    print("=" * 70)
+    
+    panel_images = create_panel_images_v2(story_script, selected_layouts)
+    
+    total_panels = sum([len(p) for p in panel_images.values()])
+    print(f"\n✅ ĐÃ TẠO XONG {total_panels} PANELS!")
+    print(f"   📖 Tất cả trang: Nhân vật nhất quán nhờ detailed prompts")
+else:
+    print("❌ Thiếu dữ liệu. Vui lòng chạy lại các bước trước.")
+
+
+

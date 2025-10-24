@@ -1,0 +1,1810 @@
+=== Sinh hình ảnh (Image Generation) | AI Thực Chiến ===
+URL: https://docs.thucchien.ai/docs/user-guide/image-generation
+Crawled: 2025-10-23 00:18:51
+============================================================
+
+MAIN CONTENT:
+----------------------------------------
+Hướng dẫn sử dụng APISinh hình ảnh (Image Generation)
+Sinh hình ảnh (Image Generation)
+AI cung cấp hai phương pháp để tạo hình ảnh từ mô tả văn bản (prompt), tùy thuộc vào mô hình bạn sử dụng.
+Phương pháp chuẩn (Standard): Sử dụng endpoint /images/generations, tuân thủ theo API của OpenAI.
+Phương pháp trò chuyện (Chat): Sử dụng endpoint /chat/completions với các mô hình đa phương thức (multimodal).
+1. Phương pháp chuẩn (Endpoint: /images/generations)
+Phương pháp này tương thích với các thư viện client của OpenAI và là cách được khuyến nghị cho các mô hình sinh ảnh chuyên dụng. API sẽ trả về dữ liệu ảnh được mã hóa dưới dạng base64 thay vì URL.
+Model được hỗ trợ:
+imagen-4 (Google Vertex AI)
+Endpoint: POST /images/generations
+CHÚ Ý
+Một số mô hình có thể trả về URL thay vì dữ liệu base64. Trong trường hợp đó, bạn có thể sử dụng phương pháp trò chuyện bên dưới. Ngoài ra để tránh lỗi caching, bạn có thể thêm một chuỗi ngẫu nhiên vào cuối prompt, ví dụ: "A beautiful landscape painting, " + str(random.randint(1, 10000)). hoặc thay đổi prompt một chút.
+curl
+Python (requests)
+Python (openai)
+Python (litellm)
+Sử dụng curl để tạo nhiều hình ảnh và lưu chúng từ dữ liệu base64.
+# Cấu hình
+API_URL="https://api.thucchien.ai/v1/images/generations"
+API_KEY="<your_api_key>"
+PROMPT="Một bức tranh phong cảnh biển hoàng hôn, phong cách sơn dầu"
+NUM_IMAGES=2 # Số lượng ảnh cần tạo
+
+# Gọi API
+response=$(curl -s --location "$API_URL" \
+--header 'Content-Type: application/json' \
+--header "Authorization: Bearer $API_KEY" \
+--data "{
+  \"model\": \"imagen-4\",
+  \"prompt\": \"$PROMPT\",
+  \"n\": $NUM_IMAGES,
+}")
+
+# Xử lý và lưu từng ảnh
+image_count=$(echo "$response" | jq '.data | length')
+if [ "$image_count" -gt 0 ]; then
+for ((i=0; i<$image_count; i++)); do
+  image_data=$(echo "$response" | jq -r ".data[$i].b64_json")
+  
+  # Lưu file
+  echo "$image_data" | base64 --decode > "generated_image_$((i+1)).png"
+  echo "Image $((i+1)) saved to generated_image_$((i+1)).png"
+done
+else
+echo "Failed to generate images. Response:"
+echo "$response"
+fi
+Ví dụ kết quả:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2. Phương pháp trò chuyện (Endpoint: /chat/completions)
+Một số mô hình đa phương thức cho phép bạn tạo hình ảnh ngay trong một cuộc hội thoại. Thay vì trả về URL, các mô hình này sẽ trả về dữ liệu ảnh được mã hóa dưới dạng base64.
+Model được hỗ trợ:
+gemini-2.5-flash-image-preview
+Endpoint: POST /chat/completions
+curl
+Python (requests)
+Python (openai)
+Python (litellm)
+Sử dụng curl để yêu cầu hình ảnh và lưu từ dữ liệu base64.
+# Bước 1: Gọi API và trích xuất dữ liệu ảnh base64
+IMAGE_DATA=$(curl -s https://api.thucchien.ai/v1/chat/completions \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer <your_api_key>" \
+-d '{
+  "model": "gemini-2.5-flash-image-preview",
+  "messages": [
+      {
+          "role": "user",
+          "content": "An olympic size swimming pool with crystal clear water and modern architecture. High resolution, photorealistic, 8k"
+      }
+  ]
+}' | jq -r '.choices[0].message.images[0].image_url.url' | sed 's/^data:image\/png;base64,//')
+
+# Bước 2: Giải mã base64 và lưu thành file ảnh
+if [ -n "$IMAGE_DATA" ]; then
+echo "$IMAGE_DATA" | base64 --decode > generated_chat_image.png
+echo "Image saved to generated_chat_image.png"
+else
+echo "Failed to get image data."
+fi
+Ví dụ kết quả:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+GHI CHÚ
+Để biết thêm chi tiết, bạn có thể tham khảo tài liệu về sinh ảnh từ Google Cloud Vertex AI và các tham số sinh ảnh cho Google AI Studio qua LiteLLM.
+Previous
+Sinh văn bản (Text Generation)
+Next
+Sinh video với Veo 3 (Quy trình bất đồng bộ)
+1. Phương pháp chuẩn (Endpoint: /images/generations)
+2. Phương pháp trò chuyện (Endpoint: /chat/completions)
+
+TAB CONTENT:
+----------------------------------------
+
+[TAB: curl_0]
+# Cấu hình
+API_URL="https://api.thucchien.ai/v1/images/generations"
+API_KEY="<your_api_key>"
+PROMPT="Một bức tranh phong cảnh biển hoàng hôn, phong cách sơn dầu"
+NUM_IMAGES=2 # Số lượng ảnh cần tạo
+
+# Gọi API
+response=$(curl -s --location "$API_URL" \
+--header 'Content-Type: application/json' \
+--header "Authorization: Bearer $API_KEY" \
+--data "{
+  \"model\": \"imagen-4\",
+  \"prompt\": \"$PROMPT\",
+  \"n\": $NUM_IMAGES,
+}")
+
+# Xử lý và lưu từng ảnh
+image_count=$(echo "$response" | jq '.data | length')
+if [ "$image_count" -gt 0 ]; then
+for ((i=0; i<$image_count; i++)); do
+  image_data=$(echo "$response" | jq -r ".data[$i].b64_json")
+  
+  # Lưu file
+  echo "$image_data" | base64 --decode > "generated_image_$((i+1)).png"
+  echo "Image $((i+1)) saved to generated_image_$((i+1)).png"
+done
+else
+echo "Failed to generate images. Response:"
+echo "$response"
+fi
+..............................
+
+[TAB: Python (requests)_1]
+import requests
+import json
+import base64
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai/v1"
+AI_API_KEY = "<your_api_key>"
+
+# --- Gọi API để tạo hình ảnh ---
+url = f"{AI_API_BASE}/images/generations"
+headers = {
+  "Content-Type": "application/json",
+  "Authorization": f"Bearer {AI_API_KEY}"
+}
+data = {
+  "model": "imagen-4",
+  "prompt": "A majestic white tiger walking through a snowy forest",
+  "n": 2, # Yêu cầu 2 ảnh
+}
+
+try:
+  response = requests.post(url, headers=headers, data=json.dumps(data))
+  response.raise_for_status()
+
+  result = response.json()
+  
+  # --- Xử lý và lưu từng ảnh ---
+  for i, image_obj in enumerate(result['data']):
+      b64_data = image_obj['b64_json']
+      image_data = base64.b64decode(b64_data)
+      
+      save_path = f"generated_image_{i+1}.png"
+      with open(save_path, 'wb') as f:
+          f.write(image_data)
+      print(f"Image saved to {save_path}")
+
+except requests.exceptions.RequestException as e:
+  print(f"An error occurred: {e}")
+  print(f"Response body: {response.text if 'response' in locals() else 'No response'}")
+..............................
+
+[TAB: Python (openai)_2]
+from openai import OpenAI
+import base64
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai/v1"
+AI_API_KEY = "<your_api_key>"
+
+# --- Khởi tạo client ---
+client = OpenAI(
+  api_key=AI_API_KEY,
+  base_url=AI_API_BASE
+)
+
+# --- Gọi API để tạo hình ảnh ---
+response = client.images.generate(
+  model="imagen-4",
+  prompt="An astronaut riding a horse on Mars, photorealistic",
+  n=2, # Yêu cầu 2 ảnh
+)
+
+# --- Xử lý và lưu từng ảnh ---
+for i, image_obj in enumerate(response.data):
+  b64_data = image_obj.b64_json
+  image_data = base64.b64decode(b64_data)
+  
+  save_path = f"generated_image_{i+1}.png"
+  with open(save_path, 'wb') as f:
+      f.write(image_data)
+  print(f"Image saved to {save_path}")
+..............................
+
+[TAB: Python (litellm)_3]
+import litellm
+import base64
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "your_api_key"
+
+
+# --- Gọi API để tạo hình ảnh ---
+response = litellm.image_generation(
+  prompt="A peaceful Japanese garden with a koi pond and cherry blossoms 2",
+  model="litellm_proxy/imagen-4",
+  n=2,
+  api_key=AI_API_KEY,
+  api_base=AI_API_BASE,
+)
+
+# --- Xử lý và lưu từng ảnh ---
+for i, image_obj in enumerate(response.data):
+  b64_data = image_obj['b64_json']
+  image_data = base64.b64decode(b64_data)
+
+  save_path = f"generated_image_{i+1}.png"
+  with open(save_path, 'wb') as f:
+      f.write(image_data)
+      print(f"Image saved to {save_path}")
+..............................
+
+[TAB: curl_4]
+# Bước 1: Gọi API và trích xuất dữ liệu ảnh base64
+IMAGE_DATA=$(curl -s https://api.thucchien.ai/v1/chat/completions \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer <your_api_key>" \
+-d '{
+  "model": "gemini-2.5-flash-image-preview",
+  "messages": [
+      {
+          "role": "user",
+          "content": "An olympic size swimming pool with crystal clear water and modern architecture. High resolution, photorealistic, 8k"
+      }
+  ]
+}' | jq -r '.choices[0].message.images[0].image_url.url' | sed 's/^data:image\/png;base64,//')
+
+# Bước 2: Giải mã base64 và lưu thành file ảnh
+if [ -n "$IMAGE_DATA" ]; then
+echo "$IMAGE_DATA" | base64 --decode > generated_chat_image.png
+echo "Image saved to generated_chat_image.png"
+else
+echo "Failed to get image data."
+fi
+..............................
+
+[TAB: Python (requests)_5]
+import litellm
+import base64
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "your_api_key"
+
+
+# --- Gọi API để tạo hình ảnh ---
+response = litellm.image_generation(
+  prompt="A peaceful Japanese garden with a koi pond and cherry blossoms 2",
+  model="litellm_proxy/imagen-4",
+  n=2,
+  api_key=AI_API_KEY,
+  api_base=AI_API_BASE,
+)
+
+# --- Xử lý và lưu từng ảnh ---
+for i, image_obj in enumerate(response.data):
+  b64_data = image_obj['b64_json']
+  image_data = base64.b64decode(b64_data)
+
+  save_path = f"generated_image_{i+1}.png"
+  with open(save_path, 'wb') as f:
+      f.write(image_data)
+      print(f"Image saved to {save_path}")
+..............................
+
+[TAB: Python (openai)_6]
+import litellm
+import base64
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "your_api_key"
+
+
+# --- Gọi API để tạo hình ảnh ---
+response = litellm.image_generation(
+  prompt="A peaceful Japanese garden with a koi pond and cherry blossoms 2",
+  model="litellm_proxy/imagen-4",
+  n=2,
+  api_key=AI_API_KEY,
+  api_base=AI_API_BASE,
+)
+
+# --- Xử lý và lưu từng ảnh ---
+for i, image_obj in enumerate(response.data):
+  b64_data = image_obj['b64_json']
+  image_data = base64.b64decode(b64_data)
+
+  save_path = f"generated_image_{i+1}.png"
+  with open(save_path, 'wb') as f:
+      f.write(image_data)
+      print(f"Image saved to {save_path}")
+..............................
+
+[TAB: Python (litellm)_7]
+import litellm
+import base64
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "your_api_key"
+
+
+# --- Gọi API để tạo hình ảnh ---
+response = litellm.image_generation(
+  prompt="A peaceful Japanese garden with a koi pond and cherry blossoms 2",
+  model="litellm_proxy/imagen-4",
+  n=2,
+  api_key=AI_API_KEY,
+  api_base=AI_API_BASE,
+)
+
+# --- Xử lý và lưu từng ảnh ---
+for i, image_obj in enumerate(response.data):
+  b64_data = image_obj['b64_json']
+  image_data = base64.b64decode(b64_data)
+
+  save_path = f"generated_image_{i+1}.png"
+  with open(save_path, 'wb') as f:
+      f.write(image_data)
+      print(f"Image saved to {save_path}")
+..............................
+
+CODE BLOCKS:
+----------------------------------------
+
+[CODE: unknown_code_4]
+```
+import litellm
+import base64
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "your_api_key"
+
+
+# --- Gọi API để tạo hình ảnh ---
+response = litellm.image_generation(
+  prompt="A peaceful Japanese garden with a koi pond and cherry blossoms 2",
+  model="litellm_proxy/imagen-4",
+  n=2,
+  api_key=AI_API_KEY,
+  api_base=AI_API_BASE,
+)
+
+# --- Xử lý và lưu từng ảnh ---
+for i, image_obj in enumerate(response.data):
+  b64_data = image_obj['b64_json']
+  image_data = base64.b64decode(b64_data)
+
+  save_path = f"generated_image_{i+1}.png"
+  with open(save_path, 'wb') as f:
+      f.write(image_data)
+      print(f"Image saved to {save_path}")
+```
+..............................
+
+[CODE: unknown_code_8]
+```
+import litellm
+import base64
+import json
+import random
+
+random_prompt_seed = random.randint(1, 10000)
+# Seed is used use to generate different images for the same prompt and avoiding caching issues
+
+AI_API_BASE = "https://api.thucchien.ai/v1"
+AI_API_KEY = "your_api_key"
+IMAGE_SAVE_PATH = "generated_chat_image.png"
+
+# Configure Litellm to use AI API
+litellm.api_base = AI_API_BASE
+
+# Use streaming with Gemini 2.5 Flash Image Preview model
+response = litellm.completion(
+  model="litellm_proxy/gemini-2.5-flash-image-preview",
+  messages=[
+      {
+          "role": "user",
+          "content": "Tạo ảnh 2 con mèo bên khung cửa sổ đang nhìn ra vườn hoa. " + str(random_prompt_seed)
+      }
+  ],
+  api_key=AI_API_KEY,
+  modalities=["image"]  # Specify modalities to include image data
+)
+# Get the base64 image string from the response
+base64_string = response.choices[0].message.images[0].get("image_url").get("url")
+print("Image data received successfully.")
+
+# Decode and save the image ---
+if ',' in base64_string:
+  header, encoded = base64_string.split(',', 1)
+else:
+  encoded = base64_string
+
+image_data = base64.b64decode(encoded)
+
+with open(IMAGE_SAVE_PATH, 'wb') as f:
+  f.write(image_data)
+  
+print(f"Image saved to {IMAGE_SAVE_PATH}")
+```
+..............................
+
+[CODE: python_code_5]
+```
+import litellm
+import base64
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "your_api_key"
+
+
+# --- Gọi API để tạo hình ảnh ---
+response = litellm.image_generation(
+  prompt="A peaceful Japanese garden with a koi pond and cherry blossoms 2",
+  model="litellm_proxy/imagen-4",
+  n=2,
+  api_key=AI_API_KEY,
+  api_base=AI_API_BASE,
+)
+
+# --- Xử lý và lưu từng ảnh ---
+for i, image_obj in enumerate(response.data):
+  b64_data = image_obj['b64_json']
+  image_data = base64.b64decode(b64_data)
+
+  save_path = f"generated_image_{i+1}.png"
+  with open(save_path, 'wb') as f:
+      f.write(image_data)
+      print(f"Image saved to {save_path}")
+```
+..............................
+
+[CODE: python_code_6]
+```
+import litellm
+import base64
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "your_api_key"
+
+
+# --- Gọi API để tạo hình ảnh ---
+response = litellm.image_generation(
+  prompt="A peaceful Japanese garden with a koi pond and cherry blossoms 2",
+  model="litellm_proxy/imagen-4",
+  n=2,
+  api_key=AI_API_KEY,
+  api_base=AI_API_BASE,
+)
+
+# --- Xử lý và lưu từng ảnh ---
+for i, image_obj in enumerate(response.data):
+  b64_data = image_obj['b64_json']
+  image_data = base64.b64decode(b64_data)
+
+  save_path = f"generated_image_{i+1}.png"
+  with open(save_path, 'wb') as f:
+      f.write(image_data)
+      print(f"Image saved to {save_path}")
+```
+..............................
+
+[CODE: python_code_11]
+```
+import litellm
+import base64
+import json
+import random
+
+random_prompt_seed = random.randint(1, 10000)
+# Seed is used use to generate different images for the same prompt and avoiding caching issues
+
+AI_API_BASE = "https://api.thucchien.ai/v1"
+AI_API_KEY = "your_api_key"
+IMAGE_SAVE_PATH = "generated_chat_image.png"
+
+# Configure Litellm to use AI API
+litellm.api_base = AI_API_BASE
+
+# Use streaming with Gemini 2.5 Flash Image Preview model
+response = litellm.completion(
+  model="litellm_proxy/gemini-2.5-flash-image-preview",
+  messages=[
+      {
+          "role": "user",
+          "content": "Tạo ảnh 2 con mèo bên khung cửa sổ đang nhìn ra vườn hoa. " + str(random_prompt_seed)
+      }
+  ],
+  api_key=AI_API_KEY,
+  modalities=["image"]  # Specify modalities to include image data
+)
+# Get the base64 image string from the response
+base64_string = response.choices[0].message.images[0].get("image_url").get("url")
+print("Image data received successfully.")
+
+# Decode and save the image ---
+if ',' in base64_string:
+  header, encoded = base64_string.split(',', 1)
+else:
+  encoded = base64_string
+
+image_data = base64.b64decode(encoded)
+
+with open(IMAGE_SAVE_PATH, 'wb') as f:
+  f.write(image_data)
+  
+print(f"Image saved to {IMAGE_SAVE_PATH}")
+```
+..............................
+
+[CODE: python_code_12]
+```
+import litellm
+import base64
+import json
+import random
+
+random_prompt_seed = random.randint(1, 10000)
+# Seed is used use to generate different images for the same prompt and avoiding caching issues
+
+AI_API_BASE = "https://api.thucchien.ai/v1"
+AI_API_KEY = "your_api_key"
+IMAGE_SAVE_PATH = "generated_chat_image.png"
+
+# Configure Litellm to use AI API
+litellm.api_base = AI_API_BASE
+
+# Use streaming with Gemini 2.5 Flash Image Preview model
+response = litellm.completion(
+  model="litellm_proxy/gemini-2.5-flash-image-preview",
+  messages=[
+      {
+          "role": "user",
+          "content": "Tạo ảnh 2 con mèo bên khung cửa sổ đang nhìn ra vườn hoa. " + str(random_prompt_seed)
+      }
+  ],
+  api_key=AI_API_KEY,
+  modalities=["image"]  # Specify modalities to include image data
+)
+# Get the base64 image string from the response
+base64_string = response.choices[0].message.images[0].get("image_url").get("url")
+print("Image data received successfully.")
+
+# Decode and save the image ---
+if ',' in base64_string:
+  header, encoded = base64_string.split(',', 1)
+else:
+  encoded = base64_string
+
+image_data = base64.b64decode(encoded)
+
+with open(IMAGE_SAVE_PATH, 'wb') as f:
+  f.write(image_data)
+  
+print(f"Image saved to {IMAGE_SAVE_PATH}")
+```
+..............................
+
+[CODE: unknown_code_5]
+```
+POST /images/generations
+```
+..............................
+
+[CODE: unknown_code_6]
+```
+"A beautiful landscape painting, " + str(random.randint(1, 10000))
+```
+..............................
+
+[CODE: unknown_code_12]
+```
+litellm.image_generation
+```
+..............................
+
+[CODE: unknown_code_13]
+```
+import litellm
+import base64
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "your_api_key"
+
+
+# --- Gọi API để tạo hình ảnh ---
+response = litellm.image_generation(
+  prompt="A peaceful Japanese garden with a koi pond and cherry blossoms 2",
+  model="litellm_proxy/imagen-4",
+  n=2,
+  api_key=AI_API_KEY,
+  api_base=AI_API_BASE,
+)
+
+# --- Xử lý và lưu từng ảnh ---
+for i, image_obj in enumerate(response.data):
+  b64_data = image_obj['b64_json']
+  image_data = base64.b64decode(b64_data)
+
+  save_path = f"generated_image_{i+1}.png"
+  with open(save_path, 'wb') as f:
+      f.write(image_data)
+      print(f"Image saved to {save_path}")
+```
+..............................
+
+[CODE: unknown_code_15]
+```
+gemini-2.5-flash-image-preview
+```
+..............................
+
+[CODE: unknown_code_16]
+```
+POST /chat/completions
+```
+..............................
+
+[CODE: unknown_code_24]
+```
+import litellm
+import base64
+import json
+import random
+
+random_prompt_seed = random.randint(1, 10000)
+# Seed is used use to generate different images for the same prompt and avoiding caching issues
+
+AI_API_BASE = "https://api.thucchien.ai/v1"
+AI_API_KEY = "your_api_key"
+IMAGE_SAVE_PATH = "generated_chat_image.png"
+
+# Configure Litellm to use AI API
+litellm.api_base = AI_API_BASE
+
+# Use streaming with Gemini 2.5 Flash Image Preview model
+response = litellm.completion(
+  model="litellm_proxy/gemini-2.5-flash-image-preview",
+  messages=[
+      {
+          "role": "user",
+          "content": "Tạo ảnh 2 con mèo bên khung cửa sổ đang nhìn ra vườn hoa. " + str(random_prompt_seed)
+      }
+  ],
+  api_key=AI_API_KEY,
+  modalities=["image"]  # Specify modalities to include image data
+)
+# Get the base64 image string from the response
+base64_string = response.choices[0].message.images[0].get("image_url").get("url")
+print("Image data received successfully.")
+
+# Decode and save the image ---
+if ',' in base64_string:
+  header, encoded = base64_string.split(',', 1)
+else:
+  encoded = base64_string
+
+image_data = base64.b64decode(encoded)
+
+with open(IMAGE_SAVE_PATH, 'wb') as f:
+  f.write(image_data)
+  
+print(f"Image saved to {IMAGE_SAVE_PATH}")
+```
+..............................
+
+FULL CONTENT:
+----------------------------------------
+Hướng dẫn sử dụng APISinh hình ảnh (Image Generation)
+Sinh hình ảnh (Image Generation)
+AI cung cấp hai phương pháp để tạo hình ảnh từ mô tả văn bản (prompt), tùy thuộc vào mô hình bạn sử dụng.
+Phương pháp chuẩn (Standard): Sử dụng endpoint /images/generations, tuân thủ theo API của OpenAI.
+Phương pháp trò chuyện (Chat): Sử dụng endpoint /chat/completions với các mô hình đa phương thức (multimodal).
+1. Phương pháp chuẩn (Endpoint: /images/generations)
+Phương pháp này tương thích với các thư viện client của OpenAI và là cách được khuyến nghị cho các mô hình sinh ảnh chuyên dụng. API sẽ trả về dữ liệu ảnh được mã hóa dưới dạng base64 thay vì URL.
+Model được hỗ trợ:
+imagen-4 (Google Vertex AI)
+Endpoint: POST /images/generations
+CHÚ Ý
+Một số mô hình có thể trả về URL thay vì dữ liệu base64. Trong trường hợp đó, bạn có thể sử dụng phương pháp trò chuyện bên dưới. Ngoài ra để tránh lỗi caching, bạn có thể thêm một chuỗi ngẫu nhiên vào cuối prompt, ví dụ: "A beautiful landscape painting, " + str(random.randint(1, 10000)). hoặc thay đổi prompt một chút.
+curl
+Python (requests)
+Python (openai)
+Python (litellm)
+Sử dụng curl để tạo nhiều hình ảnh và lưu chúng từ dữ liệu base64.
+# Cấu hình
+API_URL="https://api.thucchien.ai/v1/images/generations"
+API_KEY="<your_api_key>"
+PROMPT="Một bức tranh phong cảnh biển hoàng hôn, phong cách sơn dầu"
+NUM_IMAGES=2 # Số lượng ảnh cần tạo
+
+# Gọi API
+response=$(curl -s --location "$API_URL" \
+--header 'Content-Type: application/json' \
+--header "Authorization: Bearer $API_KEY" \
+--data "{
+  \"model\": \"imagen-4\",
+  \"prompt\": \"$PROMPT\",
+  \"n\": $NUM_IMAGES,
+}")
+
+# Xử lý và lưu từng ảnh
+image_count=$(echo "$response" | jq '.data | length')
+if [ "$image_count" -gt 0 ]; then
+for ((i=0; i<$image_count; i++)); do
+  image_data=$(echo "$response" | jq -r ".data[$i].b64_json")
+  
+  # Lưu file
+  echo "$image_data" | base64 --decode > "generated_image_$((i+1)).png"
+  echo "Image $((i+1)) saved to generated_image_$((i+1)).png"
+done
+else
+echo "Failed to generate images. Response:"
+echo "$response"
+fi
+Ví dụ kết quả:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2. Phương pháp trò chuyện (Endpoint: /chat/completions)
+Một số mô hình đa phương thức cho phép bạn tạo hình ảnh ngay trong một cuộc hội thoại. Thay vì trả về URL, các mô hình này sẽ trả về dữ liệu ảnh được mã hóa dưới dạng base64.
+Model được hỗ trợ:
+gemini-2.5-flash-image-preview
+Endpoint: POST /chat/completions
+curl
+Python (requests)
+Python (openai)
+Python (litellm)
+Sử dụng curl để yêu cầu hình ảnh và lưu từ dữ liệu base64.
+# Bước 1: Gọi API và trích xuất dữ liệu ảnh base64
+IMAGE_DATA=$(curl -s https://api.thucchien.ai/v1/chat/completions \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer <your_api_key>" \
+-d '{
+  "model": "gemini-2.5-flash-image-preview",
+  "messages": [
+      {
+          "role": "user",
+          "content": "An olympic size swimming pool with crystal clear water and modern architecture. High resolution, photorealistic, 8k"
+      }
+  ]
+}' | jq -r '.choices[0].message.images[0].image_url.url' | sed 's/^data:image\/png;base64,//')
+
+# Bước 2: Giải mã base64 và lưu thành file ảnh
+if [ -n "$IMAGE_DATA" ]; then
+echo "$IMAGE_DATA" | base64 --decode > generated_chat_image.png
+echo "Image saved to generated_chat_image.png"
+else
+echo "Failed to get image data."
+fi
+Ví dụ kết quả:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+GHI CHÚ
+Để biết thêm chi tiết, bạn có thể tham khảo tài liệu về sinh ảnh từ Google Cloud Vertex AI và các tham số sinh ảnh cho Google AI Studio qua LiteLLM.
+Previous
+Sinh văn bản (Text Generation)
+Next
+Sinh video với Veo 3 (Quy trình bất đồng bộ)
+1. Phương pháp chuẩn (Endpoint: /images/generations)
+2. Phương pháp trò chuyện (Endpoint: /chat/completions)
+
+=== TAB CONTENT ===
+
+--- curl_0 ---
+# Cấu hình
+API_URL="https://api.thucchien.ai/v1/images/generations"
+API_KEY="<your_api_key>"
+PROMPT="Một bức tranh phong cảnh biển hoàng hôn, phong cách sơn dầu"
+NUM_IMAGES=2 # Số lượng ảnh cần tạo
+
+# Gọi API
+response=$(curl -s --location "$API_URL" \
+--header 'Content-Type: application/json' \
+--header "Authorization: Bearer $API_KEY" \
+--data "{
+  \"model\": \"imagen-4\",
+  \"prompt\": \"$PROMPT\",
+  \"n\": $NUM_IMAGES,
+}")
+
+# Xử lý và lưu từng ảnh
+image_count=$(echo "$response" | jq '.data | length')
+if [ "$image_count" -gt 0 ]; then
+for ((i=0; i<$image_count; i++)); do
+  image_data=$(echo "$response" | jq -r ".data[$i].b64_json")
+  
+  # Lưu file
+  echo "$image_data" | base64 --decode > "generated_image_$((i+1)).png"
+  echo "Image $((i+1)) saved to generated_image_$((i+1)).png"
+done
+else
+echo "Failed to generate images. Response:"
+echo "$response"
+fi
+
+--- Python (requests)_1 ---
+import requests
+import json
+import base64
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai/v1"
+AI_API_KEY = "<your_api_key>"
+
+# --- Gọi API để tạo hình ảnh ---
+url = f"{AI_API_BASE}/images/generations"
+headers = {
+  "Content-Type": "application/json",
+  "Authorization": f"Bearer {AI_API_KEY}"
+}
+data = {
+  "model": "imagen-4",
+  "prompt": "A majestic white tiger walking through a snowy forest",
+  "n": 2, # Yêu cầu 2 ảnh
+}
+
+try:
+  response = requests.post(url, headers=headers, data=json.dumps(data))
+  response.raise_for_status()
+
+  result = response.json()
+  
+  # --- Xử lý và lưu từng ảnh ---
+  for i, image_obj in enumerate(result['data']):
+      b64_data = image_obj['b64_json']
+      image_data = base64.b64decode(b64_data)
+      
+      save_path = f"generated_image_{i+1}.png"
+      with open(save_path, 'wb') as f:
+          f.write(image_data)
+      print(f"Image saved to {save_path}")
+
+except requests.exceptions.RequestException as e:
+  print(f"An error occurred: {e}")
+  print(f"Response body: {response.text if 'response' in locals() else 'No response'}")
+
+--- Python (openai)_2 ---
+from openai import OpenAI
+import base64
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai/v1"
+AI_API_KEY = "<your_api_key>"
+
+# --- Khởi tạo client ---
+client = OpenAI(
+  api_key=AI_API_KEY,
+  base_url=AI_API_BASE
+)
+
+# --- Gọi API để tạo hình ảnh ---
+response = client.images.generate(
+  model="imagen-4",
+  prompt="An astronaut riding a horse on Mars, photorealistic",
+  n=2, # Yêu cầu 2 ảnh
+)
+
+# --- Xử lý và lưu từng ảnh ---
+for i, image_obj in enumerate(response.data):
+  b64_data = image_obj.b64_json
+  image_data = base64.b64decode(b64_data)
+  
+  save_path = f"generated_image_{i+1}.png"
+  with open(save_path, 'wb') as f:
+      f.write(image_data)
+  print(f"Image saved to {save_path}")
+
+--- Python (litellm)_3 ---
+import litellm
+import base64
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "your_api_key"
+
+
+# --- Gọi API để tạo hình ảnh ---
+response = litellm.image_generation(
+  prompt="A peaceful Japanese garden with a koi pond and cherry blossoms 2",
+  model="litellm_proxy/imagen-4",
+  n=2,
+  api_key=AI_API_KEY,
+  api_base=AI_API_BASE,
+)
+
+# --- Xử lý và lưu từng ảnh ---
+for i, image_obj in enumerate(response.data):
+  b64_data = image_obj['b64_json']
+  image_data = base64.b64decode(b64_data)
+
+  save_path = f"generated_image_{i+1}.png"
+  with open(save_path, 'wb') as f:
+      f.write(image_data)
+      print(f"Image saved to {save_path}")
+
+--- curl_4 ---
+# Bước 1: Gọi API và trích xuất dữ liệu ảnh base64
+IMAGE_DATA=$(curl -s https://api.thucchien.ai/v1/chat/completions \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer <your_api_key>" \
+-d '{
+  "model": "gemini-2.5-flash-image-preview",
+  "messages": [
+      {
+          "role": "user",
+          "content": "An olympic size swimming pool with crystal clear water and modern architecture. High resolution, photorealistic, 8k"
+      }
+  ]
+}' | jq -r '.choices[0].message.images[0].image_url.url' | sed 's/^data:image\/png;base64,//')
+
+# Bước 2: Giải mã base64 và lưu thành file ảnh
+if [ -n "$IMAGE_DATA" ]; then
+echo "$IMAGE_DATA" | base64 --decode > generated_chat_image.png
+echo "Image saved to generated_chat_image.png"
+else
+echo "Failed to get image data."
+fi
+
+--- Python (requests)_5 ---
+import litellm
+import base64
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "your_api_key"
+
+
+# --- Gọi API để tạo hình ảnh ---
+response = litellm.image_generation(
+  prompt="A peaceful Japanese garden with a koi pond and cherry blossoms 2",
+  model="litellm_proxy/imagen-4",
+  n=2,
+  api_key=AI_API_KEY,
+  api_base=AI_API_BASE,
+)
+
+# --- Xử lý và lưu từng ảnh ---
+for i, image_obj in enumerate(response.data):
+  b64_data = image_obj['b64_json']
+  image_data = base64.b64decode(b64_data)
+
+  save_path = f"generated_image_{i+1}.png"
+  with open(save_path, 'wb') as f:
+      f.write(image_data)
+      print(f"Image saved to {save_path}")
+
+--- Python (openai)_6 ---
+import litellm
+import base64
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "your_api_key"
+
+
+# --- Gọi API để tạo hình ảnh ---
+response = litellm.image_generation(
+  prompt="A peaceful Japanese garden with a koi pond and cherry blossoms 2",
+  model="litellm_proxy/imagen-4",
+  n=2,
+  api_key=AI_API_KEY,
+  api_base=AI_API_BASE,
+)
+
+# --- Xử lý và lưu từng ảnh ---
+for i, image_obj in enumerate(response.data):
+  b64_data = image_obj['b64_json']
+  image_data = base64.b64decode(b64_data)
+
+  save_path = f"generated_image_{i+1}.png"
+  with open(save_path, 'wb') as f:
+      f.write(image_data)
+      print(f"Image saved to {save_path}")
+
+--- Python (litellm)_7 ---
+import litellm
+import base64
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "your_api_key"
+
+
+# --- Gọi API để tạo hình ảnh ---
+response = litellm.image_generation(
+  prompt="A peaceful Japanese garden with a koi pond and cherry blossoms 2",
+  model="litellm_proxy/imagen-4",
+  n=2,
+  api_key=AI_API_KEY,
+  api_base=AI_API_BASE,
+)
+
+# --- Xử lý và lưu từng ảnh ---
+for i, image_obj in enumerate(response.data):
+  b64_data = image_obj['b64_json']
+  image_data = base64.b64decode(b64_data)
+
+  save_path = f"generated_image_{i+1}.png"
+  with open(save_path, 'wb') as f:
+      f.write(image_data)
+      print(f"Image saved to {save_path}")
+
+
+=== CODE BLOCKS ===
+
+--- unknown_code_4 ---
+import litellm
+import base64
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "your_api_key"
+
+
+# --- Gọi API để tạo hình ảnh ---
+response = litellm.image_generation(
+  prompt="A peaceful Japanese garden with a koi pond and cherry blossoms 2",
+  model="litellm_proxy/imagen-4",
+  n=2,
+  api_key=AI_API_KEY,
+  api_base=AI_API_BASE,
+)
+
+# --- Xử lý và lưu từng ảnh ---
+for i, image_obj in enumerate(response.data):
+  b64_data = image_obj['b64_json']
+  image_data = base64.b64decode(b64_data)
+
+  save_path = f"generated_image_{i+1}.png"
+  with open(save_path, 'wb') as f:
+      f.write(image_data)
+      print(f"Image saved to {save_path}")
+
+--- unknown_code_8 ---
+import litellm
+import base64
+import json
+import random
+
+random_prompt_seed = random.randint(1, 10000)
+# Seed is used use to generate different images for the same prompt and avoiding caching issues
+
+AI_API_BASE = "https://api.thucchien.ai/v1"
+AI_API_KEY = "your_api_key"
+IMAGE_SAVE_PATH = "generated_chat_image.png"
+
+# Configure Litellm to use AI API
+litellm.api_base = AI_API_BASE
+
+# Use streaming with Gemini 2.5 Flash Image Preview model
+response = litellm.completion(
+  model="litellm_proxy/gemini-2.5-flash-image-preview",
+  messages=[
+      {
+          "role": "user",
+          "content": "Tạo ảnh 2 con mèo bên khung cửa sổ đang nhìn ra vườn hoa. " + str(random_prompt_seed)
+      }
+  ],
+  api_key=AI_API_KEY,
+  modalities=["image"]  # Specify modalities to include image data
+)
+# Get the base64 image string from the response
+base64_string = response.choices[0].message.images[0].get("image_url").get("url")
+print("Image data received successfully.")
+
+# Decode and save the image ---
+if ',' in base64_string:
+  header, encoded = base64_string.split(',', 1)
+else:
+  encoded = base64_string
+
+image_data = base64.b64decode(encoded)
+
+with open(IMAGE_SAVE_PATH, 'wb') as f:
+  f.write(image_data)
+  
+print(f"Image saved to {IMAGE_SAVE_PATH}")
+
+--- python_code_5 ---
+import litellm
+import base64
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "your_api_key"
+
+
+# --- Gọi API để tạo hình ảnh ---
+response = litellm.image_generation(
+  prompt="A peaceful Japanese garden with a koi pond and cherry blossoms 2",
+  model="litellm_proxy/imagen-4",
+  n=2,
+  api_key=AI_API_KEY,
+  api_base=AI_API_BASE,
+)
+
+# --- Xử lý và lưu từng ảnh ---
+for i, image_obj in enumerate(response.data):
+  b64_data = image_obj['b64_json']
+  image_data = base64.b64decode(b64_data)
+
+  save_path = f"generated_image_{i+1}.png"
+  with open(save_path, 'wb') as f:
+      f.write(image_data)
+      print(f"Image saved to {save_path}")
+
+--- python_code_6 ---
+import litellm
+import base64
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "your_api_key"
+
+
+# --- Gọi API để tạo hình ảnh ---
+response = litellm.image_generation(
+  prompt="A peaceful Japanese garden with a koi pond and cherry blossoms 2",
+  model="litellm_proxy/imagen-4",
+  n=2,
+  api_key=AI_API_KEY,
+  api_base=AI_API_BASE,
+)
+
+# --- Xử lý và lưu từng ảnh ---
+for i, image_obj in enumerate(response.data):
+  b64_data = image_obj['b64_json']
+  image_data = base64.b64decode(b64_data)
+
+  save_path = f"generated_image_{i+1}.png"
+  with open(save_path, 'wb') as f:
+      f.write(image_data)
+      print(f"Image saved to {save_path}")
+
+--- python_code_11 ---
+import litellm
+import base64
+import json
+import random
+
+random_prompt_seed = random.randint(1, 10000)
+# Seed is used use to generate different images for the same prompt and avoiding caching issues
+
+AI_API_BASE = "https://api.thucchien.ai/v1"
+AI_API_KEY = "your_api_key"
+IMAGE_SAVE_PATH = "generated_chat_image.png"
+
+# Configure Litellm to use AI API
+litellm.api_base = AI_API_BASE
+
+# Use streaming with Gemini 2.5 Flash Image Preview model
+response = litellm.completion(
+  model="litellm_proxy/gemini-2.5-flash-image-preview",
+  messages=[
+      {
+          "role": "user",
+          "content": "Tạo ảnh 2 con mèo bên khung cửa sổ đang nhìn ra vườn hoa. " + str(random_prompt_seed)
+      }
+  ],
+  api_key=AI_API_KEY,
+  modalities=["image"]  # Specify modalities to include image data
+)
+# Get the base64 image string from the response
+base64_string = response.choices[0].message.images[0].get("image_url").get("url")
+print("Image data received successfully.")
+
+# Decode and save the image ---
+if ',' in base64_string:
+  header, encoded = base64_string.split(',', 1)
+else:
+  encoded = base64_string
+
+image_data = base64.b64decode(encoded)
+
+with open(IMAGE_SAVE_PATH, 'wb') as f:
+  f.write(image_data)
+  
+print(f"Image saved to {IMAGE_SAVE_PATH}")
+
+--- python_code_12 ---
+import litellm
+import base64
+import json
+import random
+
+random_prompt_seed = random.randint(1, 10000)
+# Seed is used use to generate different images for the same prompt and avoiding caching issues
+
+AI_API_BASE = "https://api.thucchien.ai/v1"
+AI_API_KEY = "your_api_key"
+IMAGE_SAVE_PATH = "generated_chat_image.png"
+
+# Configure Litellm to use AI API
+litellm.api_base = AI_API_BASE
+
+# Use streaming with Gemini 2.5 Flash Image Preview model
+response = litellm.completion(
+  model="litellm_proxy/gemini-2.5-flash-image-preview",
+  messages=[
+      {
+          "role": "user",
+          "content": "Tạo ảnh 2 con mèo bên khung cửa sổ đang nhìn ra vườn hoa. " + str(random_prompt_seed)
+      }
+  ],
+  api_key=AI_API_KEY,
+  modalities=["image"]  # Specify modalities to include image data
+)
+# Get the base64 image string from the response
+base64_string = response.choices[0].message.images[0].get("image_url").get("url")
+print("Image data received successfully.")
+
+# Decode and save the image ---
+if ',' in base64_string:
+  header, encoded = base64_string.split(',', 1)
+else:
+  encoded = base64_string
+
+image_data = base64.b64decode(encoded)
+
+with open(IMAGE_SAVE_PATH, 'wb') as f:
+  f.write(image_data)
+  
+print(f"Image saved to {IMAGE_SAVE_PATH}")
+
+--- unknown_code_5 ---
+POST /images/generations
+
+--- unknown_code_6 ---
+"A beautiful landscape painting, " + str(random.randint(1, 10000))
+
+--- unknown_code_12 ---
+litellm.image_generation
+
+--- unknown_code_13 ---
+import litellm
+import base64
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "your_api_key"
+
+
+# --- Gọi API để tạo hình ảnh ---
+response = litellm.image_generation(
+  prompt="A peaceful Japanese garden with a koi pond and cherry blossoms 2",
+  model="litellm_proxy/imagen-4",
+  n=2,
+  api_key=AI_API_KEY,
+  api_base=AI_API_BASE,
+)
+
+# --- Xử lý và lưu từng ảnh ---
+for i, image_obj in enumerate(response.data):
+  b64_data = image_obj['b64_json']
+  image_data = base64.b64decode(b64_data)
+
+  save_path = f"generated_image_{i+1}.png"
+  with open(save_path, 'wb') as f:
+      f.write(image_data)
+      print(f"Image saved to {save_path}")
+
+--- unknown_code_15 ---
+gemini-2.5-flash-image-preview
+
+--- unknown_code_16 ---
+POST /chat/completions
+
+--- unknown_code_24 ---
+import litellm
+import base64
+import json
+import random
+
+random_prompt_seed = random.randint(1, 10000)
+# Seed is used use to generate different images for the same prompt and avoiding caching issues
+
+AI_API_BASE = "https://api.thucchien.ai/v1"
+AI_API_KEY = "your_api_key"
+IMAGE_SAVE_PATH = "generated_chat_image.png"
+
+# Configure Litellm to use AI API
+litellm.api_base = AI_API_BASE
+
+# Use streaming with Gemini 2.5 Flash Image Preview model
+response = litellm.completion(
+  model="litellm_proxy/gemini-2.5-flash-image-preview",
+  messages=[
+      {
+          "role": "user",
+          "content": "Tạo ảnh 2 con mèo bên khung cửa sổ đang nhìn ra vườn hoa. " + str(random_prompt_seed)
+      }
+  ],
+  api_key=AI_API_KEY,
+  modalities=["image"]  # Specify modalities to include image data
+)
+# Get the base64 image string from the response
+base64_string = response.choices[0].message.images[0].get("image_url").get("url")
+print("Image data received successfully.")
+
+# Decode and save the image ---
+if ',' in base64_string:
+  header, encoded = base64_string.split(',', 1)
+else:
+  encoded = base64_string
+
+image_data = base64.b64decode(encoded)
+
+with open(IMAGE_SAVE_PATH, 'wb') as f:
+  f.write(image_data)
+  
+print(f"Image saved to {IMAGE_SAVE_PATH}")

@@ -1,0 +1,588 @@
+=== Tạo phản hồi trò chuyện | AI Thực Chiến ===
+URL: https://docs.thucchien.ai/docs/api-reference/text-generation
+Crawled: 2025-10-23 00:19:17
+============================================================
+
+MAIN CONTENT:
+----------------------------------------
+Tham chiếu APITạo phản hồi trò chuyện
+Tạo phản hồi trò chuyện (Chat Completions)
+POST /chat/completions
+Tạo một phản hồi cho một cuộc hội thoại cho trước.
+THAM KHẢO
+Chi tiết đầy đủ các tham số, tham khảo tài liệu LiteLLM API
+Cấu trúc yêu cầu (Request Body)
+messages
+array
+Required
+Một danh sách các đối tượng message mô tả cuộc hội thoại cho đến thời điểm hiện tại.
+model
+string
+Required
+ID của mô hình sẽ sử dụng. Xem danh sách các mô hình được hỗ trợ trong trang hướng dẫn.
+max_tokens
+integer
+Số lượng token tối đa được tạo ra trong phần hoàn thành.
+n
+integer
+Số lượng lựa chọn hoàn thành cần tạo cho mỗi tin nhắn đầu vào. Mặc định là 1.
+seed
+integer
+Nếu được chỉ định, hệ thống sẽ cố gắng trả về kết quả có tính xác định (deterministic).
+stream
+boolean
+Nếu được đặt là true, các delta message từng phần sẽ được gửi, giống như trong ChatGPT. Mặc định là false.
+temperature
+number
+Giá trị từ 0 đến 2. Giá trị cao hơn (ví dụ: 0.8) sẽ làm cho đầu ra ngẫu nhiên hơn, trong khi giá trị thấp hơn (ví dụ: 0.2) sẽ làm cho nó tập trung và xác định hơn.
+top_p
+number
+Một phương pháp thay thế cho việc lấy mẫu bằng temperature, được gọi là nucleus sampling. Mô hình sẽ xem xét kết quả của các token với tổng khối lượng xác suất top_p. Ví dụ, 0.1 có nghĩa là chỉ các token chiếm 10% khối lượng xác suất hàng đầu được xem xét.
+Cấu trúc Phản hồi (Response Body)
+API sẽ trả về một đối tượng JSON với cấu trúc như sau.
+Đối tượng ChatCompletion
+id
+string
+Một định danh duy nhất cho yêu cầu hoàn thành trò chuyện.
+choices
+array
+Một danh sách các lựa chọn hoàn thành.
+created
+integer
+Thời gian Unix timestamp của thời điểm yêu cầu được tạo.
+model
+string
+Tên mô hình đã được sử dụng.
+object
+string
+Loại đối tượng, luôn là chat.completion.
+usage
+object
+Thống kê sử dụng cho yêu cầu.
+Đối tượng Choice
+finish_reason
+string
+Lý do mô hình ngừng tạo token. Có thể là stop (đạt điểm dừng tự nhiên), length (đạt max_tokens), v.v.
+index
+integer
+Chỉ số của lựa chọn trong danh sách.
+message
+object
+Đối tượng message chứa nội dung phản hồi.
+Đối tượng Usage
+completion_tokens
+integer
+Số lượng token trong phần nội dung được tạo ra.
+prompt_tokens
+integer
+Số lượng token trong phần prompt đầu vào.
+total_tokens
+integer
+Tổng số token đã sử dụng trong yêu cầu.
+curl
+Python (openai)
+Python (requests)
+Python (litellm)
+curl https://api.thucchien.ai/chat/completions \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer " \
+-d '{
+  "model": "
+gemini-2.5-pro
+gemini-2.5-flash
+",
+  "messages": [
+    {
+      "role": "system",
+      "content": "Bạn là một trợ lý ảo"
+    },
+    {
+      "role": "user",
+      "content": "Hãy viết một câu giới thiệu về Việt Nam."
+    }
+  ]
+}'
+Try It!
+Example Response
+{
+  "id": "k4LkaMWmM622vr0PutCC6AU",
+  "created": 1759806089,
+  "model": "gemini-2.5-flash",
+  "object": "chat.completion",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "Dưới đây là một vài lựa chọn, tùy thuộc vào sắc th... [TRUNCATED] ...i thân thiện, mến khách.\"\n\nBạn thích câu nào nhất?",
+        "role": "assistant",
+        "images": [],
+        "thinking_blocks": []
+      }
+    }
+  ],
+  "usage": {
+    "completion_tokens": 1581,
+    "prompt_tokens": 11,
+    "total_tokens": 1592,
+    "completion_tokens_details": {
+      "reasoning_tokens": 1399,
+      "text_tokens": 182
+    },
+    "prompt_tokens_details": {
+      "text_tokens": 11
+    }
+  },
+  "vertex_ai_grounding_metadata": [],
+  "vertex_ai_url_context_metadata": [],
+  "vertex_ai_safety_results": [],
+  "vertex_ai_citation_metadata": []
+}
+Copy full
+Previous
+Tham chiếu API
+Next
+Sinh hình ảnh
+
+CODE BLOCKS:
+----------------------------------------
+
+[CODE: unknown_code_1]
+```
+curl https://api.thucchien.ai/chat/completions \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer " \
+-d '{
+  "model": "
+gemini-2.5-pro
+gemini-2.5-flash
+",
+  "messages": [
+    {
+      "role": "system",
+      "content": "Bạn là một trợ lý ảo"
+    },
+    {
+      "role": "user",
+      "content": "Hãy viết một câu giới thiệu về Việt Nam."
+    }
+  ]
+}'
+```
+..............................
+
+[CODE: unknown_code_2]
+```
+{
+  "id": "k4LkaMWmM622vr0PutCC6AU",
+  "created": 1759806089,
+  "model": "gemini-2.5-flash",
+  "object": "chat.completion",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "Dưới đây là một vài lựa chọn, tùy thuộc vào sắc th... [TRUNCATED] ...i thân thiện, mến khách.\"\n\nBạn thích câu nào nhất?",
+        "role": "assistant",
+        "images": [],
+        "thinking_blocks": []
+      }
+    }
+  ],
+  "usage": {
+    "completion_tokens": 1581,
+    "prompt_tokens": 11,
+    "total_tokens": 1592,
+    "completion_tokens_details": {
+      "reasoning_tokens": 1399,
+      "text_tokens": 182
+    },
+    "prompt_tokens_details": {
+      "text_tokens": 11
+    }
+  },
+  "vertex_ai_grounding_metadata": [],
+  "vertex_ai_url_context_metadata": [],
+  "vertex_ai_safety_results": [],
+  "vertex_ai_citation_metadata": []
+}
+```
+..............................
+
+[CODE: bash_code_1]
+```
+curl https://api.thucchien.ai/chat/completions \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer " \
+-d '{
+  "model": "
+gemini-2.5-pro
+gemini-2.5-flash
+",
+  "messages": [
+    {
+      "role": "system",
+      "content": "Bạn là một trợ lý ảo"
+    },
+    {
+      "role": "user",
+      "content": "Hãy viết một câu giới thiệu về Việt Nam."
+    }
+  ]
+}'
+```
+..............................
+
+[CODE: unknown_code_32]
+```
+curl https://api.thucchien.ai/chat/completions \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer " \
+-d '{
+  "model": "
+gemini-2.5-pro
+gemini-2.5-flash
+",
+  "messages": [
+    {
+      "role": "system",
+      "content": "Bạn là một trợ lý ảo"
+    },
+    {
+      "role": "user",
+      "content": "Hãy viết một câu giới thiệu về Việt Nam."
+    }
+  ]
+}'
+```
+..............................
+
+[CODE: unknown_code_33]
+```
+{
+  "id": "k4LkaMWmM622vr0PutCC6AU",
+  "created": 1759806089,
+  "model": "gemini-2.5-flash",
+  "object": "chat.completion",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "Dưới đây là một vài lựa chọn, tùy thuộc vào sắc th... [TRUNCATED] ...i thân thiện, mến khách.\"\n\nBạn thích câu nào nhất?",
+        "role": "assistant",
+        "images": [],
+        "thinking_blocks": []
+      }
+    }
+  ],
+  "usage": {
+    "completion_tokens": 1581,
+    "prompt_tokens": 11,
+    "total_tokens": 1592,
+    "completion_tokens_details": {
+      "reasoning_tokens": 1399,
+      "text_tokens": 182
+    },
+    "prompt_tokens_details": {
+      "text_tokens": 11
+    }
+  },
+  "vertex_ai_grounding_metadata": [],
+  "vertex_ai_url_context_metadata": [],
+  "vertex_ai_safety_results": [],
+  "vertex_ai_citation_metadata": []
+}
+```
+..............................
+
+FULL CONTENT:
+----------------------------------------
+Tham chiếu APITạo phản hồi trò chuyện
+Tạo phản hồi trò chuyện (Chat Completions)
+POST /chat/completions
+Tạo một phản hồi cho một cuộc hội thoại cho trước.
+THAM KHẢO
+Chi tiết đầy đủ các tham số, tham khảo tài liệu LiteLLM API
+Cấu trúc yêu cầu (Request Body)
+messages
+array
+Required
+Một danh sách các đối tượng message mô tả cuộc hội thoại cho đến thời điểm hiện tại.
+model
+string
+Required
+ID của mô hình sẽ sử dụng. Xem danh sách các mô hình được hỗ trợ trong trang hướng dẫn.
+max_tokens
+integer
+Số lượng token tối đa được tạo ra trong phần hoàn thành.
+n
+integer
+Số lượng lựa chọn hoàn thành cần tạo cho mỗi tin nhắn đầu vào. Mặc định là 1.
+seed
+integer
+Nếu được chỉ định, hệ thống sẽ cố gắng trả về kết quả có tính xác định (deterministic).
+stream
+boolean
+Nếu được đặt là true, các delta message từng phần sẽ được gửi, giống như trong ChatGPT. Mặc định là false.
+temperature
+number
+Giá trị từ 0 đến 2. Giá trị cao hơn (ví dụ: 0.8) sẽ làm cho đầu ra ngẫu nhiên hơn, trong khi giá trị thấp hơn (ví dụ: 0.2) sẽ làm cho nó tập trung và xác định hơn.
+top_p
+number
+Một phương pháp thay thế cho việc lấy mẫu bằng temperature, được gọi là nucleus sampling. Mô hình sẽ xem xét kết quả của các token với tổng khối lượng xác suất top_p. Ví dụ, 0.1 có nghĩa là chỉ các token chiếm 10% khối lượng xác suất hàng đầu được xem xét.
+Cấu trúc Phản hồi (Response Body)
+API sẽ trả về một đối tượng JSON với cấu trúc như sau.
+Đối tượng ChatCompletion
+id
+string
+Một định danh duy nhất cho yêu cầu hoàn thành trò chuyện.
+choices
+array
+Một danh sách các lựa chọn hoàn thành.
+created
+integer
+Thời gian Unix timestamp của thời điểm yêu cầu được tạo.
+model
+string
+Tên mô hình đã được sử dụng.
+object
+string
+Loại đối tượng, luôn là chat.completion.
+usage
+object
+Thống kê sử dụng cho yêu cầu.
+Đối tượng Choice
+finish_reason
+string
+Lý do mô hình ngừng tạo token. Có thể là stop (đạt điểm dừng tự nhiên), length (đạt max_tokens), v.v.
+index
+integer
+Chỉ số của lựa chọn trong danh sách.
+message
+object
+Đối tượng message chứa nội dung phản hồi.
+Đối tượng Usage
+completion_tokens
+integer
+Số lượng token trong phần nội dung được tạo ra.
+prompt_tokens
+integer
+Số lượng token trong phần prompt đầu vào.
+total_tokens
+integer
+Tổng số token đã sử dụng trong yêu cầu.
+curl
+Python (openai)
+Python (requests)
+Python (litellm)
+curl https://api.thucchien.ai/chat/completions \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer " \
+-d '{
+  "model": "
+gemini-2.5-pro
+gemini-2.5-flash
+",
+  "messages": [
+    {
+      "role": "system",
+      "content": "Bạn là một trợ lý ảo"
+    },
+    {
+      "role": "user",
+      "content": "Hãy viết một câu giới thiệu về Việt Nam."
+    }
+  ]
+}'
+Try It!
+Example Response
+{
+  "id": "k4LkaMWmM622vr0PutCC6AU",
+  "created": 1759806089,
+  "model": "gemini-2.5-flash",
+  "object": "chat.completion",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "Dưới đây là một vài lựa chọn, tùy thuộc vào sắc th... [TRUNCATED] ...i thân thiện, mến khách.\"
+
+
+
+Bạn thích câu nào nhất?",
+        "role": "assistant",
+        "images": [],
+        "thinking_blocks": []
+      }
+    }
+  ],
+  "usage": {
+    "completion_tokens": 1581,
+    "prompt_tokens": 11,
+    "total_tokens": 1592,
+    "completion_tokens_details": {
+      "reasoning_tokens": 1399,
+      "text_tokens": 182
+    },
+    "prompt_tokens_details": {
+      "text_tokens": 11
+    }
+  },
+  "vertex_ai_grounding_metadata": [],
+  "vertex_ai_url_context_metadata": [],
+  "vertex_ai_safety_results": [],
+  "vertex_ai_citation_metadata": []
+}
+Copy full
+Previous
+Tham chiếu API
+Next
+Sinh hình ảnh
+
+=== CODE BLOCKS ===
+
+--- unknown_code_1 ---
+curl https://api.thucchien.ai/chat/completions \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer " \
+-d '{
+  "model": "
+gemini-2.5-pro
+gemini-2.5-flash
+",
+  "messages": [
+    {
+      "role": "system",
+      "content": "Bạn là một trợ lý ảo"
+    },
+    {
+      "role": "user",
+      "content": "Hãy viết một câu giới thiệu về Việt Nam."
+    }
+  ]
+}'
+
+--- unknown_code_2 ---
+{
+  "id": "k4LkaMWmM622vr0PutCC6AU",
+  "created": 1759806089,
+  "model": "gemini-2.5-flash",
+  "object": "chat.completion",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "Dưới đây là một vài lựa chọn, tùy thuộc vào sắc th... [TRUNCATED] ...i thân thiện, mến khách.\"
+
+
+
+Bạn thích câu nào nhất?",
+        "role": "assistant",
+        "images": [],
+        "thinking_blocks": []
+      }
+    }
+  ],
+  "usage": {
+    "completion_tokens": 1581,
+    "prompt_tokens": 11,
+    "total_tokens": 1592,
+    "completion_tokens_details": {
+      "reasoning_tokens": 1399,
+      "text_tokens": 182
+    },
+    "prompt_tokens_details": {
+      "text_tokens": 11
+    }
+  },
+  "vertex_ai_grounding_metadata": [],
+  "vertex_ai_url_context_metadata": [],
+  "vertex_ai_safety_results": [],
+  "vertex_ai_citation_metadata": []
+}
+
+--- bash_code_1 ---
+curl https://api.thucchien.ai/chat/completions \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer " \
+-d '{
+  "model": "
+gemini-2.5-pro
+gemini-2.5-flash
+",
+  "messages": [
+    {
+      "role": "system",
+      "content": "Bạn là một trợ lý ảo"
+    },
+    {
+      "role": "user",
+      "content": "Hãy viết một câu giới thiệu về Việt Nam."
+    }
+  ]
+}'
+
+--- unknown_code_32 ---
+curl https://api.thucchien.ai/chat/completions \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer " \
+-d '{
+  "model": "
+gemini-2.5-pro
+gemini-2.5-flash
+",
+  "messages": [
+    {
+      "role": "system",
+      "content": "Bạn là một trợ lý ảo"
+    },
+    {
+      "role": "user",
+      "content": "Hãy viết một câu giới thiệu về Việt Nam."
+    }
+  ]
+}'
+
+--- unknown_code_33 ---
+{
+  "id": "k4LkaMWmM622vr0PutCC6AU",
+  "created": 1759806089,
+  "model": "gemini-2.5-flash",
+  "object": "chat.completion",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "Dưới đây là một vài lựa chọn, tùy thuộc vào sắc th... [TRUNCATED] ...i thân thiện, mến khách.\"
+
+
+
+Bạn thích câu nào nhất?",
+        "role": "assistant",
+        "images": [],
+        "thinking_blocks": []
+      }
+    }
+  ],
+  "usage": {
+    "completion_tokens": 1581,
+    "prompt_tokens": 11,
+    "total_tokens": 1592,
+    "completion_tokens_details": {
+      "reasoning_tokens": 1399,
+      "text_tokens": 182
+    },
+    "prompt_tokens_details": {
+      "text_tokens": 11
+    }
+  },
+  "vertex_ai_grounding_metadata": [],
+  "vertex_ai_url_context_metadata": [],
+  "vertex_ai_safety_results": [],
+  "vertex_ai_citation_metadata": []
+}

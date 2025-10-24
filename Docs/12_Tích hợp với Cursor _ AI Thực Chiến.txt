@@ -1,0 +1,81 @@
+=== Tích hợp với Cursor | AI Thực Chiến ===
+URL: https://docs.thucchien.ai/docs/vibe-coding/cursor-integration
+Crawled: 2025-10-23 00:18:57
+============================================================
+
+MAIN CONTENT:
+----------------------------------------
+VibeCodingTích hợp với Cursor
+Tích hợp với Cursor
+Cursor là một trình soạn thảo code được xây dựng dựa trên VSCode, được tối ưu hóa cho việc lập trình với AI. Việc tích hợp Cursor với AI Thực Chiến Gateway cho phép bạn tận dụng các mô hình mạnh mẽ ngay trong môi trường code của mình.
+Cấu hình Cursor
+Cursor hỗ trợ việc sử dụng các mô hình OpenAI-compatible, giúp việc tích hợp trở nên dễ dàng.
+Thêm Model Tùy chỉnh:
+Truy cập Settings > Models.
+Chọn + Add Custom Model.
+Nhập gemini-2.5-pro và nhấn Add để xác nhận.
+Cấu hình Endpoint và API Key:
+Trong mục API Keys, nhập OpenAI API Key của bạn.
+Kích hoạt tùy chọn Override OpenAI Base URL.
+Thiết lập Base URL thành https://api.thucchien.ai/v1.
+Giao diện cấu hình model trong Cursor.
+LƯU Ý
+Đảm bảo disable các provider khác trong mục API Keys chỉ giữ lại OpenAI
+Sau khi hoàn tất, bạn có thể chọn gemini-2.5-pro từ danh sách mô hình để bắt đầu sử dụng.
+Video hướng dẫn
+Previous
+Tích hợp với CLine
+Next
+Các phương pháp tốt nhất (Best Practices)
+Cấu hình Cursor
+Video hướng dẫn
+
+CODE BLOCKS:
+----------------------------------------
+
+[CODE: unknown_code_7]
+```
+Override OpenAI Base URL
+```
+..............................
+
+[CODE: unknown_code_8]
+```
+https://api.thucchien.ai/v1
+```
+..............................
+
+FULL CONTENT:
+----------------------------------------
+VibeCodingTích hợp với Cursor
+Tích hợp với Cursor
+Cursor là một trình soạn thảo code được xây dựng dựa trên VSCode, được tối ưu hóa cho việc lập trình với AI. Việc tích hợp Cursor với AI Thực Chiến Gateway cho phép bạn tận dụng các mô hình mạnh mẽ ngay trong môi trường code của mình.
+Cấu hình Cursor
+Cursor hỗ trợ việc sử dụng các mô hình OpenAI-compatible, giúp việc tích hợp trở nên dễ dàng.
+Thêm Model Tùy chỉnh:
+Truy cập Settings > Models.
+Chọn + Add Custom Model.
+Nhập gemini-2.5-pro và nhấn Add để xác nhận.
+Cấu hình Endpoint và API Key:
+Trong mục API Keys, nhập OpenAI API Key của bạn.
+Kích hoạt tùy chọn Override OpenAI Base URL.
+Thiết lập Base URL thành https://api.thucchien.ai/v1.
+Giao diện cấu hình model trong Cursor.
+LƯU Ý
+Đảm bảo disable các provider khác trong mục API Keys chỉ giữ lại OpenAI
+Sau khi hoàn tất, bạn có thể chọn gemini-2.5-pro từ danh sách mô hình để bắt đầu sử dụng.
+Video hướng dẫn
+Previous
+Tích hợp với CLine
+Next
+Các phương pháp tốt nhất (Best Practices)
+Cấu hình Cursor
+Video hướng dẫn
+
+=== CODE BLOCKS ===
+
+--- unknown_code_7 ---
+Override OpenAI Base URL
+
+--- unknown_code_8 ---
+https://api.thucchien.ai/v1

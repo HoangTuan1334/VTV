@@ -1,0 +1,79 @@
+# 📄 Gộp tất cả trang thành 1 file PDF
+def create_comic_pdf(final_pages, output_filename="final_comic/TRUYEN_TRANH.pdf"):
+    """
+    Gộp tất cả trang PNG thành 1 file PDF duy nhất
+    """
+    try:
+        from PIL import Image
+        
+        if not final_pages:
+            print("❌ Không có trang nào để tạo PDF")
+            return None
+        
+        print(f"\n📄 Đang tạo PDF từ {len(final_pages)} trang...")
+        
+        # Đọc tất cả trang
+        images = []
+        for i, page_path in enumerate(final_pages):
+            print(f"   Đọc trang {i+1}/{len(final_pages)}: {page_path}")
+            img = Image.open(page_path)
+            
+            # Convert sang RGB nếu cần (PDF không hỗ trợ RGBA)
+            if img.mode != 'RGB':
+                img = img.convert('RGB')
+            
+            images.append(img)
+        
+        # Lưu thành PDF (trang đầu tiên làm gốc, các trang còn lại append vào)
+        if len(images) > 0:
+            print(f"\n💾 Đang lưu PDF: {output_filename}")
+            images[0].save(
+                output_filename,
+                save_all=True,
+                append_images=images[1:] if len(images) > 1 else [],
+                resolution=300.0,  # 300 DPI
+                quality=95,
+                optimize=False
+            )
+            
+            # Kiểm tra file size
+            import os
+            file_size = os.path.getsize(output_filename) / (1024 * 1024)  # MB
+            
+            print(f"\n✅ ĐÃ TẠO PDF THÀNH CÔNG!")
+            print(f"   📁 File: {output_filename}")
+            print(f"   📊 Kích thước: {file_size:.2f} MB")
+            print(f"   📄 Số trang: {len(images)}")
+            
+            return output_filename
+        else:
+            print("❌ Không có ảnh nào để tạo PDF")
+            return None
+            
+    except Exception as e:
+        print(f"\n❌ Lỗi tạo PDF: {e}")
+        print("💡 Thử cài đặt: pip install Pillow")
+        return None
+
+
+# Tạo PDF nếu đã có final_pages
+if 'final_pages' in locals() and final_pages:
+    print("\n" + "=" * 70)
+    print("📄 BƯỚC CUỐI: TẠO FILE PDF")
+    print("=" * 70)
+    
+    pdf_file = create_comic_pdf(final_pages)
+    
+    if pdf_file:
+        print("\n" + "=" * 70)
+        print("🎉 HOÀN THÀNH TOÀN BỘ QUY TRÌNH!")
+        print("=" * 70)
+        print(f"\n📚 Truyện của bạn:")
+        print(f"   - Các trang PNG: final_comic/page_*.png")
+        print(f"   - File PDF hoàn chỉnh: {pdf_file}")
+        print(f"\n📖 Bạn có thể đọc truyện bằng:")
+        print(f"   - Mở file PDF bằng trình đọc PDF")
+        print(f"   - Hoặc xem từng trang PNG")
+        print("=" * 70)
+else:
+    print("❌ Chưa có dữ liệu trang. Vui lòng chạy lại các bước trước.")

@@ -1,0 +1,238 @@
+=== Kiểm tra trạng thái video | AI Thực Chiến ===
+URL: https://docs.thucchien.ai/docs/api-reference/video-generation-status
+Crawled: 2025-10-23 00:20:39
+============================================================
+
+MAIN CONTENT:
+----------------------------------------
+Tham chiếu APIKiểm tra trạng thái video
+Sinh video (Bước 2/3): Kiểm tra trạng thái
+GET /gemini/v1beta/{operation_name}
+Sử dụng operation_name (name nhận được ở Bước 1) để hỏi API xem video đã được tạo xong chưa. Bạn cần lặp lại bước này cho đến khi nhận được trạng thái hoàn tất.
+Tham số đường dẫn (Path Parameters)
+operation_name
+string
+Required
+Tên của tác vụ cần kiểm tra. Ví dụ: models/veo-3.0-generate-001/operations/idrk08ltkg0a.
+Cấu trúc Phản hồi (Response Body)
+name
+string
+Tên đầy đủ của tác vụ.
+done
+boolean
+Trạng thái của tác vụ. true nếu đã hoàn thành.
+response
+object
+Chứa kết quả khi done là true.
+uri
+string
+Đường dẫn URI đến file video đã được tạo. Bạn sẽ sử dụng video_id trích xuất từ URI này để tải video về ở Bước 3. Trong ví dụ: https://generativelanguage.googleapis.com/v1beta/files/3j6svp4106e7:download?alt=media, thì video_id là 3j6svp4106e7.
+curl
+curl "https://api.thucchien.ai/gemini/v1beta/" \
+-H "x-goog-api-key: "
+Try It!
+Example Response
+{
+  "name": "models/veo-3.0-generate-preview/operations/idrk08ltkg0a",
+  "done": true,
+  "response": {
+    "@type": "type.googleapis.com/google.ai.generativelanguage.v1beta.PredictLongRunningResponse",
+    "generateVideoResponse": {
+      "generatedSamples": [
+        {
+          "video": {
+            "uri": "https://generativelanguage.googleapis.com/v1beta/files/3j6svp4106e7:download?alt=media"
+          }
+        }
+      ]
+    }
+  }
+}
+Copy full
+Previous
+Tạo video
+Next
+Tải xuống video hoàn thành
+
+CODE BLOCKS:
+----------------------------------------
+
+[CODE: unknown_code_1]
+```
+/gemini/v1beta/{operation_name}
+```
+..............................
+
+[CODE: unknown_code_2]
+```
+{
+  "name": "models/veo-3.0-generate-preview/operations/idrk08ltkg0a",
+  "done": true,
+  "response": {
+    "@type": "type.googleapis.com/google.ai.generativelanguage.v1beta.PredictLongRunningResponse",
+    "generateVideoResponse": {
+      "generatedSamples": [
+        {
+          "video": {
+            "uri": "https://generativelanguage.googleapis.com/v1beta/files/3j6svp4106e7:download?alt=media"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+..............................
+
+[CODE: bash_code_1]
+```
+curl "https://api.thucchien.ai/gemini/v1beta/" \
+-H "x-goog-api-key: "
+```
+..............................
+
+[CODE: unknown_code_5]
+```
+models/veo-3.0-generate-001/operations/idrk08ltkg0a
+```
+..............................
+
+[CODE: unknown_code_14]
+```
+https://generativelanguage.googleapis.com/v1beta/files/3j6svp4106e7:download?alt=media
+```
+..............................
+
+[CODE: unknown_code_17]
+```
+curl "https://api.thucchien.ai/gemini/v1beta/" \
+-H "x-goog-api-key: "
+```
+..............................
+
+[CODE: unknown_code_18]
+```
+{
+  "name": "models/veo-3.0-generate-preview/operations/idrk08ltkg0a",
+  "done": true,
+  "response": {
+    "@type": "type.googleapis.com/google.ai.generativelanguage.v1beta.PredictLongRunningResponse",
+    "generateVideoResponse": {
+      "generatedSamples": [
+        {
+          "video": {
+            "uri": "https://generativelanguage.googleapis.com/v1beta/files/3j6svp4106e7:download?alt=media"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+..............................
+
+FULL CONTENT:
+----------------------------------------
+Tham chiếu APIKiểm tra trạng thái video
+Sinh video (Bước 2/3): Kiểm tra trạng thái
+GET /gemini/v1beta/{operation_name}
+Sử dụng operation_name (name nhận được ở Bước 1) để hỏi API xem video đã được tạo xong chưa. Bạn cần lặp lại bước này cho đến khi nhận được trạng thái hoàn tất.
+Tham số đường dẫn (Path Parameters)
+operation_name
+string
+Required
+Tên của tác vụ cần kiểm tra. Ví dụ: models/veo-3.0-generate-001/operations/idrk08ltkg0a.
+Cấu trúc Phản hồi (Response Body)
+name
+string
+Tên đầy đủ của tác vụ.
+done
+boolean
+Trạng thái của tác vụ. true nếu đã hoàn thành.
+response
+object
+Chứa kết quả khi done là true.
+uri
+string
+Đường dẫn URI đến file video đã được tạo. Bạn sẽ sử dụng video_id trích xuất từ URI này để tải video về ở Bước 3. Trong ví dụ: https://generativelanguage.googleapis.com/v1beta/files/3j6svp4106e7:download?alt=media, thì video_id là 3j6svp4106e7.
+curl
+curl "https://api.thucchien.ai/gemini/v1beta/" \
+-H "x-goog-api-key: "
+Try It!
+Example Response
+{
+  "name": "models/veo-3.0-generate-preview/operations/idrk08ltkg0a",
+  "done": true,
+  "response": {
+    "@type": "type.googleapis.com/google.ai.generativelanguage.v1beta.PredictLongRunningResponse",
+    "generateVideoResponse": {
+      "generatedSamples": [
+        {
+          "video": {
+            "uri": "https://generativelanguage.googleapis.com/v1beta/files/3j6svp4106e7:download?alt=media"
+          }
+        }
+      ]
+    }
+  }
+}
+Copy full
+Previous
+Tạo video
+Next
+Tải xuống video hoàn thành
+
+=== CODE BLOCKS ===
+
+--- unknown_code_1 ---
+/gemini/v1beta/{operation_name}
+
+--- unknown_code_2 ---
+{
+  "name": "models/veo-3.0-generate-preview/operations/idrk08ltkg0a",
+  "done": true,
+  "response": {
+    "@type": "type.googleapis.com/google.ai.generativelanguage.v1beta.PredictLongRunningResponse",
+    "generateVideoResponse": {
+      "generatedSamples": [
+        {
+          "video": {
+            "uri": "https://generativelanguage.googleapis.com/v1beta/files/3j6svp4106e7:download?alt=media"
+          }
+        }
+      ]
+    }
+  }
+}
+
+--- bash_code_1 ---
+curl "https://api.thucchien.ai/gemini/v1beta/" \
+-H "x-goog-api-key: "
+
+--- unknown_code_5 ---
+models/veo-3.0-generate-001/operations/idrk08ltkg0a
+
+--- unknown_code_14 ---
+https://generativelanguage.googleapis.com/v1beta/files/3j6svp4106e7:download?alt=media
+
+--- unknown_code_17 ---
+curl "https://api.thucchien.ai/gemini/v1beta/" \
+-H "x-goog-api-key: "
+
+--- unknown_code_18 ---
+{
+  "name": "models/veo-3.0-generate-preview/operations/idrk08ltkg0a",
+  "done": true,
+  "response": {
+    "@type": "type.googleapis.com/google.ai.generativelanguage.v1beta.PredictLongRunningResponse",
+    "generateVideoResponse": {
+      "generatedSamples": [
+        {
+          "video": {
+            "uri": "https://generativelanguage.googleapis.com/v1beta/files/3j6svp4106e7:download?alt=media"
+          }
+        }
+      ]
+    }
+  }
+}

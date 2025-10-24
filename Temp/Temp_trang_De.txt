@@ -1,0 +1,141 @@
+# ===========================================
+# 🇻🇳 COMIC + TEXT OVERLAY (TRUE AUTO-FIT)
+# ===========================================
+# pip install pillow opencv-python numpy google-genai
+
+import os
+import base64
+import cv2
+import numpy as np
+from PIL import Image, ImageDraw, ImageFont
+from google import genai
+from google.genai import types
+
+# ===========================
+# 🔑 CONFIG
+# ===========================
+API_KEY = "AIzaSyDi-soBuW5bmVCncY2ImjtmSONR2AukSng"
+MODEL_IMG = "gemini-2.5-flash-image"
+client = genai.Client(api_key=API_KEY)
+
+# ===========================
+# 💬 PROMPT (SINH BACKGROUND)
+# ===========================
+prompt_background = """
+Generate a high-resolution comic page in A4 vertical portrait mode (210mm x 297mm, aspect ratio 0.707:1). Render all Vietnamese text exactly as quoted, with perfect diacritics and no spelling errors whatsoever—use sans-serif bold font for clarity. Style: Emotional Disney-like cartoon with sepia tones for flashbacks (brown-gray with rain/mud effects), vibrant red-yellow-green for present scenes. Keep characters consistent: Minh (12-year-old boy, short black hair, white shirt, blue shorts, curious to emotional with tears); Ông nội (elderly man, silver hair, brown áo bà ba, kind wrinkled face, teary eyes); Chiến sĩ trẻ (young soldier version of ông nội, skinny, green army shirt, tai bèo hat, resolute but pained); Bác Hồ (historical figure, long silver beard, ka-ki shirt, benevolent smile); Võ Nguyên Giáp (young general, military uniform, decisive yet humane); Nhân dân (diverse crowd: skinny farmers, burdened women, hungry children, suffering but united with tears); Kẻ thù (blurry shadows, no personal details, suggested by falling bombs and foreign flags). Emphasize tears, hugs, and personal sacrifices for deep patriotism. No English text except if specified. Black borders, no overlapping text."
+    "Create a deeply emotional comic cover page as the start of a story about Vietnam's journey from painful colonial struggles and wars to joyful independence celebrations in 2025. The scene unfolds at Ba Đình Square during the 2/9/2025 parade: In the central foreground, young Minh with watery eyes and tears streaming down his cheeks holds a glowing red Vietnamese flag, embracing his ông nội who wipes a tear from his kind wrinkled face, surrounded by a joyful crowd waving banners under exploding fireworks. The background fades into sepia flashbacks showing exhausted warriors pulling cannons through muddy rain, Bác Hồ declaring independence to a hopeful teary crowd, and symbols of sacrifices like a mother hugging her child amid ruins—all evoking gratitude for the past's hardships that led to today's peace. Layout: Single large full-page panel with black borders
+No text, no captions, no banners, no dialogue — purely visual background.
+Style: emotional, cinematic, warm lighting, detailed and vibrant.
+"""
+
+# ===========================
+# 💾 SAVE FILE HELPER
+# ===========================
+def save_binary_file(file_name, data):
+    with open(file_name, "wb") as f:
+        f.write(data)
+    print(f"✅ Saved: {file_name}")
+
+# ===========================
+# 1️⃣ SINH BACKGROUND
+# ===========================
+def generate_background():
+    print("\n🎨 Generating background with Gemini...")
+    response = client.models.generate_content(
+        model=MODEL_IMG,
+        contents=[prompt_background],
+        config=types.GenerateContentConfig(response_modalities=["IMAGE"])
+    )
+    bg_path = "background.png"
+    for part in response.candidates[0].content.parts:
+        if hasattr(part, "inline_data") and part.inline_data and part.inline_data.data:
+            img_data = base64.b64decode(part.inline_data.data)
+            save_binary_file(bg_path, img_data)
+    return bg_path
+
+# ===========================
+# 2️⃣ SINH CHỮ (AUTO-RESIZE)
+# ===========================
+def generate_text_image(bg_path):
+    print("\n🖋 Rendering Vietnamese text (true auto-fit)...")
+
+    text = "Kỷ niệm 80 năm Quốc khánh Việt Nam 2/9/1945 - 2/9/2025"
+    font_path = r"C:\Windows\Fonts\TIMESBD.TTF"
+
+    if not os.path.exists(font_path):
+        raise FileNotFoundError("❌ Font không tồn tại, vui lòng kiểm tra đường dẫn.")
+
+    bg = Image.open(bg_path).convert("RGBA")
+    bg_w, bg_h = bg.size
+
+    max_text_w = int(bg_w * 0.9)
+    max_text_h = int(bg_h * 0.16)
+
+    # Bắt đầu với font lớn, giảm dần cho tới khi toàn bộ text (cả glow) nằm trong khung
+    font_size = 300
+    while font_size > 50:
+        font = ImageFont.truetype(font_path, font_size)
+        temp_img = Image.new("RGBA", (10, 10))
+        draw = ImageDraw.Draw(temp_img)
+        bbox = draw.textbbox((0, 0), text, font=font)
+        text_w, text_h = bbox[2] - bbox[0], bbox[3] - bbox[1]
+
+        # Thêm padding cho glow (vì glow mở rộng vùng sáng)
+        text_w_glow = int(text_w * 1.12)
+        text_h_glow = int(text_h * 1.25)
+
+        if text_w_glow <= max_text_w and text_h_glow <= max_text_h:
+            break
+        font_size -= 5
+
+    # Vẽ chữ thật
+    img = Image.new("RGBA", (text_w_glow, text_h_glow), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    draw.text(((text_w_glow - text_w) // 2, (text_h_glow - text_h) // 2),
+              text, font=font, fill="#FFD700")
+
+    # Hiệu ứng glow mềm
+    img_cv = np.array(img)
+    alpha = img_cv[:, :, 3]
+    mask = cv2.dilate(alpha, np.ones((15, 15), np.uint8), iterations=1)
+    glow = cv2.GaussianBlur(mask, (45, 45), 0)
+    glow_layer = np.zeros_like(img_cv)
+    glow_layer[:, :, :3] = (255, 215, 0)
+    glow_layer[:, :, 3] = glow
+    final = cv2.addWeighted(glow_layer, 0.5, img_cv, 1.0, 0)
+
+    text_path = "text_overlay.png"
+    Image.fromarray(final).save(text_path)
+    print(f"✅ Saved: {text_path} (font size {font_size}, safe-fit)")
+    return text_path, bg_w, bg_h
+
+# ===========================
+# 3️⃣ GHÉP ẢNH
+# ===========================
+def overlay_text_on_background(bg_path, text_path, bg_w, bg_h):
+    print("\n🪄 Overlaying text on background...")
+    bg = Image.open(bg_path).convert("RGBA")
+    text = Image.open(text_path).convert("RGBA")
+
+    # Nếu text vẫn hơi lớn → giảm lại 1 chút
+    if text.width > bg.width * 0.95:
+        ratio = (bg.width * 0.9) / text.width
+        new_w = int(text.width * ratio)
+        new_h = int(text.height * ratio)
+        text = text.resize((new_w, new_h), Image.LANCZOS)
+
+    pos_x = (bg_w - text.width) // 2
+    pos_y = int(bg_h * 0.1)  # đặt gần top
+
+    bg.alpha_composite(text, (pos_x, pos_y))
+    output_path = "final_comic_cover.png"
+    bg.save(output_path)
+    print(f"🎉 Final poster saved: {output_path}")
+
+# ===========================
+# 🏁 MAIN
+# ===========================
+if __name__ == "__main__":
+    bg_path = generate_background()
+    text_path, bg_w, bg_h = generate_text_image(bg_path)
+    overlay_text_on_background(bg_path, text_path, bg_w, bg_h)

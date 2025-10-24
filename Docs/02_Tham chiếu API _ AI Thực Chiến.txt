@@ -1,0 +1,64 @@
+=== Tham chiếu API | AI Thực Chiến ===
+URL: https://docs.thucchien.ai/docs/api-reference
+Crawled: 2025-10-23 00:17:20
+============================================================
+
+MAIN CONTENT:
+----------------------------------------
+Tham chiếu API
+Tham chiếu API
+Tài liệu tham khảo chi tiết cho từng endpoint của API.
+📄️ Tạo phản hồi trò chuyện
+Tạo một phản hồi cho một cuộc hội thoại cho trước.
+📄️ Sinh hình ảnh
+Tạo một hoặc nhiều hình ảnh dựa trên mô tả văn bản (prompt).
+📄️ Sinh hình ảnh (với Chat)
+Tạo hình ảnh trong một cuộc hội thoại bằng cách sử dụng mô hình đa phương thức.
+📄️ Sinh/Sửa hình ảnh (với Google Gemini)
+Tạo hình ảnh với endpoint pass through tới Google Gemini.
+📄️ Tạo video
+Bắt đầu một tác vụ tạo video từ mô tả văn bản.
+📄️ Kiểm tra trạng thái video
+Kiểm tra trạng thái của một tác vụ tạo video đang chạy.
+📄️ Tải xuống video hoàn thành
+Tải xuống file video đã được tạo.
+📄️ Chuyển văn bản thành giọng nói
+Chuyển đổi văn bản thành file âm thanh có giọng nói tự nhiên.
+📄️ Chuyển văn bản thành giọng nói (với Google Gemini)
+Tạo file âm thanh với endpoint pass through tới Google Gemini.
+📄️ Kiểm tra chi tiêu
+Kiểm tra thông tin API key và chi tiêu hiện tại.
+Previous
+Các phương pháp tốt nhất (Best Practices)
+Next
+Tạo phản hồi trò chuyện
+
+FULL CONTENT:
+----------------------------------------
+Tham chiếu API
+Tham chiếu API
+Tài liệu tham khảo chi tiết cho từng endpoint của API.
+📄️ Tạo phản hồi trò chuyện
+Tạo một phản hồi cho một cuộc hội thoại cho trước.
+📄️ Sinh hình ảnh
+Tạo một hoặc nhiều hình ảnh dựa trên mô tả văn bản (prompt).
+📄️ Sinh hình ảnh (với Chat)
+Tạo hình ảnh trong một cuộc hội thoại bằng cách sử dụng mô hình đa phương thức.
+📄️ Sinh/Sửa hình ảnh (với Google Gemini)
+Tạo hình ảnh với endpoint pass through tới Google Gemini.
+📄️ Tạo video
+Bắt đầu một tác vụ tạo video từ mô tả văn bản.
+📄️ Kiểm tra trạng thái video
+Kiểm tra trạng thái của một tác vụ tạo video đang chạy.
+📄️ Tải xuống video hoàn thành
+Tải xuống file video đã được tạo.
+📄️ Chuyển văn bản thành giọng nói
+Chuyển đổi văn bản thành file âm thanh có giọng nói tự nhiên.
+📄️ Chuyển văn bản thành giọng nói (với Google Gemini)
+Tạo file âm thanh với endpoint pass through tới Google Gemini.
+📄️ Kiểm tra chi tiêu
+Kiểm tra thông tin API key và chi tiêu hiện tại.
+Previous
+Các phương pháp tốt nhất (Best Practices)
+Next
+Tạo phản hồi trò chuyện

@@ -1,0 +1,432 @@
+=== Sinh hình ảnh (với Chat) | AI Thực Chiến ===
+URL: https://docs.thucchien.ai/docs/api-reference/image-generation-chat
+Crawled: 2025-10-23 00:20:06
+============================================================
+
+MAIN CONTENT:
+----------------------------------------
+Tham chiếu APISinh hình ảnh (với Chat)
+Sinh hình ảnh (với Chat Completions)
+POST /chat/completions
+Tạo hình ảnh trong một cuộc hội thoại bằng cách sử dụng mô hình đa phương thức.
+Cấu trúc yêu cầu (Request Body)
+messages
+array
+Required
+Một danh sách các đối tượng message. Message cuối cùng nên chứa prompt để tạo ảnh.
+model
+string
+Required
+ID của mô hình đa phương thức sẽ sử dụng. Ví dụ: gemini-2.5-flash-image-preview.
+modalities
+array
+Chỉ định ["image"] để yêu cầu trả về dữ liệu hình ảnh.
+Cấu trúc Phản hồi (Response Body)
+Phản hồi sẽ tương tự như của Chat Completions, nhưng đối tượng message sẽ chứa một mảng images.
+Đối tượng ImageMessage
+images
+array
+Một danh sách các đối tượng hình ảnh được tạo.
+Đối tượng ImageURL
+image_url
+object
+Đối tượng chứa URL dữ liệu base64 của ảnh.
+url
+string
+URL dữ liệu base64 của ảnh (ví dụ: data:image/png;base64,...).
+curl
+Python (openai)
+curl https://api.thucchien.ai/chat/completions \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer " \
+-d '{
+  "model": "
+gemini-2.5-flash-image-preview
+",
+  "messages": [
+    {
+      "role": "user",
+      "content": "A breathtaking scene where a majestic waterfall cascades down rugged cliffs, shimmering like silver threads under the warm sunlight. Lush greenery surrounds the falls—towering trees, vibrant flowers, and soft moss painting nature’s perfect canvas. Mist rises gently, forming a magical rainbow that arches across the sky, while birds soar gracefully above as if dancing to the music of nature. A dreamlike moment that blends serenity and beauty in one stunning view."
+    }
+  ],
+  "modalities": ["image"]
+}'
+Try It!
+Example Response
+{
+  "id": "chatcmpl-mock",
+  "object": "chat.completion",
+  "created": 1759806089,
+  "model": "gemini-2.5-flash-image-preview",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": null,
+        "images": [
+          {
+            "image_url": {
+              "url": "data:image/png;base64,<base64_encoded_image_data>"
+            }
+          }
+        ]
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 15,
+    "completion_tokens": 1,
+    "total_tokens": 16
+  }
+}
+Copy full
+Previous
+Sinh hình ảnh
+Next
+Sinh/Sửa hình ảnh (với Google Gemini)
+
+CODE BLOCKS:
+----------------------------------------
+
+[CODE: unknown_code_1]
+```
+curl https://api.thucchien.ai/chat/completions \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer " \
+-d '{
+  "model": "
+gemini-2.5-flash-image-preview
+",
+  "messages": [
+    {
+      "role": "user",
+      "content": "A breathtaking scene where a majestic waterfall cascades down rugged cliffs, shimmering like silver threads under the warm sunlight. Lush greenery surrounds the falls—towering trees, vibrant flowers, and soft moss painting nature’s perfect canvas. Mist rises gently, forming a magical rainbow that arches across the sky, while birds soar gracefully above as if dancing to the music of nature. A dreamlike moment that blends serenity and beauty in one stunning view."
+    }
+  ],
+  "modalities": ["image"]
+}'
+```
+..............................
+
+[CODE: unknown_code_2]
+```
+{
+  "id": "chatcmpl-mock",
+  "object": "chat.completion",
+  "created": 1759806089,
+  "model": "gemini-2.5-flash-image-preview",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": null,
+        "images": [
+          {
+            "image_url": {
+              "url": "data:image/png;base64,<base64_encoded_image_data>"
+            }
+          }
+        ]
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 15,
+    "completion_tokens": 1,
+    "total_tokens": 16
+  }
+}
+```
+..............................
+
+[CODE: bash_code_1]
+```
+curl https://api.thucchien.ai/chat/completions \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer " \
+-d '{
+  "model": "
+gemini-2.5-flash-image-preview
+",
+  "messages": [
+    {
+      "role": "user",
+      "content": "A breathtaking scene where a majestic waterfall cascades down rugged cliffs, shimmering like silver threads under the warm sunlight. Lush greenery surrounds the falls—towering trees, vibrant flowers, and soft moss painting nature’s perfect canvas. Mist rises gently, forming a magical rainbow that arches across the sky, while birds soar gracefully above as if dancing to the music of nature. A dreamlike moment that blends serenity and beauty in one stunning view."
+    }
+  ],
+  "modalities": ["image"]
+}'
+```
+..............................
+
+[CODE: unknown_code_4]
+```
+gemini-2.5-flash-image-preview
+```
+..............................
+
+[CODE: unknown_code_14]
+```
+data:image/png;base64,...
+```
+..............................
+
+[CODE: unknown_code_15]
+```
+curl https://api.thucchien.ai/chat/completions \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer " \
+-d '{
+  "model": "
+gemini-2.5-flash-image-preview
+",
+  "messages": [
+    {
+      "role": "user",
+      "content": "A breathtaking scene where a majestic waterfall cascades down rugged cliffs, shimmering like silver threads under the warm sunlight. Lush greenery surrounds the falls—towering trees, vibrant flowers, and soft moss painting nature’s perfect canvas. Mist rises gently, forming a magical rainbow that arches across the sky, while birds soar gracefully above as if dancing to the music of nature. A dreamlike moment that blends serenity and beauty in one stunning view."
+    }
+  ],
+  "modalities": ["image"]
+}'
+```
+..............................
+
+[CODE: unknown_code_16]
+```
+{
+  "id": "chatcmpl-mock",
+  "object": "chat.completion",
+  "created": 1759806089,
+  "model": "gemini-2.5-flash-image-preview",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": null,
+        "images": [
+          {
+            "image_url": {
+              "url": "data:image/png;base64,<base64_encoded_image_data>"
+            }
+          }
+        ]
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 15,
+    "completion_tokens": 1,
+    "total_tokens": 16
+  }
+}
+```
+..............................
+
+FULL CONTENT:
+----------------------------------------
+Tham chiếu APISinh hình ảnh (với Chat)
+Sinh hình ảnh (với Chat Completions)
+POST /chat/completions
+Tạo hình ảnh trong một cuộc hội thoại bằng cách sử dụng mô hình đa phương thức.
+Cấu trúc yêu cầu (Request Body)
+messages
+array
+Required
+Một danh sách các đối tượng message. Message cuối cùng nên chứa prompt để tạo ảnh.
+model
+string
+Required
+ID của mô hình đa phương thức sẽ sử dụng. Ví dụ: gemini-2.5-flash-image-preview.
+modalities
+array
+Chỉ định ["image"] để yêu cầu trả về dữ liệu hình ảnh.
+Cấu trúc Phản hồi (Response Body)
+Phản hồi sẽ tương tự như của Chat Completions, nhưng đối tượng message sẽ chứa một mảng images.
+Đối tượng ImageMessage
+images
+array
+Một danh sách các đối tượng hình ảnh được tạo.
+Đối tượng ImageURL
+image_url
+object
+Đối tượng chứa URL dữ liệu base64 của ảnh.
+url
+string
+URL dữ liệu base64 của ảnh (ví dụ: data:image/png;base64,...).
+curl
+Python (openai)
+curl https://api.thucchien.ai/chat/completions \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer " \
+-d '{
+  "model": "
+gemini-2.5-flash-image-preview
+",
+  "messages": [
+    {
+      "role": "user",
+      "content": "A breathtaking scene where a majestic waterfall cascades down rugged cliffs, shimmering like silver threads under the warm sunlight. Lush greenery surrounds the falls—towering trees, vibrant flowers, and soft moss painting nature’s perfect canvas. Mist rises gently, forming a magical rainbow that arches across the sky, while birds soar gracefully above as if dancing to the music of nature. A dreamlike moment that blends serenity and beauty in one stunning view."
+    }
+  ],
+  "modalities": ["image"]
+}'
+Try It!
+Example Response
+{
+  "id": "chatcmpl-mock",
+  "object": "chat.completion",
+  "created": 1759806089,
+  "model": "gemini-2.5-flash-image-preview",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": null,
+        "images": [
+          {
+            "image_url": {
+              "url": "data:image/png;base64,<base64_encoded_image_data>"
+            }
+          }
+        ]
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 15,
+    "completion_tokens": 1,
+    "total_tokens": 16
+  }
+}
+Copy full
+Previous
+Sinh hình ảnh
+Next
+Sinh/Sửa hình ảnh (với Google Gemini)
+
+=== CODE BLOCKS ===
+
+--- unknown_code_1 ---
+curl https://api.thucchien.ai/chat/completions \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer " \
+-d '{
+  "model": "
+gemini-2.5-flash-image-preview
+",
+  "messages": [
+    {
+      "role": "user",
+      "content": "A breathtaking scene where a majestic waterfall cascades down rugged cliffs, shimmering like silver threads under the warm sunlight. Lush greenery surrounds the falls—towering trees, vibrant flowers, and soft moss painting nature’s perfect canvas. Mist rises gently, forming a magical rainbow that arches across the sky, while birds soar gracefully above as if dancing to the music of nature. A dreamlike moment that blends serenity and beauty in one stunning view."
+    }
+  ],
+  "modalities": ["image"]
+}'
+
+--- unknown_code_2 ---
+{
+  "id": "chatcmpl-mock",
+  "object": "chat.completion",
+  "created": 1759806089,
+  "model": "gemini-2.5-flash-image-preview",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": null,
+        "images": [
+          {
+            "image_url": {
+              "url": "data:image/png;base64,<base64_encoded_image_data>"
+            }
+          }
+        ]
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 15,
+    "completion_tokens": 1,
+    "total_tokens": 16
+  }
+}
+
+--- bash_code_1 ---
+curl https://api.thucchien.ai/chat/completions \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer " \
+-d '{
+  "model": "
+gemini-2.5-flash-image-preview
+",
+  "messages": [
+    {
+      "role": "user",
+      "content": "A breathtaking scene where a majestic waterfall cascades down rugged cliffs, shimmering like silver threads under the warm sunlight. Lush greenery surrounds the falls—towering trees, vibrant flowers, and soft moss painting nature’s perfect canvas. Mist rises gently, forming a magical rainbow that arches across the sky, while birds soar gracefully above as if dancing to the music of nature. A dreamlike moment that blends serenity and beauty in one stunning view."
+    }
+  ],
+  "modalities": ["image"]
+}'
+
+--- unknown_code_4 ---
+gemini-2.5-flash-image-preview
+
+--- unknown_code_14 ---
+data:image/png;base64,...
+
+--- unknown_code_15 ---
+curl https://api.thucchien.ai/chat/completions \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer " \
+-d '{
+  "model": "
+gemini-2.5-flash-image-preview
+",
+  "messages": [
+    {
+      "role": "user",
+      "content": "A breathtaking scene where a majestic waterfall cascades down rugged cliffs, shimmering like silver threads under the warm sunlight. Lush greenery surrounds the falls—towering trees, vibrant flowers, and soft moss painting nature’s perfect canvas. Mist rises gently, forming a magical rainbow that arches across the sky, while birds soar gracefully above as if dancing to the music of nature. A dreamlike moment that blends serenity and beauty in one stunning view."
+    }
+  ],
+  "modalities": ["image"]
+}'
+
+--- unknown_code_16 ---
+{
+  "id": "chatcmpl-mock",
+  "object": "chat.completion",
+  "created": 1759806089,
+  "model": "gemini-2.5-flash-image-preview",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": null,
+        "images": [
+          {
+            "image_url": {
+              "url": "data:image/png;base64,<base64_encoded_image_data>"
+            }
+          }
+        ]
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 15,
+    "completion_tokens": 1,
+    "total_tokens": 16
+  }
+}

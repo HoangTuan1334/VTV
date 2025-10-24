@@ -1,0 +1,497 @@
+=== Chuyển văn bản thành giọng nói | AI Thực Chiến ===
+URL: https://docs.thucchien.ai/docs/api-reference/text-to-speech
+Crawled: 2025-10-23 00:19:10
+============================================================
+
+MAIN CONTENT:
+----------------------------------------
+Tham chiếu APIChuyển văn bản thành giọng nói
+Chuyển văn bản thành giọng nói (Text-to-Speech)
+POST /audio/speech
+Chuyển đổi một đoạn văn bản thành file âm thanh có giọng nói tự nhiên.
+THAM KHẢO
+Chi tiết tham khảo tại tài liệu LiteLLM API
+PHƯƠNG PHÁP THAY THẾ
+Ngoài endpoint này, bạn cũng có thể sử dụng mô hình text-to-speech thông qua endpoint Google Gemini với multi-speaker prompts.
+Cấu trúc yêu cầu (Request Body)
+model
+string
+Required
+ID của mô hình text-to-speech sẽ sử dụng. Ví dụ: gemini-2.5-flash-preview-tts.
+input
+string
+Required
+Đoạn văn bản cần chuyển đổi thành giọng nói.
+voice
+string
+Required
+Giọng nói sẽ sử dụng. Các tùy chọn bao gồm Zephyr, Puck, Charon, và nhiều hơn nữa. Xem danh sách đầy đủ trong ví dụ tương tác.
+Cấu trúc Phản hồi (Response Body)
+Phản hồi thành công sẽ trả về file âm thanh.
+curl
+Python (openai)
+curl https://api.thucchien.ai/audio/speech \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer " \
+-d '{
+  "model": "
+gemini-2.5-flash-preview-tts
+gemini-2.5-pro-preview-tts
+",
+  "input": "Xin chào, đây là một thử nghiệm chuyển văn bản thành giọng nói qua AI Thực Chiến gateway.",
+  "voice": "
+Zephyr
+Puck
+Charon
+Kore
+Fenrir
+Leda
+Orus
+Aoede
+Callirrhoe
+Autonoe
+Enceladus
+Iapetus
+Umbriel
+Algieba
+Despina
+Erinome
+Algenib
+Rasalgethi
+Laomedeia
+Achernar
+Alnilam
+Schedar
+Gacrux
+Pulcherrima
+Achird
+Zubenelgenubi
+Vindemiatrix
+Sadachbia
+Sadaltager
+Sulafat
+"
+}' \
+--output generated_audio.mp3
+Try It!
+Example Response
+{
+  "status": 200,
+  "contentType": "audio/mpeg",
+  "message": "Response body contains the audio file."
+}
+Copy full
+Previous
+Tải xuống video hoàn thành
+Next
+Chuyển văn bản thành giọng nói (với Google Gemini)
+
+CODE BLOCKS:
+----------------------------------------
+
+[CODE: unknown_code_1]
+```
+curl https://api.thucchien.ai/audio/speech \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer " \
+-d '{
+  "model": "
+gemini-2.5-flash-preview-tts
+gemini-2.5-pro-preview-tts
+",
+  "input": "Xin chào, đây là một thử nghiệm chuyển văn bản thành giọng nói qua AI Thực Chiến gateway.",
+  "voice": "
+Zephyr
+Puck
+Charon
+Kore
+Fenrir
+Leda
+Orus
+Aoede
+Callirrhoe
+Autonoe
+Enceladus
+Iapetus
+Umbriel
+Algieba
+Despina
+Erinome
+Algenib
+Rasalgethi
+Laomedeia
+Achernar
+Alnilam
+Schedar
+Gacrux
+Pulcherrima
+Achird
+Zubenelgenubi
+Vindemiatrix
+Sadachbia
+Sadaltager
+Sulafat
+"
+}' \
+--output generated_audio.mp3
+```
+..............................
+
+[CODE: unknown_code_2]
+```
+{
+  "status": 200,
+  "contentType": "audio/mpeg",
+  "message": "Response body contains the audio file."
+}
+```
+..............................
+
+[CODE: bash_code_1]
+```
+curl https://api.thucchien.ai/audio/speech \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer " \
+-d '{
+  "model": "
+gemini-2.5-flash-preview-tts
+gemini-2.5-pro-preview-tts
+",
+  "input": "Xin chào, đây là một thử nghiệm chuyển văn bản thành giọng nói qua AI Thực Chiến gateway.",
+  "voice": "
+Zephyr
+Puck
+Charon
+Kore
+Fenrir
+Leda
+Orus
+Aoede
+Callirrhoe
+Autonoe
+Enceladus
+Iapetus
+Umbriel
+Algieba
+Despina
+Erinome
+Algenib
+Rasalgethi
+Laomedeia
+Achernar
+Alnilam
+Schedar
+Gacrux
+Pulcherrima
+Achird
+Zubenelgenubi
+Vindemiatrix
+Sadachbia
+Sadaltager
+Sulafat
+"
+}' \
+--output generated_audio.mp3
+```
+..............................
+
+[CODE: unknown_code_3]
+```
+gemini-2.5-flash-preview-tts
+```
+..............................
+
+[CODE: unknown_code_9]
+```
+curl https://api.thucchien.ai/audio/speech \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer " \
+-d '{
+  "model": "
+gemini-2.5-flash-preview-tts
+gemini-2.5-pro-preview-tts
+",
+  "input": "Xin chào, đây là một thử nghiệm chuyển văn bản thành giọng nói qua AI Thực Chiến gateway.",
+  "voice": "
+Zephyr
+Puck
+Charon
+Kore
+Fenrir
+Leda
+Orus
+Aoede
+Callirrhoe
+Autonoe
+Enceladus
+Iapetus
+Umbriel
+Algieba
+Despina
+Erinome
+Algenib
+Rasalgethi
+Laomedeia
+Achernar
+Alnilam
+Schedar
+Gacrux
+Pulcherrima
+Achird
+Zubenelgenubi
+Vindemiatrix
+Sadachbia
+Sadaltager
+Sulafat
+"
+}' \
+--output generated_audio.mp3
+```
+..............................
+
+[CODE: unknown_code_10]
+```
+{
+  "status": 200,
+  "contentType": "audio/mpeg",
+  "message": "Response body contains the audio file."
+}
+```
+..............................
+
+FULL CONTENT:
+----------------------------------------
+Tham chiếu APIChuyển văn bản thành giọng nói
+Chuyển văn bản thành giọng nói (Text-to-Speech)
+POST /audio/speech
+Chuyển đổi một đoạn văn bản thành file âm thanh có giọng nói tự nhiên.
+THAM KHẢO
+Chi tiết tham khảo tại tài liệu LiteLLM API
+PHƯƠNG PHÁP THAY THẾ
+Ngoài endpoint này, bạn cũng có thể sử dụng mô hình text-to-speech thông qua endpoint Google Gemini với multi-speaker prompts.
+Cấu trúc yêu cầu (Request Body)
+model
+string
+Required
+ID của mô hình text-to-speech sẽ sử dụng. Ví dụ: gemini-2.5-flash-preview-tts.
+input
+string
+Required
+Đoạn văn bản cần chuyển đổi thành giọng nói.
+voice
+string
+Required
+Giọng nói sẽ sử dụng. Các tùy chọn bao gồm Zephyr, Puck, Charon, và nhiều hơn nữa. Xem danh sách đầy đủ trong ví dụ tương tác.
+Cấu trúc Phản hồi (Response Body)
+Phản hồi thành công sẽ trả về file âm thanh.
+curl
+Python (openai)
+curl https://api.thucchien.ai/audio/speech \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer " \
+-d '{
+  "model": "
+gemini-2.5-flash-preview-tts
+gemini-2.5-pro-preview-tts
+",
+  "input": "Xin chào, đây là một thử nghiệm chuyển văn bản thành giọng nói qua AI Thực Chiến gateway.",
+  "voice": "
+Zephyr
+Puck
+Charon
+Kore
+Fenrir
+Leda
+Orus
+Aoede
+Callirrhoe
+Autonoe
+Enceladus
+Iapetus
+Umbriel
+Algieba
+Despina
+Erinome
+Algenib
+Rasalgethi
+Laomedeia
+Achernar
+Alnilam
+Schedar
+Gacrux
+Pulcherrima
+Achird
+Zubenelgenubi
+Vindemiatrix
+Sadachbia
+Sadaltager
+Sulafat
+"
+}' \
+--output generated_audio.mp3
+Try It!
+Example Response
+{
+  "status": 200,
+  "contentType": "audio/mpeg",
+  "message": "Response body contains the audio file."
+}
+Copy full
+Previous
+Tải xuống video hoàn thành
+Next
+Chuyển văn bản thành giọng nói (với Google Gemini)
+
+=== CODE BLOCKS ===
+
+--- unknown_code_1 ---
+curl https://api.thucchien.ai/audio/speech \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer " \
+-d '{
+  "model": "
+gemini-2.5-flash-preview-tts
+gemini-2.5-pro-preview-tts
+",
+  "input": "Xin chào, đây là một thử nghiệm chuyển văn bản thành giọng nói qua AI Thực Chiến gateway.",
+  "voice": "
+Zephyr
+Puck
+Charon
+Kore
+Fenrir
+Leda
+Orus
+Aoede
+Callirrhoe
+Autonoe
+Enceladus
+Iapetus
+Umbriel
+Algieba
+Despina
+Erinome
+Algenib
+Rasalgethi
+Laomedeia
+Achernar
+Alnilam
+Schedar
+Gacrux
+Pulcherrima
+Achird
+Zubenelgenubi
+Vindemiatrix
+Sadachbia
+Sadaltager
+Sulafat
+"
+}' \
+--output generated_audio.mp3
+
+--- unknown_code_2 ---
+{
+  "status": 200,
+  "contentType": "audio/mpeg",
+  "message": "Response body contains the audio file."
+}
+
+--- bash_code_1 ---
+curl https://api.thucchien.ai/audio/speech \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer " \
+-d '{
+  "model": "
+gemini-2.5-flash-preview-tts
+gemini-2.5-pro-preview-tts
+",
+  "input": "Xin chào, đây là một thử nghiệm chuyển văn bản thành giọng nói qua AI Thực Chiến gateway.",
+  "voice": "
+Zephyr
+Puck
+Charon
+Kore
+Fenrir
+Leda
+Orus
+Aoede
+Callirrhoe
+Autonoe
+Enceladus
+Iapetus
+Umbriel
+Algieba
+Despina
+Erinome
+Algenib
+Rasalgethi
+Laomedeia
+Achernar
+Alnilam
+Schedar
+Gacrux
+Pulcherrima
+Achird
+Zubenelgenubi
+Vindemiatrix
+Sadachbia
+Sadaltager
+Sulafat
+"
+}' \
+--output generated_audio.mp3
+
+--- unknown_code_3 ---
+gemini-2.5-flash-preview-tts
+
+--- unknown_code_9 ---
+curl https://api.thucchien.ai/audio/speech \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer " \
+-d '{
+  "model": "
+gemini-2.5-flash-preview-tts
+gemini-2.5-pro-preview-tts
+",
+  "input": "Xin chào, đây là một thử nghiệm chuyển văn bản thành giọng nói qua AI Thực Chiến gateway.",
+  "voice": "
+Zephyr
+Puck
+Charon
+Kore
+Fenrir
+Leda
+Orus
+Aoede
+Callirrhoe
+Autonoe
+Enceladus
+Iapetus
+Umbriel
+Algieba
+Despina
+Erinome
+Algenib
+Rasalgethi
+Laomedeia
+Achernar
+Alnilam
+Schedar
+Gacrux
+Pulcherrima
+Achird
+Zubenelgenubi
+Vindemiatrix
+Sadachbia
+Sadaltager
+Sulafat
+"
+}' \
+--output generated_audio.mp3
+
+--- unknown_code_10 ---
+{
+  "status": 200,
+  "contentType": "audio/mpeg",
+  "message": "Response body contains the audio file."
+}

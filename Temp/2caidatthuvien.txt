@@ -1,0 +1,81 @@
+# # 📦 Cài đặt thư viện cần thiết
+# !pip install --quiet pillow google-generativeai requests vertexai
+
+# 📚 Import thư viện
+import json
+import os
+import random
+import base64
+import time
+from PIL import Image, ImageDraw, ImageFont
+from pathlib import Path
+import google.generativeai as genai
+import requests
+from io import BytesIO
+
+
+
+import requests
+import json
+import base64
+from openai import OpenAI
+
+# ⚙️ Cấu hình API Keys
+GEMINI_API_KEY = "AIzaSyCwhqIs7GrVi1G6wgtejD_w_niFFQws6mo"
+
+# Cấu hình API gián tiếp
+AI_API_BASE = "https://api.thucchien.ai/v1"
+
+# Khởi tạo client cho text generation (sử dụng OpenAI-compatible)
+client = OpenAI(
+    api_key=GEMINI_API_KEY,
+    base_url=AI_API_BASE
+)
+
+# Model cho sinh kịch bản (text) - Không cần khởi tạo riêng, sử dụng qua client
+text_model = "gemini-2.0-flash-exp"  # Chỉ định model khi gọi
+
+# Model cho sinh ảnh - Sử dụng qua requests
+image_model = "gemini-2.5-flash-image"  # Chỉ định model khi gọi, nhưng sẽ kiểm tra
+
+print("✅ Đã cấu hình Gemini API qua API gián tiếp")
+print(f"   - API Key: {'✓' if GEMINI_API_KEY else '✗'}")
+print(f"   - Text Model: {text_model} ✓")
+print(f"   - Image Model: {image_model} ✓ (sẽ gọi qua API khi cần)")
+
+# Kiểm tra text model (tùy chọn, để xác nhận)
+try:
+    response = client.chat.completions.create(
+        model=text_model,
+        messages=[
+            {
+                "role": "user",
+                "content": "Test connection: Say 'OK' if connected."
+            }
+        ]
+    )
+    print(f"   - Text Model Test: {response.choices[0].message.content}")
+except Exception as e:
+    print(f"⚠️ Lỗi kiểm tra text model: {e}")
+
+# Kiểm tra image model (thử tạo ảnh test nhỏ)
+try:
+    url = f"{AI_API_BASE}/images/generations"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {GEMINI_API_KEY}"
+    }
+    data = {
+        "model": image_model,
+        "prompt": "A simple test image: a blue square",
+        "n": 1  # Tạo 1 ảnh test
+    }
+
+    response = requests.post(url, headers=headers, data=json.dumps(data))
+    response.raise_for_status()
+    print("   - Image Model Test: OK")
+except Exception as e:
+    print(f"⚠️ Lỗi kiểm tra image model: {e}")
+
+
+

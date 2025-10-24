@@ -1,0 +1,1407 @@
+=== Chuyển văn bản thành giọng nói (với Google Gemini) | AI Thực Chiến ===
+URL: https://docs.thucchien.ai/docs/api-reference/text-to-speech-gemini
+Crawled: 2025-10-23 00:20:46
+============================================================
+
+MAIN CONTENT:
+----------------------------------------
+Tham chiếu APIChuyển văn bản thành giọng nói (với Google Gemini)
+Chuyển văn bản thành giọng nói (với Google Gemini)
+POST /gemini/v1beta/models/{model}:generateContent
+Tạo file âm thanh với endpoint pass through tới Google Gemini.
+THAM KHẢO
+Chi tiết đầy đủ các tham số, tham khảo tài liệu Google Gemini.
+Tham số đường dẫn (Path Parameters)
+model
+string
+Required
+ID của mô hình sẽ sử dụng. Ví dụ: gemini-2.5-flash-preview-tts.
+Cấu trúc yêu cầu (Request Body)
+contents
+array
+Required
+Nội dung của yêu cầu.
+parts
+array
+Required
+Một danh sách các phần của nội dung.
+text
+string
+Required
+Prompt văn bản để chuyển thành giọng nói.
+generationConfig
+object
+Cấu hình cho việc sinh nội dung.
+responseModalities
+array
+Chỉ định ["AUDIO"] để yêu cầu trả về dữ liệu âm thanh.
+speechConfig
+object
+Cấu hình dành riêng cho việc sinh giọng nói.
+voiceConfig
+object
+Cấu hình cho giọng nói của một người nói.
+prebuiltVoiceConfig
+object
+Sử dụng một giọng nói được dựng sẵn.
+voiceName
+string
+Tên của giọng nói sẽ sử dụng. Ví dụ: Kore.
+multiSpeakerVoiceConfig
+object
+Cấu hình cho giọng nói của nhiều người nói.
+speakerVoiceConfigs
+array
+Một danh sách các cấu hình giọng nói cho từng người nói.
+speaker
+string
+Tên của người nói (phải khớp với tên trong prompt).
+voiceConfig
+object
+Cấu hình giọng nói cho người nói này.
+Cấu trúc Phản hồi (Response Body)
+Phản hồi thành công sẽ chứa dữ liệu âm thanh được mã hóa base64.
+Đối tượng Candidate
+candidates
+array
+Một danh sách các ứng viên được tạo.
+content
+object
+Nội dung của ứng viên.
+parts
+array
+Một danh sách các phần của nội dung.
+inlineData
+object
+Dữ liệu âm thanh dưới dạng base64.
+mime_type
+string
+Loại MIME của âm thanh, ví dụ: audio/L16;codec=pcm;rate=24000.
+data
+string
+Dữ liệu âm thanh được mã hóa base64.
+Ví dụ một người nói (Single-speaker)
+curl
+curl 'https://api.thucchien.ai/gemini/v1beta/models/
+gemini-2.5-flash-preview-tts
+gemini-2.5-pro-preview-tts
+:generateContent' \
+-H 'x-goog-api-key: ' \
+-H 'Content-Type: application/json' \
+-d '{
+  "contents": [{
+    "parts": [
+      {"text": "Say cheerfully: Have a wonderful day!"}
+    ]
+  }],
+  "generationConfig": {
+      "responseModalities": ["AUDIO"],
+      "speechConfig": {
+        "voiceConfig": {
+          "prebuiltVoiceConfig": {
+            "voiceName": "
+Zephyr
+Puck
+Charon
+Kore
+Fenrir
+Leda
+Orus
+Aoede
+Callirrhoe
+Autonoe
+Enceladus
+Iapetus
+Umbriel
+Algieba
+Despina
+Erinome
+Algenib
+Rasalgethi
+Laomedeia
+Achernar
+Alnilam
+Schedar
+Gacrux
+Pulcherrima
+Achird
+Zubenelgenubi
+Vindemiatrix
+Sadachbia
+Sadaltager
+Sulafat
+"
+          }
+        }
+      }
+  }
+}'
+Try It!
+Example Response
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "inlineData": {
+              "mime_type": "audio/L16;codec=pcm;rate=24000",
+              "data": "<base64_encoded_audio_data>"
+            }
+          }
+        ],
+        "role": "model"
+      }
+    }
+  ]
+}
+Copy full
+Ví dụ nhiều người nói (Multi-speaker)
+curl
+curl 'https://api.thucchien.ai/gemini/v1beta/models/
+gemini-2.5-flash-preview-tts
+gemini-2.5-pro-preview-tts
+:generateContent' \
+-H 'x-goog-api-key: ' \
+-H 'Content-Type: application/json' \
+-d '{
+  "contents": [{
+    "parts": [
+      {"text": "Make Speaker1 sound tired and bored, and Speaker2 sound excited and happy:
+Speaker1: So... what's on the agenda today?
+Speaker2: You're never going to guess!"}
+    ]
+  }],
+  "generationConfig": {
+      "responseModalities": ["AUDIO"],
+      "speechConfig": {
+        "multiSpeakerVoiceConfig": {
+          "speakerVoiceConfigs": [{
+              "speaker": "",
+              "voiceConfig": {
+                "prebuiltVoiceConfig": {
+                  "voiceName": "
+Zephyr
+Puck
+Charon
+Kore
+Fenrir
+Leda
+Orus
+Aoede
+Callirrhoe
+Autonoe
+Enceladus
+Iapetus
+Umbriel
+Algieba
+Despina
+Erinome
+Algenib
+Rasalgethi
+Laomedeia
+Achernar
+Alnilam
+Schedar
+Gacrux
+Pulcherrima
+Achird
+Zubenelgenubi
+Vindemiatrix
+Sadachbia
+Sadaltager
+Sulafat
+"
+                }
+              }
+            }, {
+              "speaker": "",
+              "voiceConfig": {
+                "prebuiltVoiceConfig": {
+                  "voiceName": "
+Zephyr
+Puck
+Charon
+Kore
+Fenrir
+Leda
+Orus
+Aoede
+Callirrhoe
+Autonoe
+Enceladus
+Iapetus
+Umbriel
+Algieba
+Despina
+Erinome
+Algenib
+Rasalgethi
+Laomedeia
+Achernar
+Alnilam
+Schedar
+Gacrux
+Pulcherrima
+Achird
+Zubenelgenubi
+Vindemiatrix
+Sadachbia
+Sadaltager
+Sulafat
+"
+                }
+              }
+            }]
+        }
+      }
+  }
+}'
+Try It!
+Example Response
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "inlineData": {
+              "mime_type": "audio/L16;codec=pcm;rate=24000",
+              "data": "<base64_encoded_audio_data>"
+            }
+          }
+        ],
+        "role": "model"
+      }
+    }
+  ]
+}
+Copy full
+Previous
+Chuyển văn bản thành giọng nói
+Next
+Kiểm tra chi tiêu
+
+CODE BLOCKS:
+----------------------------------------
+
+[CODE: unknown_code_1]
+```
+/gemini/v1beta/models/{model}:generateContent
+```
+..............................
+
+[CODE: unknown_code_2]
+```
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "inlineData": {
+              "mime_type": "audio/L16;codec=pcm;rate=24000",
+              "data": "<base64_encoded_audio_data>"
+            }
+          }
+        ],
+        "role": "model"
+      }
+    }
+  ]
+}
+```
+..............................
+
+[CODE: unknown_code_3]
+```
+gemini-2.5-flash-preview-tts
+```
+..............................
+
+[CODE: unknown_code_4]
+```
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "inlineData": {
+              "mime_type": "audio/L16;codec=pcm;rate=24000",
+              "data": "<base64_encoded_audio_data>"
+            }
+          }
+        ],
+        "role": "model"
+      }
+    }
+  ]
+}
+```
+..............................
+
+[CODE: bash_code_1]
+```
+curl 'https://api.thucchien.ai/gemini/v1beta/models/
+gemini-2.5-flash-preview-tts
+gemini-2.5-pro-preview-tts
+:generateContent' \
+-H 'x-goog-api-key: ' \
+-H 'Content-Type: application/json' \
+-d '{
+  "contents": [{
+    "parts": [
+      {"text": "Say cheerfully: Have a wonderful day!"}
+    ]
+  }],
+  "generationConfig": {
+      "responseModalities": ["AUDIO"],
+      "speechConfig": {
+        "voiceConfig": {
+          "prebuiltVoiceConfig": {
+            "voiceName": "
+Zephyr
+Puck
+Charon
+Kore
+Fenrir
+Leda
+Orus
+Aoede
+Callirrhoe
+Autonoe
+Enceladus
+Iapetus
+Umbriel
+Algieba
+Despina
+Erinome
+Algenib
+Rasalgethi
+Laomedeia
+Achernar
+Alnilam
+Schedar
+Gacrux
+Pulcherrima
+Achird
+Zubenelgenubi
+Vindemiatrix
+Sadachbia
+Sadaltager
+Sulafat
+"
+          }
+        }
+      }
+  }
+}'
+```
+..............................
+
+[CODE: bash_code_2]
+```
+curl 'https://api.thucchien.ai/gemini/v1beta/models/
+gemini-2.5-flash-preview-tts
+gemini-2.5-pro-preview-tts
+:generateContent' \
+-H 'x-goog-api-key: ' \
+-H 'Content-Type: application/json' \
+-d '{
+  "contents": [{
+    "parts": [
+      {"text": "Make Speaker1 sound tired and bored, and Speaker2 sound excited and happy:
+Speaker1: So... what's on the agenda today?
+Speaker2: You're never going to guess!"}
+    ]
+  }],
+  "generationConfig": {
+      "responseModalities": ["AUDIO"],
+      "speechConfig": {
+        "multiSpeakerVoiceConfig": {
+          "speakerVoiceConfigs": [{
+              "speaker": "",
+              "voiceConfig": {
+                "prebuiltVoiceConfig": {
+                  "voiceName": "
+Zephyr
+Puck
+Charon
+Kore
+Fenrir
+Leda
+Orus
+Aoede
+Callirrhoe
+Autonoe
+Enceladus
+Iapetus
+Umbriel
+Algieba
+Despina
+Erinome
+Algenib
+Rasalgethi
+Laomedeia
+Achernar
+Alnilam
+Schedar
+Gacrux
+Pulcherrima
+Achird
+Zubenelgenubi
+Vindemiatrix
+Sadachbia
+Sadaltager
+Sulafat
+"
+                }
+              }
+            }, {
+              "speaker": "",
+              "voiceConfig": {
+                "prebuiltVoiceConfig": {
+                  "voiceName": "
+Zephyr
+Puck
+Charon
+Kore
+Fenrir
+Leda
+Orus
+Aoede
+Callirrhoe
+Autonoe
+Enceladus
+Iapetus
+Umbriel
+Algieba
+Despina
+Erinome
+Algenib
+Rasalgethi
+Laomedeia
+Achernar
+Alnilam
+Schedar
+Gacrux
+Pulcherrima
+Achird
+Zubenelgenubi
+Vindemiatrix
+Sadachbia
+Sadaltager
+Sulafat
+"
+                }
+              }
+            }]
+        }
+      }
+  }
+}'
+```
+..............................
+
+[CODE: unknown_code_15]
+```
+multiSpeakerVoiceConfig
+```
+..............................
+
+[CODE: unknown_code_25]
+```
+audio/L16;codec=pcm;rate=24000
+```
+..............................
+
+[CODE: unknown_code_27]
+```
+curl 'https://api.thucchien.ai/gemini/v1beta/models/
+gemini-2.5-flash-preview-tts
+gemini-2.5-pro-preview-tts
+:generateContent' \
+-H 'x-goog-api-key: ' \
+-H 'Content-Type: application/json' \
+-d '{
+  "contents": [{
+    "parts": [
+      {"text": "Say cheerfully: Have a wonderful day!"}
+    ]
+  }],
+  "generationConfig": {
+      "responseModalities": ["AUDIO"],
+      "speechConfig": {
+        "voiceConfig": {
+          "prebuiltVoiceConfig": {
+            "voiceName": "
+Zephyr
+Puck
+Charon
+Kore
+Fenrir
+Leda
+Orus
+Aoede
+Callirrhoe
+Autonoe
+Enceladus
+Iapetus
+Umbriel
+Algieba
+Despina
+Erinome
+Algenib
+Rasalgethi
+Laomedeia
+Achernar
+Alnilam
+Schedar
+Gacrux
+Pulcherrima
+Achird
+Zubenelgenubi
+Vindemiatrix
+Sadachbia
+Sadaltager
+Sulafat
+"
+          }
+        }
+      }
+  }
+}'
+```
+..............................
+
+[CODE: unknown_code_28]
+```
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "inlineData": {
+              "mime_type": "audio/L16;codec=pcm;rate=24000",
+              "data": "<base64_encoded_audio_data>"
+            }
+          }
+        ],
+        "role": "model"
+      }
+    }
+  ]
+}
+```
+..............................
+
+[CODE: unknown_code_29]
+```
+curl 'https://api.thucchien.ai/gemini/v1beta/models/
+gemini-2.5-flash-preview-tts
+gemini-2.5-pro-preview-tts
+:generateContent' \
+-H 'x-goog-api-key: ' \
+-H 'Content-Type: application/json' \
+-d '{
+  "contents": [{
+    "parts": [
+      {"text": "Make Speaker1 sound tired and bored, and Speaker2 sound excited and happy:
+Speaker1: So... what's on the agenda today?
+Speaker2: You're never going to guess!"}
+    ]
+  }],
+  "generationConfig": {
+      "responseModalities": ["AUDIO"],
+      "speechConfig": {
+        "multiSpeakerVoiceConfig": {
+          "speakerVoiceConfigs": [{
+              "speaker": "",
+              "voiceConfig": {
+                "prebuiltVoiceConfig": {
+                  "voiceName": "
+Zephyr
+Puck
+Charon
+Kore
+Fenrir
+Leda
+Orus
+Aoede
+Callirrhoe
+Autonoe
+Enceladus
+Iapetus
+Umbriel
+Algieba
+Despina
+Erinome
+Algenib
+Rasalgethi
+Laomedeia
+Achernar
+Alnilam
+Schedar
+Gacrux
+Pulcherrima
+Achird
+Zubenelgenubi
+Vindemiatrix
+Sadachbia
+Sadaltager
+Sulafat
+"
+                }
+              }
+            }, {
+              "speaker": "",
+              "voiceConfig": {
+                "prebuiltVoiceConfig": {
+                  "voiceName": "
+Zephyr
+Puck
+Charon
+Kore
+Fenrir
+Leda
+Orus
+Aoede
+Callirrhoe
+Autonoe
+Enceladus
+Iapetus
+Umbriel
+Algieba
+Despina
+Erinome
+Algenib
+Rasalgethi
+Laomedeia
+Achernar
+Alnilam
+Schedar
+Gacrux
+Pulcherrima
+Achird
+Zubenelgenubi
+Vindemiatrix
+Sadachbia
+Sadaltager
+Sulafat
+"
+                }
+              }
+            }]
+        }
+      }
+  }
+}'
+```
+..............................
+
+[CODE: unknown_code_30]
+```
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "inlineData": {
+              "mime_type": "audio/L16;codec=pcm;rate=24000",
+              "data": "<base64_encoded_audio_data>"
+            }
+          }
+        ],
+        "role": "model"
+      }
+    }
+  ]
+}
+```
+..............................
+
+FULL CONTENT:
+----------------------------------------
+Tham chiếu APIChuyển văn bản thành giọng nói (với Google Gemini)
+Chuyển văn bản thành giọng nói (với Google Gemini)
+POST /gemini/v1beta/models/{model}:generateContent
+Tạo file âm thanh với endpoint pass through tới Google Gemini.
+THAM KHẢO
+Chi tiết đầy đủ các tham số, tham khảo tài liệu Google Gemini.
+Tham số đường dẫn (Path Parameters)
+model
+string
+Required
+ID của mô hình sẽ sử dụng. Ví dụ: gemini-2.5-flash-preview-tts.
+Cấu trúc yêu cầu (Request Body)
+contents
+array
+Required
+Nội dung của yêu cầu.
+parts
+array
+Required
+Một danh sách các phần của nội dung.
+text
+string
+Required
+Prompt văn bản để chuyển thành giọng nói.
+generationConfig
+object
+Cấu hình cho việc sinh nội dung.
+responseModalities
+array
+Chỉ định ["AUDIO"] để yêu cầu trả về dữ liệu âm thanh.
+speechConfig
+object
+Cấu hình dành riêng cho việc sinh giọng nói.
+voiceConfig
+object
+Cấu hình cho giọng nói của một người nói.
+prebuiltVoiceConfig
+object
+Sử dụng một giọng nói được dựng sẵn.
+voiceName
+string
+Tên của giọng nói sẽ sử dụng. Ví dụ: Kore.
+multiSpeakerVoiceConfig
+object
+Cấu hình cho giọng nói của nhiều người nói.
+speakerVoiceConfigs
+array
+Một danh sách các cấu hình giọng nói cho từng người nói.
+speaker
+string
+Tên của người nói (phải khớp với tên trong prompt).
+voiceConfig
+object
+Cấu hình giọng nói cho người nói này.
+Cấu trúc Phản hồi (Response Body)
+Phản hồi thành công sẽ chứa dữ liệu âm thanh được mã hóa base64.
+Đối tượng Candidate
+candidates
+array
+Một danh sách các ứng viên được tạo.
+content
+object
+Nội dung của ứng viên.
+parts
+array
+Một danh sách các phần của nội dung.
+inlineData
+object
+Dữ liệu âm thanh dưới dạng base64.
+mime_type
+string
+Loại MIME của âm thanh, ví dụ: audio/L16;codec=pcm;rate=24000.
+data
+string
+Dữ liệu âm thanh được mã hóa base64.
+Ví dụ một người nói (Single-speaker)
+curl
+curl 'https://api.thucchien.ai/gemini/v1beta/models/
+gemini-2.5-flash-preview-tts
+gemini-2.5-pro-preview-tts
+:generateContent' \
+-H 'x-goog-api-key: ' \
+-H 'Content-Type: application/json' \
+-d '{
+  "contents": [{
+    "parts": [
+      {"text": "Say cheerfully: Have a wonderful day!"}
+    ]
+  }],
+  "generationConfig": {
+      "responseModalities": ["AUDIO"],
+      "speechConfig": {
+        "voiceConfig": {
+          "prebuiltVoiceConfig": {
+            "voiceName": "
+Zephyr
+Puck
+Charon
+Kore
+Fenrir
+Leda
+Orus
+Aoede
+Callirrhoe
+Autonoe
+Enceladus
+Iapetus
+Umbriel
+Algieba
+Despina
+Erinome
+Algenib
+Rasalgethi
+Laomedeia
+Achernar
+Alnilam
+Schedar
+Gacrux
+Pulcherrima
+Achird
+Zubenelgenubi
+Vindemiatrix
+Sadachbia
+Sadaltager
+Sulafat
+"
+          }
+        }
+      }
+  }
+}'
+Try It!
+Example Response
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "inlineData": {
+              "mime_type": "audio/L16;codec=pcm;rate=24000",
+              "data": "<base64_encoded_audio_data>"
+            }
+          }
+        ],
+        "role": "model"
+      }
+    }
+  ]
+}
+Copy full
+Ví dụ nhiều người nói (Multi-speaker)
+curl
+curl 'https://api.thucchien.ai/gemini/v1beta/models/
+gemini-2.5-flash-preview-tts
+gemini-2.5-pro-preview-tts
+:generateContent' \
+-H 'x-goog-api-key: ' \
+-H 'Content-Type: application/json' \
+-d '{
+  "contents": [{
+    "parts": [
+      {"text": "Make Speaker1 sound tired and bored, and Speaker2 sound excited and happy:
+Speaker1: So... what's on the agenda today?
+Speaker2: You're never going to guess!"}
+    ]
+  }],
+  "generationConfig": {
+      "responseModalities": ["AUDIO"],
+      "speechConfig": {
+        "multiSpeakerVoiceConfig": {
+          "speakerVoiceConfigs": [{
+              "speaker": "",
+              "voiceConfig": {
+                "prebuiltVoiceConfig": {
+                  "voiceName": "
+Zephyr
+Puck
+Charon
+Kore
+Fenrir
+Leda
+Orus
+Aoede
+Callirrhoe
+Autonoe
+Enceladus
+Iapetus
+Umbriel
+Algieba
+Despina
+Erinome
+Algenib
+Rasalgethi
+Laomedeia
+Achernar
+Alnilam
+Schedar
+Gacrux
+Pulcherrima
+Achird
+Zubenelgenubi
+Vindemiatrix
+Sadachbia
+Sadaltager
+Sulafat
+"
+                }
+              }
+            }, {
+              "speaker": "",
+              "voiceConfig": {
+                "prebuiltVoiceConfig": {
+                  "voiceName": "
+Zephyr
+Puck
+Charon
+Kore
+Fenrir
+Leda
+Orus
+Aoede
+Callirrhoe
+Autonoe
+Enceladus
+Iapetus
+Umbriel
+Algieba
+Despina
+Erinome
+Algenib
+Rasalgethi
+Laomedeia
+Achernar
+Alnilam
+Schedar
+Gacrux
+Pulcherrima
+Achird
+Zubenelgenubi
+Vindemiatrix
+Sadachbia
+Sadaltager
+Sulafat
+"
+                }
+              }
+            }]
+        }
+      }
+  }
+}'
+Try It!
+Example Response
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "inlineData": {
+              "mime_type": "audio/L16;codec=pcm;rate=24000",
+              "data": "<base64_encoded_audio_data>"
+            }
+          }
+        ],
+        "role": "model"
+      }
+    }
+  ]
+}
+Copy full
+Previous
+Chuyển văn bản thành giọng nói
+Next
+Kiểm tra chi tiêu
+
+=== CODE BLOCKS ===
+
+--- unknown_code_1 ---
+/gemini/v1beta/models/{model}:generateContent
+
+--- unknown_code_2 ---
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "inlineData": {
+              "mime_type": "audio/L16;codec=pcm;rate=24000",
+              "data": "<base64_encoded_audio_data>"
+            }
+          }
+        ],
+        "role": "model"
+      }
+    }
+  ]
+}
+
+--- unknown_code_3 ---
+gemini-2.5-flash-preview-tts
+
+--- unknown_code_4 ---
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "inlineData": {
+              "mime_type": "audio/L16;codec=pcm;rate=24000",
+              "data": "<base64_encoded_audio_data>"
+            }
+          }
+        ],
+        "role": "model"
+      }
+    }
+  ]
+}
+
+--- bash_code_1 ---
+curl 'https://api.thucchien.ai/gemini/v1beta/models/
+gemini-2.5-flash-preview-tts
+gemini-2.5-pro-preview-tts
+:generateContent' \
+-H 'x-goog-api-key: ' \
+-H 'Content-Type: application/json' \
+-d '{
+  "contents": [{
+    "parts": [
+      {"text": "Say cheerfully: Have a wonderful day!"}
+    ]
+  }],
+  "generationConfig": {
+      "responseModalities": ["AUDIO"],
+      "speechConfig": {
+        "voiceConfig": {
+          "prebuiltVoiceConfig": {
+            "voiceName": "
+Zephyr
+Puck
+Charon
+Kore
+Fenrir
+Leda
+Orus
+Aoede
+Callirrhoe
+Autonoe
+Enceladus
+Iapetus
+Umbriel
+Algieba
+Despina
+Erinome
+Algenib
+Rasalgethi
+Laomedeia
+Achernar
+Alnilam
+Schedar
+Gacrux
+Pulcherrima
+Achird
+Zubenelgenubi
+Vindemiatrix
+Sadachbia
+Sadaltager
+Sulafat
+"
+          }
+        }
+      }
+  }
+}'
+
+--- bash_code_2 ---
+curl 'https://api.thucchien.ai/gemini/v1beta/models/
+gemini-2.5-flash-preview-tts
+gemini-2.5-pro-preview-tts
+:generateContent' \
+-H 'x-goog-api-key: ' \
+-H 'Content-Type: application/json' \
+-d '{
+  "contents": [{
+    "parts": [
+      {"text": "Make Speaker1 sound tired and bored, and Speaker2 sound excited and happy:
+Speaker1: So... what's on the agenda today?
+Speaker2: You're never going to guess!"}
+    ]
+  }],
+  "generationConfig": {
+      "responseModalities": ["AUDIO"],
+      "speechConfig": {
+        "multiSpeakerVoiceConfig": {
+          "speakerVoiceConfigs": [{
+              "speaker": "",
+              "voiceConfig": {
+                "prebuiltVoiceConfig": {
+                  "voiceName": "
+Zephyr
+Puck
+Charon
+Kore
+Fenrir
+Leda
+Orus
+Aoede
+Callirrhoe
+Autonoe
+Enceladus
+Iapetus
+Umbriel
+Algieba
+Despina
+Erinome
+Algenib
+Rasalgethi
+Laomedeia
+Achernar
+Alnilam
+Schedar
+Gacrux
+Pulcherrima
+Achird
+Zubenelgenubi
+Vindemiatrix
+Sadachbia
+Sadaltager
+Sulafat
+"
+                }
+              }
+            }, {
+              "speaker": "",
+              "voiceConfig": {
+                "prebuiltVoiceConfig": {
+                  "voiceName": "
+Zephyr
+Puck
+Charon
+Kore
+Fenrir
+Leda
+Orus
+Aoede
+Callirrhoe
+Autonoe
+Enceladus
+Iapetus
+Umbriel
+Algieba
+Despina
+Erinome
+Algenib
+Rasalgethi
+Laomedeia
+Achernar
+Alnilam
+Schedar
+Gacrux
+Pulcherrima
+Achird
+Zubenelgenubi
+Vindemiatrix
+Sadachbia
+Sadaltager
+Sulafat
+"
+                }
+              }
+            }]
+        }
+      }
+  }
+}'
+
+--- unknown_code_15 ---
+multiSpeakerVoiceConfig
+
+--- unknown_code_25 ---
+audio/L16;codec=pcm;rate=24000
+
+--- unknown_code_27 ---
+curl 'https://api.thucchien.ai/gemini/v1beta/models/
+gemini-2.5-flash-preview-tts
+gemini-2.5-pro-preview-tts
+:generateContent' \
+-H 'x-goog-api-key: ' \
+-H 'Content-Type: application/json' \
+-d '{
+  "contents": [{
+    "parts": [
+      {"text": "Say cheerfully: Have a wonderful day!"}
+    ]
+  }],
+  "generationConfig": {
+      "responseModalities": ["AUDIO"],
+      "speechConfig": {
+        "voiceConfig": {
+          "prebuiltVoiceConfig": {
+            "voiceName": "
+Zephyr
+Puck
+Charon
+Kore
+Fenrir
+Leda
+Orus
+Aoede
+Callirrhoe
+Autonoe
+Enceladus
+Iapetus
+Umbriel
+Algieba
+Despina
+Erinome
+Algenib
+Rasalgethi
+Laomedeia
+Achernar
+Alnilam
+Schedar
+Gacrux
+Pulcherrima
+Achird
+Zubenelgenubi
+Vindemiatrix
+Sadachbia
+Sadaltager
+Sulafat
+"
+          }
+        }
+      }
+  }
+}'
+
+--- unknown_code_28 ---
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "inlineData": {
+              "mime_type": "audio/L16;codec=pcm;rate=24000",
+              "data": "<base64_encoded_audio_data>"
+            }
+          }
+        ],
+        "role": "model"
+      }
+    }
+  ]
+}
+
+--- unknown_code_29 ---
+curl 'https://api.thucchien.ai/gemini/v1beta/models/
+gemini-2.5-flash-preview-tts
+gemini-2.5-pro-preview-tts
+:generateContent' \
+-H 'x-goog-api-key: ' \
+-H 'Content-Type: application/json' \
+-d '{
+  "contents": [{
+    "parts": [
+      {"text": "Make Speaker1 sound tired and bored, and Speaker2 sound excited and happy:
+Speaker1: So... what's on the agenda today?
+Speaker2: You're never going to guess!"}
+    ]
+  }],
+  "generationConfig": {
+      "responseModalities": ["AUDIO"],
+      "speechConfig": {
+        "multiSpeakerVoiceConfig": {
+          "speakerVoiceConfigs": [{
+              "speaker": "",
+              "voiceConfig": {
+                "prebuiltVoiceConfig": {
+                  "voiceName": "
+Zephyr
+Puck
+Charon
+Kore
+Fenrir
+Leda
+Orus
+Aoede
+Callirrhoe
+Autonoe
+Enceladus
+Iapetus
+Umbriel
+Algieba
+Despina
+Erinome
+Algenib
+Rasalgethi
+Laomedeia
+Achernar
+Alnilam
+Schedar
+Gacrux
+Pulcherrima
+Achird
+Zubenelgenubi
+Vindemiatrix
+Sadachbia
+Sadaltager
+Sulafat
+"
+                }
+              }
+            }, {
+              "speaker": "",
+              "voiceConfig": {
+                "prebuiltVoiceConfig": {
+                  "voiceName": "
+Zephyr
+Puck
+Charon
+Kore
+Fenrir
+Leda
+Orus
+Aoede
+Callirrhoe
+Autonoe
+Enceladus
+Iapetus
+Umbriel
+Algieba
+Despina
+Erinome
+Algenib
+Rasalgethi
+Laomedeia
+Achernar
+Alnilam
+Schedar
+Gacrux
+Pulcherrima
+Achird
+Zubenelgenubi
+Vindemiatrix
+Sadachbia
+Sadaltager
+Sulafat
+"
+                }
+              }
+            }]
+        }
+      }
+  }
+}'
+
+--- unknown_code_30 ---
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "inlineData": {
+              "mime_type": "audio/L16;codec=pcm;rate=24000",
+              "data": "<base64_encoded_audio_data>"
+            }
+          }
+        ],
+        "role": "model"
+      }
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+import requests
+import json
+import base64
+from openai import OpenAI
+
+# Cấu hình API
+AI_API_BASE = "https://api.thucchien.ai/v1"
+AI_API_KEY = "AIzaSyDi-soBuW5bmVCncY2ImjtmSONR2AukSng"  # Giữ nguyên key, nhưng sử dụng qua API gián tiếp
+
+# Khởi tạo client cho text generation (sử dụng OpenAI-compatible)
+client = OpenAI(
+    api_key=AI_API_KEY,
+    base_url=AI_API_BASE
+)
+
+# Test text generation
+print("🧪 TEST 1: Kiểm tra Text Generation...")
+try:
+    response = client.chat.completions.create(
+        model="gemini-2.0-flash-exp",  # Giữ model tương tự, giả sử hỗ trợ
+        messages=[
+            {
+                "role": "user",
+                "content": "Say hello in 3 words"
+            }
+        ]
+    )
+    print(f"✅ Text Generation: OK")
+    print(f"   Response: {response.choices[0].message.content}")
+except Exception as e:
+    print(f"❌ Text Generation lỗi: {e}")
+    raise
+
+# Test image generation
+print("\n🧪 TEST 2: Kiểm tra Image Model...")
+try:
+    url = f"{AI_API_BASE}/images/generations"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {AI_API_KEY}"
+    }
+    data = {
+        "model": "gemini-2.5-flash-image",  # Giữ model tương tự, giả sử hỗ trợ (hoặc thay bằng 'imagen-4' nếu cần)
+        "prompt": "A simple test image: a red apple on a table",
+        "n": 1  # Tạo 1 ảnh để test
+    }
+
+    response = requests.post(url, headers=headers, data=json.dumps(data))
+    response.raise_for_status()
+
+    result = response.json()
+
+    # Xử lý và lưu ảnh test
+    for i, image_obj in enumerate(result['data']):
+        b64_data = image_obj['b64_json']
+        image_data = base64.b64decode(b64_data)
+        save_path = f"test_image_{i+1}.png"
+        with open(save_path, 'wb') as f:
+            f.write(image_data)
+        print(f"Image saved to {save_path}")
+
+    print(f"✅ Image Generation: OK")
+except Exception as e:
+    print(f"❌ Image Generation lỗi: {e}")
+    if 'response' in locals():
+        print(f"Response body: {response.text}")
+
+print("\n✅ API Key hoạt động tốt!")
+print("📌 Text generation sẵn sàng")
+print("📌 Image model: gemini-2.5-flash-image")

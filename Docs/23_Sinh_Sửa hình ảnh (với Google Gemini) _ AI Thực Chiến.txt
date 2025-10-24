@@ -1,0 +1,568 @@
+=== Sinh/Sửa hình ảnh (với Google Gemini) | AI Thực Chiến ===
+URL: https://docs.thucchien.ai/docs/api-reference/image-generation-gemini
+Crawled: 2025-10-23 00:20:13
+============================================================
+
+MAIN CONTENT:
+----------------------------------------
+Tham chiếu APISinh/Sửa hình ảnh (với Google Gemini)
+Sinh/Sửa hình ảnh (với Google Gemini)
+POST /gemini/v1beta/models/gemini-2.5-flash-image-preview:generateContent
+Tạo hình ảnh, sửa hình ảnh với endpoint pass through tới Google Gemini.
+THAM KHẢO
+Chi tiết đầy đủ các tham số, tham khảo tài liệu Google Gemini.
+Cấu trúc yêu cầu (Request Body)
+contents
+array
+Required
+Nội dung của yêu cầu.
+parts
+array
+Required
+Một danh sách các phần của nội dung. Phần tử đầu tiên nên là prompt văn bản.
+text
+string
+Required
+Prompt văn bản để tạo hình ảnh.
+inline_data
+string
+Dữ liệu hình ảnh dưới dạng base64 (nếu có). Tham khảo cách truyền dữ liệu hình ảnh tại đây.
+mime_type
+string
+Loại MIME của hình ảnh, ví dụ: image/png, image/jpeg.
+data
+string
+Dữ liệu hình ảnh dưới dạng base64.
+generationConfig
+object
+Cấu hình cho việc sinh nội dung.
+imageConfig
+object
+Cấu hình dành riêng cho việc sinh hình ảnh.
+aspectRatio
+string
+Tỷ lệ khung hình của hình ảnh được tạo. Các giá trị được hỗ trợ:
+Landscape: 21:9, 16:9, 4:3, 3:2
+Square: 1:1
+Portrait: 9:16, 3:4, 2:3
+Flexible: 5:4, 4:5
+Cấu trúc Phản hồi (Response Body)
+Đối tượng Candidate
+candidates
+array
+Một danh sách các ứng viên được tạo.
+content
+object
+Nội dung của ứng viên.
+parts
+array
+Một danh sách các phần của nội dung.
+inlineData
+object
+Dữ liệu hình ảnh dưới dạng base64.
+mimeType
+string
+Loại MIME của hình ảnh, ví dụ: image/png.
+data
+string
+Dữ liệu hình ảnh được mã hóa base64.
+curl
+curl 'https://api.thucchien.ai/gemini/v1beta/models/gemini-2.5-flash-image-preview:generateContent' \
+-H 'x-goog-api-key: ' \
+-H 'Content-Type: application/json' \
+-d '{
+  "contents": [{
+    "parts": [
+      {"text": "A photorealistic close-up portrait of an elderly Japanese ceramicist with deep, sun-etched wrinkles and a warm, knowing smile. He is carefully inspecting a freshly glazed tea bowl. The setting is his rustic, sun-drenched workshop with pottery wheels and shelves of clay pots in the background. The scene is illuminated by soft, golden hour light streaming through a window, highlighting the fine texture of the clay and the fabric of his apron. Captured with an 85mm portrait lens, resulting in a soft, blurred background (bokeh). The overall mood is serene and masterful."}
+    ]
+  }],
+  "generationConfig": {
+      "imageConfig": {
+          "aspectRatio": "
+21:9
+16:9
+4:3
+3:2
+1:1
+9:16
+3:4
+2:3
+5:4
+4:5
+"
+      }
+  }
+}'
+Try It!
+Example Response
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "inlineData": {
+              "mimeType": "image/png",
+              "data": "<base64_encoded_image_data>"
+            }
+          }
+        ],
+        "role": "model"
+      },
+      "finishReason": "STOP",
+      "index": 0,
+      "safetyRatings": [
+        {
+          "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+          "probability": "NEGLIGIBLE"
+        },
+        {
+          "category": "HARM_CATEGORY_HATE_SPEECH",
+          "probability": "NEGLIGIBLE"
+        },
+        {
+          "category": "HARM_CATEGORY_HARASSMENT",
+          "probability": "NEGLIGIBLE"
+        },
+        {
+          "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+          "probability": "NEGLIGIBLE"
+        }
+      ]
+    }
+  ]
+}
+Copy full
+Previous
+Sinh hình ảnh (với Chat)
+Next
+Tạo video
+
+CODE BLOCKS:
+----------------------------------------
+
+[CODE: unknown_code_1]
+```
+/gemini/v1beta/models/gemini-2.5-flash-image-preview:generateContent
+```
+..............................
+
+[CODE: unknown_code_2]
+```
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "inlineData": {
+              "mimeType": "image/png",
+              "data": "<base64_encoded_image_data>"
+            }
+          }
+        ],
+        "role": "model"
+      },
+      "finishReason": "STOP",
+      "index": 0,
+      "safetyRatings": [
+        {
+          "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+          "probability": "NEGLIGIBLE"
+        },
+        {
+          "category": "HARM_CATEGORY_HATE_SPEECH",
+          "probability": "NEGLIGIBLE"
+        },
+        {
+          "category": "HARM_CATEGORY_HARASSMENT",
+          "probability": "NEGLIGIBLE"
+        },
+        {
+          "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+          "probability": "NEGLIGIBLE"
+        }
+      ]
+    }
+  ]
+}
+```
+..............................
+
+[CODE: bash_code_1]
+```
+curl 'https://api.thucchien.ai/gemini/v1beta/models/gemini-2.5-flash-image-preview:generateContent' \
+-H 'x-goog-api-key: ' \
+-H 'Content-Type: application/json' \
+-d '{
+  "contents": [{
+    "parts": [
+      {"text": "A photorealistic close-up portrait of an elderly Japanese ceramicist with deep, sun-etched wrinkles and a warm, knowing smile. He is carefully inspecting a freshly glazed tea bowl. The setting is his rustic, sun-drenched workshop with pottery wheels and shelves of clay pots in the background. The scene is illuminated by soft, golden hour light streaming through a window, highlighting the fine texture of the clay and the fabric of his apron. Captured with an 85mm portrait lens, resulting in a soft, blurred background (bokeh). The overall mood is serene and masterful."}
+    ]
+  }],
+  "generationConfig": {
+      "imageConfig": {
+          "aspectRatio": "
+21:9
+16:9
+4:3
+3:2
+1:1
+9:16
+3:4
+2:3
+5:4
+4:5
+"
+      }
+  }
+}'
+```
+..............................
+
+[CODE: unknown_code_31]
+```
+curl 'https://api.thucchien.ai/gemini/v1beta/models/gemini-2.5-flash-image-preview:generateContent' \
+-H 'x-goog-api-key: ' \
+-H 'Content-Type: application/json' \
+-d '{
+  "contents": [{
+    "parts": [
+      {"text": "A photorealistic close-up portrait of an elderly Japanese ceramicist with deep, sun-etched wrinkles and a warm, knowing smile. He is carefully inspecting a freshly glazed tea bowl. The setting is his rustic, sun-drenched workshop with pottery wheels and shelves of clay pots in the background. The scene is illuminated by soft, golden hour light streaming through a window, highlighting the fine texture of the clay and the fabric of his apron. Captured with an 85mm portrait lens, resulting in a soft, blurred background (bokeh). The overall mood is serene and masterful."}
+    ]
+  }],
+  "generationConfig": {
+      "imageConfig": {
+          "aspectRatio": "
+21:9
+16:9
+4:3
+3:2
+1:1
+9:16
+3:4
+2:3
+5:4
+4:5
+"
+      }
+  }
+}'
+```
+..............................
+
+[CODE: unknown_code_32]
+```
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "inlineData": {
+              "mimeType": "image/png",
+              "data": "<base64_encoded_image_data>"
+            }
+          }
+        ],
+        "role": "model"
+      },
+      "finishReason": "STOP",
+      "index": 0,
+      "safetyRatings": [
+        {
+          "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+          "probability": "NEGLIGIBLE"
+        },
+        {
+          "category": "HARM_CATEGORY_HATE_SPEECH",
+          "probability": "NEGLIGIBLE"
+        },
+        {
+          "category": "HARM_CATEGORY_HARASSMENT",
+          "probability": "NEGLIGIBLE"
+        },
+        {
+          "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+          "probability": "NEGLIGIBLE"
+        }
+      ]
+    }
+  ]
+}
+```
+..............................
+
+FULL CONTENT:
+----------------------------------------
+Tham chiếu APISinh/Sửa hình ảnh (với Google Gemini)
+Sinh/Sửa hình ảnh (với Google Gemini)
+POST /gemini/v1beta/models/gemini-2.5-flash-image-preview:generateContent
+Tạo hình ảnh, sửa hình ảnh với endpoint pass through tới Google Gemini.
+THAM KHẢO
+Chi tiết đầy đủ các tham số, tham khảo tài liệu Google Gemini.
+Cấu trúc yêu cầu (Request Body)
+contents
+array
+Required
+Nội dung của yêu cầu.
+parts
+array
+Required
+Một danh sách các phần của nội dung. Phần tử đầu tiên nên là prompt văn bản.
+text
+string
+Required
+Prompt văn bản để tạo hình ảnh.
+inline_data
+string
+Dữ liệu hình ảnh dưới dạng base64 (nếu có). Tham khảo cách truyền dữ liệu hình ảnh tại đây.
+mime_type
+string
+Loại MIME của hình ảnh, ví dụ: image/png, image/jpeg.
+data
+string
+Dữ liệu hình ảnh dưới dạng base64.
+generationConfig
+object
+Cấu hình cho việc sinh nội dung.
+imageConfig
+object
+Cấu hình dành riêng cho việc sinh hình ảnh.
+aspectRatio
+string
+Tỷ lệ khung hình của hình ảnh được tạo. Các giá trị được hỗ trợ:
+Landscape: 21:9, 16:9, 4:3, 3:2
+Square: 1:1
+Portrait: 9:16, 3:4, 2:3
+Flexible: 5:4, 4:5
+Cấu trúc Phản hồi (Response Body)
+Đối tượng Candidate
+candidates
+array
+Một danh sách các ứng viên được tạo.
+content
+object
+Nội dung của ứng viên.
+parts
+array
+Một danh sách các phần của nội dung.
+inlineData
+object
+Dữ liệu hình ảnh dưới dạng base64.
+mimeType
+string
+Loại MIME của hình ảnh, ví dụ: image/png.
+data
+string
+Dữ liệu hình ảnh được mã hóa base64.
+curl
+curl 'https://api.thucchien.ai/gemini/v1beta/models/gemini-2.5-flash-image-preview:generateContent' \
+-H 'x-goog-api-key: ' \
+-H 'Content-Type: application/json' \
+-d '{
+  "contents": [{
+    "parts": [
+      {"text": "A photorealistic close-up portrait of an elderly Japanese ceramicist with deep, sun-etched wrinkles and a warm, knowing smile. He is carefully inspecting a freshly glazed tea bowl. The setting is his rustic, sun-drenched workshop with pottery wheels and shelves of clay pots in the background. The scene is illuminated by soft, golden hour light streaming through a window, highlighting the fine texture of the clay and the fabric of his apron. Captured with an 85mm portrait lens, resulting in a soft, blurred background (bokeh). The overall mood is serene and masterful."}
+    ]
+  }],
+  "generationConfig": {
+      "imageConfig": {
+          "aspectRatio": "
+21:9
+16:9
+4:3
+3:2
+1:1
+9:16
+3:4
+2:3
+5:4
+4:5
+"
+      }
+  }
+}'
+Try It!
+Example Response
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "inlineData": {
+              "mimeType": "image/png",
+              "data": "<base64_encoded_image_data>"
+            }
+          }
+        ],
+        "role": "model"
+      },
+      "finishReason": "STOP",
+      "index": 0,
+      "safetyRatings": [
+        {
+          "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+          "probability": "NEGLIGIBLE"
+        },
+        {
+          "category": "HARM_CATEGORY_HATE_SPEECH",
+          "probability": "NEGLIGIBLE"
+        },
+        {
+          "category": "HARM_CATEGORY_HARASSMENT",
+          "probability": "NEGLIGIBLE"
+        },
+        {
+          "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+          "probability": "NEGLIGIBLE"
+        }
+      ]
+    }
+  ]
+}
+Copy full
+Previous
+Sinh hình ảnh (với Chat)
+Next
+Tạo video
+
+=== CODE BLOCKS ===
+
+--- unknown_code_1 ---
+/gemini/v1beta/models/gemini-2.5-flash-image-preview:generateContent
+
+--- unknown_code_2 ---
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "inlineData": {
+              "mimeType": "image/png",
+              "data": "<base64_encoded_image_data>"
+            }
+          }
+        ],
+        "role": "model"
+      },
+      "finishReason": "STOP",
+      "index": 0,
+      "safetyRatings": [
+        {
+          "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+          "probability": "NEGLIGIBLE"
+        },
+        {
+          "category": "HARM_CATEGORY_HATE_SPEECH",
+          "probability": "NEGLIGIBLE"
+        },
+        {
+          "category": "HARM_CATEGORY_HARASSMENT",
+          "probability": "NEGLIGIBLE"
+        },
+        {
+          "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+          "probability": "NEGLIGIBLE"
+        }
+      ]
+    }
+  ]
+}
+
+--- bash_code_1 ---
+curl 'https://api.thucchien.ai/gemini/v1beta/models/gemini-2.5-flash-image-preview:generateContent' \
+-H 'x-goog-api-key: ' \
+-H 'Content-Type: application/json' \
+-d '{
+  "contents": [{
+    "parts": [
+      {"text": "A photorealistic close-up portrait of an elderly Japanese ceramicist with deep, sun-etched wrinkles and a warm, knowing smile. He is carefully inspecting a freshly glazed tea bowl. The setting is his rustic, sun-drenched workshop with pottery wheels and shelves of clay pots in the background. The scene is illuminated by soft, golden hour light streaming through a window, highlighting the fine texture of the clay and the fabric of his apron. Captured with an 85mm portrait lens, resulting in a soft, blurred background (bokeh). The overall mood is serene and masterful."}
+    ]
+  }],
+  "generationConfig": {
+      "imageConfig": {
+          "aspectRatio": "
+21:9
+16:9
+4:3
+3:2
+1:1
+9:16
+3:4
+2:3
+5:4
+4:5
+"
+      }
+  }
+}'
+
+--- unknown_code_31 ---
+curl 'https://api.thucchien.ai/gemini/v1beta/models/gemini-2.5-flash-image-preview:generateContent' \
+-H 'x-goog-api-key: ' \
+-H 'Content-Type: application/json' \
+-d '{
+  "contents": [{
+    "parts": [
+      {"text": "A photorealistic close-up portrait of an elderly Japanese ceramicist with deep, sun-etched wrinkles and a warm, knowing smile. He is carefully inspecting a freshly glazed tea bowl. The setting is his rustic, sun-drenched workshop with pottery wheels and shelves of clay pots in the background. The scene is illuminated by soft, golden hour light streaming through a window, highlighting the fine texture of the clay and the fabric of his apron. Captured with an 85mm portrait lens, resulting in a soft, blurred background (bokeh). The overall mood is serene and masterful."}
+    ]
+  }],
+  "generationConfig": {
+      "imageConfig": {
+          "aspectRatio": "
+21:9
+16:9
+4:3
+3:2
+1:1
+9:16
+3:4
+2:3
+5:4
+4:5
+"
+      }
+  }
+}'
+
+--- unknown_code_32 ---
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "inlineData": {
+              "mimeType": "image/png",
+              "data": "<base64_encoded_image_data>"
+            }
+          }
+        ],
+        "role": "model"
+      },
+      "finishReason": "STOP",
+      "index": 0,
+      "safetyRatings": [
+        {
+          "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+          "probability": "NEGLIGIBLE"
+        },
+        {
+          "category": "HARM_CATEGORY_HATE_SPEECH",
+          "probability": "NEGLIGIBLE"
+        },
+        {
+          "category": "HARM_CATEGORY_HARASSMENT",
+          "probability": "NEGLIGIBLE"
+        },
+        {
+          "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+          "probability": "NEGLIGIBLE"
+        }
+      ]
+    }
+  ]
+}

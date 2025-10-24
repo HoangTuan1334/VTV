@@ -1,0 +1,64 @@
+=== Tích hợp với CLine | AI Thực Chiến ===
+URL: https://docs.thucchien.ai/docs/vibe-coding/cline-integration
+Crawled: 2025-10-23 00:21:24
+============================================================
+
+MAIN CONTENT:
+----------------------------------------
+VibeCodingTích hợp với CLine
+Tích hợp với CLine
+CLine là một trợ lý mã AI được thiết kế để giúp các nhà phát triển viết, xem xét và tối ưu hóa mã hiệu quả hơn. Bằng cách tích hợp CLine với AI Thực Chiến Gateway, bạn có thể thực hành VibeCoding một cách hiệu quả.
+Cấu hình CLine
+Để kết nối CLine với gateway, bạn làm theo các bước sau:
+Truy cập Settings ⚙️ > API Configuration.
+Thiết lập API Provider thành LiteLLM.
+Thiết lập Base URL là https://api.thucchien.ai.
+Nhập API Key của bạn.
+Thiết lập Model ID thành gemini-2.5-pro.
+(Tùy chọn) Trong MODEL CONFIGURATION, thiết lập Context Window Size thành 1048576.
+Nhấn Done để lưu cấu hình.
+Giao diện cấu hình CLine
+Video hướng dẫn
+Previous
+Giới thiệu về VibeCoding
+Next
+Tích hợp với Cursor
+Cấu hình CLine
+Video hướng dẫn
+
+CODE BLOCKS:
+----------------------------------------
+
+[CODE: unknown_code_6]
+```
+https://api.thucchien.ai
+```
+..............................
+
+FULL CONTENT:
+----------------------------------------
+VibeCodingTích hợp với CLine
+Tích hợp với CLine
+CLine là một trợ lý mã AI được thiết kế để giúp các nhà phát triển viết, xem xét và tối ưu hóa mã hiệu quả hơn. Bằng cách tích hợp CLine với AI Thực Chiến Gateway, bạn có thể thực hành VibeCoding một cách hiệu quả.
+Cấu hình CLine
+Để kết nối CLine với gateway, bạn làm theo các bước sau:
+Truy cập Settings ⚙️ > API Configuration.
+Thiết lập API Provider thành LiteLLM.
+Thiết lập Base URL là https://api.thucchien.ai.
+Nhập API Key của bạn.
+Thiết lập Model ID thành gemini-2.5-pro.
+(Tùy chọn) Trong MODEL CONFIGURATION, thiết lập Context Window Size thành 1048576.
+Nhấn Done để lưu cấu hình.
+Giao diện cấu hình CLine
+Video hướng dẫn
+Previous
+Giới thiệu về VibeCoding
+Next
+Tích hợp với Cursor
+Cấu hình CLine
+Video hướng dẫn
+
+=== CODE BLOCKS ===
+
+--- unknown_code_6 ---
+https://api.thucchien.ai

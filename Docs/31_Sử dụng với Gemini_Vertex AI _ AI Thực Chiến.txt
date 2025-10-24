@@ -1,0 +1,336 @@
+=== Sử dụng với Gemini/Vertex AI | AI Thực Chiến ===
+URL: https://docs.thucchien.ai/docs/using-google-genai/google-genai
+Crawled: 2025-10-23 00:21:10
+============================================================
+
+MAIN CONTENT:
+----------------------------------------
+Sử dụng với Google GenAISử dụng với Gemini/Vertex AI
+Sử dụng với Gemini/Vertex AI
+Vertex AI
+Gemini
+Xác thực (Authentication)
+Để xác thực với Vertex AI, bạn cần sử dụng service account key đã được ban tổ chức cung cấp và đặt đường dẫn của nó vào biến môi trường GOOGLE_APPLICATION_CREDENTIALS.
+Đặt Biến Môi trường: Thêm biến môi trường sau vào môi trường local của bạn, trỏ đến file JSON đã được cung cấp.
+export GOOGLE_APPLICATION_CREDENTIALS="/path/to/your/keyfile.json"
+Chi tiết hơn có thể xem tại Google Cloud Documentation.
+Hướng dẫn sử dụng cơ bản
+Tạo văn bản (Text Generation)
+Cài đặt thư viện cần thiết:
+pip install --upgrade google-genai
+Sử dụng trong code:
+from google import genai
+from dotenv import load_dotenv
+load_dotenv()   
+
+client = genai.Client(vertexai=True, location="us-central1")
+
+response = client.models.generate_content(
+  model="gemini-2.5-flash",
+  contents="Explain how AI works in a few words"
+)
+print(response.text)
+Tạo hình ảnh (Image Generation)
+Với Vertex AI, bạn có thể sử dụng các mô hình tạo ảnh như Imagen.
+from google import genai
+from google.genai.types import GenerateImagesConfig
+
+# Cần xác thực với GOOGLE_APPLICATION_CREDENTIALS
+client = genai.Client()
+
+output_file = "output-image.png"
+
+image = client.models.generate_images(
+  model="imagen-4.0-generate-001",
+  prompt="A dog reading a newspaper",
+  config=GenerateImagesConfig(
+      image_size="2K",
+  ),
+)
+
+image.generated_images[0].image.save(output_file)
+
+print(f"Created output image using {len(image.generated_images[0].image.image_bytes)} bytes")
+
+
+
+
+
+
+
+
+
+
+
+
+
+Để biết thêm chi tiết về các tính năng nâng cao như tạo video và nhiều hơn nữa, vui lòng tham khảo tài liệu chính thức của Google Generative AI.
+Previous
+Sử dụng với Google GenAI
+Next
+Tích hợp với công cụ AI Coding
+Xác thực (Authentication)
+Hướng dẫn sử dụng cơ bản
+Tạo văn bản (Text Generation)
+Tạo hình ảnh (Image Generation)
+Xác thực với Gemini API
+Hướng dẫn cơ bản cho Gemini
+Tạo văn bản với Gemini API
+
+TAB CONTENT:
+----------------------------------------
+
+[TAB: Vertex AI_0]
+export GOOGLE_APPLICATION_CREDENTIALS="/path/to/your/keyfile.json"
+..............................
+
+[TAB: Gemini_1]
+export GEMINI_API_KEY="YOUR_API_KEY"
+..............................
+
+CODE BLOCKS:
+----------------------------------------
+
+[CODE: unknown_code_5]
+```
+export GEMINI_API_KEY="YOUR_API_KEY"
+```
+..............................
+
+[CODE: unknown_code_6]
+```
+pip install -q -U google-genai
+```
+..............................
+
+[CODE: unknown_code_7]
+```
+export GEMINI_API_KEY="YOUR_API_KEY"
+```
+..............................
+
+[CODE: python_code_5]
+```
+from google import genai
+from google.genai.types import HttpOptions
+
+# Cần đặt GEMINI_API_KEY trong môi trường của bạn
+client = genai.Client(http_options=HttpOptions(api_version="v1"))
+
+response = client.models.generate_content(
+  model="gemini-2.5-flash",
+  contents="How does AI work?",
+)
+print(response.text)
+```
+..............................
+
+[CODE: python_code_6]
+```
+from google import genai
+from google.genai.types import HttpOptions
+
+# Cần đặt GEMINI_API_KEY trong môi trường của bạn
+client = genai.Client(http_options=HttpOptions(api_version="v1"))
+
+response = client.models.generate_content(
+  model="gemini-2.5-flash",
+  contents="How does AI work?",
+)
+print(response.text)
+```
+..............................
+
+[CODE: bash_code_5]
+```
+export GEMINI_API_KEY="YOUR_API_KEY"
+```
+..............................
+
+[CODE: bash_code_6]
+```
+export GEMINI_API_KEY="YOUR_API_KEY"
+```
+..............................
+
+[CODE: bash_code_7]
+```
+pip install -q -U google-genai
+```
+..............................
+
+[CODE: bash_code_8]
+```
+pip install -q -U google-genai
+```
+..............................
+
+[CODE: unknown_code_8]
+```
+pip install -q -U google-genai
+```
+..............................
+
+[CODE: unknown_code_9]
+```
+from google import genai
+from google.genai.types import HttpOptions
+
+# Cần đặt GEMINI_API_KEY trong môi trường của bạn
+client = genai.Client(http_options=HttpOptions(api_version="v1"))
+
+response = client.models.generate_content(
+  model="gemini-2.5-flash",
+  contents="How does AI work?",
+)
+print(response.text)
+```
+..............................
+
+FULL CONTENT:
+----------------------------------------
+Sử dụng với Google GenAISử dụng với Gemini/Vertex AI
+Sử dụng với Gemini/Vertex AI
+Vertex AI
+Gemini
+Xác thực (Authentication)
+Để xác thực với Vertex AI, bạn cần sử dụng service account key đã được ban tổ chức cung cấp và đặt đường dẫn của nó vào biến môi trường GOOGLE_APPLICATION_CREDENTIALS.
+Đặt Biến Môi trường: Thêm biến môi trường sau vào môi trường local của bạn, trỏ đến file JSON đã được cung cấp.
+export GOOGLE_APPLICATION_CREDENTIALS="/path/to/your/keyfile.json"
+Chi tiết hơn có thể xem tại Google Cloud Documentation.
+Hướng dẫn sử dụng cơ bản
+Tạo văn bản (Text Generation)
+Cài đặt thư viện cần thiết:
+pip install --upgrade google-genai
+Sử dụng trong code:
+from google import genai
+from dotenv import load_dotenv
+load_dotenv()   
+
+client = genai.Client(vertexai=True, location="us-central1")
+
+response = client.models.generate_content(
+  model="gemini-2.5-flash",
+  contents="Explain how AI works in a few words"
+)
+print(response.text)
+Tạo hình ảnh (Image Generation)
+Với Vertex AI, bạn có thể sử dụng các mô hình tạo ảnh như Imagen.
+from google import genai
+from google.genai.types import GenerateImagesConfig
+
+# Cần xác thực với GOOGLE_APPLICATION_CREDENTIALS
+client = genai.Client()
+
+output_file = "output-image.png"
+
+image = client.models.generate_images(
+  model="imagen-4.0-generate-001",
+  prompt="A dog reading a newspaper",
+  config=GenerateImagesConfig(
+      image_size="2K",
+  ),
+)
+
+image.generated_images[0].image.save(output_file)
+
+print(f"Created output image using {len(image.generated_images[0].image.image_bytes)} bytes")
+
+
+
+
+
+
+
+
+
+
+
+
+
+Để biết thêm chi tiết về các tính năng nâng cao như tạo video và nhiều hơn nữa, vui lòng tham khảo tài liệu chính thức của Google Generative AI.
+Previous
+Sử dụng với Google GenAI
+Next
+Tích hợp với công cụ AI Coding
+Xác thực (Authentication)
+Hướng dẫn sử dụng cơ bản
+Tạo văn bản (Text Generation)
+Tạo hình ảnh (Image Generation)
+Xác thực với Gemini API
+Hướng dẫn cơ bản cho Gemini
+Tạo văn bản với Gemini API
+
+=== TAB CONTENT ===
+
+--- Vertex AI_0 ---
+export GOOGLE_APPLICATION_CREDENTIALS="/path/to/your/keyfile.json"
+
+--- Gemini_1 ---
+export GEMINI_API_KEY="YOUR_API_KEY"
+
+
+=== CODE BLOCKS ===
+
+--- unknown_code_5 ---
+export GEMINI_API_KEY="YOUR_API_KEY"
+
+--- unknown_code_6 ---
+pip install -q -U google-genai
+
+--- unknown_code_7 ---
+export GEMINI_API_KEY="YOUR_API_KEY"
+
+--- python_code_5 ---
+from google import genai
+from google.genai.types import HttpOptions
+
+# Cần đặt GEMINI_API_KEY trong môi trường của bạn
+client = genai.Client(http_options=HttpOptions(api_version="v1"))
+
+response = client.models.generate_content(
+  model="gemini-2.5-flash",
+  contents="How does AI work?",
+)
+print(response.text)
+
+--- python_code_6 ---
+from google import genai
+from google.genai.types import HttpOptions
+
+# Cần đặt GEMINI_API_KEY trong môi trường của bạn
+client = genai.Client(http_options=HttpOptions(api_version="v1"))
+
+response = client.models.generate_content(
+  model="gemini-2.5-flash",
+  contents="How does AI work?",
+)
+print(response.text)
+
+--- bash_code_5 ---
+export GEMINI_API_KEY="YOUR_API_KEY"
+
+--- bash_code_6 ---
+export GEMINI_API_KEY="YOUR_API_KEY"
+
+--- bash_code_7 ---
+pip install -q -U google-genai
+
+--- bash_code_8 ---
+pip install -q -U google-genai
+
+--- unknown_code_8 ---
+pip install -q -U google-genai
+
+--- unknown_code_9 ---
+from google import genai
+from google.genai.types import HttpOptions
+
+# Cần đặt GEMINI_API_KEY trong môi trường của bạn
+client = genai.Client(http_options=HttpOptions(api_version="v1"))
+
+response = client.models.generate_content(
+  model="gemini-2.5-flash",
+  contents="How does AI work?",
+)
+print(response.text)

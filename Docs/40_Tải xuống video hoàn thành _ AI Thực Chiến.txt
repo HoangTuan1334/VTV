@@ -1,0 +1,126 @@
+=== Tải xuống video hoàn thành | AI Thực Chiến ===
+URL: https://docs.thucchien.ai/docs/api-reference/video-generation-download
+Crawled: 2025-10-23 00:22:09
+============================================================
+
+MAIN CONTENT:
+----------------------------------------
+Tham chiếu APITải xuống video hoàn thành
+Sinh video (Bước 3/3): Tải video
+GET /gemini/download/v1beta/files/{video_id}:download?alt=media
+Khi video đã sẵn sàng, kết quả kiểm tra trạng thái sẽ chứa một URI. Bạn sử dụng video_id trích xuất từ URI này để tải video về.
+Tham số đường dẫn (Path Parameters)
+video_id
+string
+Required
+ID của video cần tải về, được trích xuất từ uri ở Bước 2. Ví dụ: 3j6svp4106e7.
+Phản hồi (Response)
+Phản hồi thành công sẽ là dữ liệu video (ví dụ: file video/mp4).
+curl
+curl "https://api.thucchien.ai/gemini/download/v1beta/files/:download?alt=media" \
+-H "x-goog-api-key: " \
+--output my_generated_video.mp4
+Try It!
+Example Response
+{
+  "message": "Phản hồi thành công sẽ là file video. Trình duyệt sẽ tự động tải file về."
+}
+Copy full
+Previous
+Kiểm tra trạng thái video
+Next
+Chuyển văn bản thành giọng nói
+
+CODE BLOCKS:
+----------------------------------------
+
+[CODE: unknown_code_1]
+```
+/gemini/download/v1beta/files/{video_id}:download?alt=media
+```
+..............................
+
+[CODE: unknown_code_2]
+```
+{
+  "message": "Phản hồi thành công sẽ là file video. Trình duyệt sẽ tự động tải file về."
+}
+```
+..............................
+
+[CODE: bash_code_1]
+```
+curl "https://api.thucchien.ai/gemini/download/v1beta/files/:download?alt=media" \
+-H "x-goog-api-key: " \
+--output my_generated_video.mp4
+```
+..............................
+
+[CODE: unknown_code_7]
+```
+curl "https://api.thucchien.ai/gemini/download/v1beta/files/:download?alt=media" \
+-H "x-goog-api-key: " \
+--output my_generated_video.mp4
+```
+..............................
+
+[CODE: unknown_code_8]
+```
+{
+  "message": "Phản hồi thành công sẽ là file video. Trình duyệt sẽ tự động tải file về."
+}
+```
+..............................
+
+FULL CONTENT:
+----------------------------------------
+Tham chiếu APITải xuống video hoàn thành
+Sinh video (Bước 3/3): Tải video
+GET /gemini/download/v1beta/files/{video_id}:download?alt=media
+Khi video đã sẵn sàng, kết quả kiểm tra trạng thái sẽ chứa một URI. Bạn sử dụng video_id trích xuất từ URI này để tải video về.
+Tham số đường dẫn (Path Parameters)
+video_id
+string
+Required
+ID của video cần tải về, được trích xuất từ uri ở Bước 2. Ví dụ: 3j6svp4106e7.
+Phản hồi (Response)
+Phản hồi thành công sẽ là dữ liệu video (ví dụ: file video/mp4).
+curl
+curl "https://api.thucchien.ai/gemini/download/v1beta/files/:download?alt=media" \
+-H "x-goog-api-key: " \
+--output my_generated_video.mp4
+Try It!
+Example Response
+{
+  "message": "Phản hồi thành công sẽ là file video. Trình duyệt sẽ tự động tải file về."
+}
+Copy full
+Previous
+Kiểm tra trạng thái video
+Next
+Chuyển văn bản thành giọng nói
+
+=== CODE BLOCKS ===
+
+--- unknown_code_1 ---
+/gemini/download/v1beta/files/{video_id}:download?alt=media
+
+--- unknown_code_2 ---
+{
+  "message": "Phản hồi thành công sẽ là file video. Trình duyệt sẽ tự động tải file về."
+}
+
+--- bash_code_1 ---
+curl "https://api.thucchien.ai/gemini/download/v1beta/files/:download?alt=media" \
+-H "x-goog-api-key: " \
+--output my_generated_video.mp4
+
+--- unknown_code_7 ---
+curl "https://api.thucchien.ai/gemini/download/v1beta/files/:download?alt=media" \
+-H "x-goog-api-key: " \
+--output my_generated_video.mp4
+
+--- unknown_code_8 ---
+{
+  "message": "Phản hồi thành công sẽ là file video. Trình duyệt sẽ tự động tải file về."
+}

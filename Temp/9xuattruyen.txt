@@ -1,0 +1,80 @@
+# 📦 Tạo báo cáo và thông tin truyện
+if story_script and 'final_pages' in locals():
+    # Tạo file info
+    comic_info = {
+        "title": story_script['title'],
+        "art_style": story_script['art_style'],
+        "num_pages": len(final_pages),
+        "characters": story_script['characters'],
+        "created_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "pages": []
+    }
+    
+    for i, page_path in enumerate(final_pages):
+        page_num = i + 1
+        comic_info['pages'].append({
+            "page_num": page_num,
+            "file": page_path,
+            "layout": selected_layouts[i]['layout_name'],
+            "num_panels": len(panel_images[page_num])
+        })
+    
+    # Lưu thông tin truyện
+    with open("final_comic/comic_info.json", "w", encoding="utf-8") as f:
+        json.dump(comic_info, f, indent=2, ensure_ascii=False)
+    
+    # Tạo README - Xử lý character appearance
+    character_descriptions = []
+    for c in story_script['characters']:
+        if 'appearance' in c:
+            app = c['appearance']
+            desc = f"{app.get('age', 'unknown age')}, {app.get('hair', 'unknown hair')}, {app.get('eyes', 'unknown eyes')}"
+        elif 'description' in c:
+            # Fallback cho format cũ
+            desc = c['description']
+        else:
+            desc = "No description available"
+        character_descriptions.append(f'- **{c["name"]}** ({c.get("role", "unknown")}): {desc}')
+    
+    readme_content = f"""
+# {story_script['title']}
+
+## Thông tin truyện
+- **Phong cách**: {story_script['art_style']}
+- **Thể loại**: {story_script.get('genre', 'N/A')}
+- **Số trang**: {len(final_pages)}
+- **Số nhân vật**: {len(story_script['characters'])}
+- **Ngày tạo**: {time.strftime("%Y-%m-%d %H:%M:%S")}
+
+## Nhân vật
+{chr(10).join(character_descriptions)}
+
+## Cấu trúc
+{chr(10).join([f'- Trang {p["page_num"]}: {p["layout"]} ({p["num_panels"]} panels)' for p in comic_info['pages']])}
+
+## Files
+- `comic_info.json`: Thông tin chi tiết truyện
+- `page_01.png` - `page_{len(final_pages):02d}.png`: Các trang truyện
+
+---
+Tạo bởi Comic Auto Creator với Gemini AI
+"""
+    
+    with open("final_comic/README.md", "w", encoding="utf-8") as f:
+        f.write(readme_content)
+    
+    print("\n" + "="*60)
+    print("🎉 HOÀN THÀNH TẠO TRUYỆN!")
+    print("="*60)
+    print(f"\n📚 Tên truyện: {story_script['title']}")
+    print(f"📄 Số trang: {len(final_pages)}")
+    print(f"🎨 Phong cách: {story_script['art_style']}")
+    print(f"\n📁 Truyện đã được lưu trong folder: final_comic/")
+    print(f"\nCác file:")
+    print(f"  - comic_info.json (thông tin truyện)")
+    print(f"  - README.md (hướng dẫn)")
+    for page_path in final_pages:
+        print(f"  - {os.path.basename(page_path)}")
+    print("\n" + "="*60)
+else:
+    print("❌ Chưa đủ dữ liệu để hoàn thành. Vui lòng chạy lại các bước trước.")

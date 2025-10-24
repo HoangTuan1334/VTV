@@ -1,0 +1,550 @@
+=== Chuyển văn bản thành giọng nói (Text-to-Speech) | AI Thực Chiến ===
+URL: https://docs.thucchien.ai/docs/user-guide/text-to-speech
+Crawled: 2025-10-23 00:18:25
+============================================================
+
+MAIN CONTENT:
+----------------------------------------
+Hướng dẫn sử dụng APIChuyển văn bản thành giọng nói (Text-to-Speech)
+Chuyển văn bản thành giọng nói (Text-to-Speech)
+Các mô hình Text-to-Speech (TTS) cho phép bạn chuyển đổi một đoạn văn bản thành file âm thanh có giọng nói tự nhiên.
+Các model được hỗ trợ:
+gemini-2.5-flash-preview-tts (Google Gemini)
+gemini-2.5-pro-preview-tts (Google Gemini)
+Endpoint: POST /audio/speech
+curl
+Python (requests)
+Python (openai)
+Cách này cho phép bạn nhanh chóng tạo và lưu file âm thanh.
+curl https://api.thucchien.ai/audio/speech \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer <your_api_key>" \
+-d '{
+  "model": "gemini-2.5-flash-preview-tts",
+  "input": "Xin chào, đây là một thử nghiệm chuyển văn bản thành giọng nói qua [AI Thực Chiến](https://thucchien.ai) gateway.",
+  "voice": "Zephyr"
+}' \
+--output speech_output.mp3
+Kết quả bạn sẽ có file audio như sau:
+Your browser does not support the audio element.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Các tham số tùy chọn
+Ngoài model, input, và voice, bạn có thể sử dụng thêm các tham số khác để tinh chỉnh giọng nói, tốc độ, và định dạng âm thanh đầu ra.
+Để biết danh sách đầy đủ các tham số và cách sử dụng, vui lòng tham khảo tài liệu chính thức tại đây: Google Cloud Text-to-Speech Documentation
+Ngoài ra, xem thêm nhiều lượt nói (multi-speaker) tại đây
+Previous
+Sinh video với Veo 3 (Quy trình bất đồng bộ)
+Next
+Tham khảo
+Các tham số tùy chọn
+
+TAB CONTENT:
+----------------------------------------
+
+[TAB: curl_0]
+curl https://api.thucchien.ai/audio/speech \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer <your_api_key>" \
+-d '{
+  "model": "gemini-2.5-flash-preview-tts",
+  "input": "Xin chào, đây là một thử nghiệm chuyển văn bản thành giọng nói qua [AI Thực Chiến](https://thucchien.ai) gateway.",
+  "voice": "Zephyr"
+}' \
+--output speech_output.mp3
+..............................
+
+[TAB: Python (requests)_1]
+import requests
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "sk-1234" # Thay bằng API key của bạn
+
+# --- Thực thi ---
+url = f"{AI_API_BASE}/audio/speech"
+headers = {
+  "Content-Type": "application/json",
+  "Authorization": f"Bearer {AI_API_KEY}"
+}
+data = {
+  "model": "gemini-2.5-pro-preview-tts",
+  "input": "Hello world! This is a test of the text-to-speech API.",
+  "voice": "Puck"
+}
+
+response = requests.post(url, headers=headers, json=data, stream=True)
+
+if response.status_code == 200:
+  with open("speech_from_requests.mp3", "wb") as f:
+      for chunk in response.iter_content(chunk_size=8192):
+          f.write(chunk)
+  print("File âm thanh đã được tạo thành công!")
+else:
+  print(f"Error: {response.status_code}")
+  print(response.text)
+..............................
+
+[TAB: Python (openai)_2]
+from openai import OpenAI
+from pathlib import Path
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "sk-1234" # Thay bằng API key của bạn
+
+# --- Thực thi ---
+client = OpenAI(
+  api_key=AI_API_KEY,
+  base_url=AI_API_BASE
+)
+
+speech_file_path = Path(__file__).parent / "speech_from_openai.mp3"
+
+response = client.audio.speech.create(
+model="gemini-2.5-flash-preview-tts",
+voice="Charon",
+input="Hôm nay là một ngày đẹp trời để lập trình."
+)
+
+response.stream_to_file(speech_file_path)
+print(f"File âm thanh đã được lưu tại: {speech_file_path}")
+..............................
+
+CODE BLOCKS:
+----------------------------------------
+
+[CODE: unknown_code_3]
+```
+from openai import OpenAI
+from pathlib import Path
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "sk-1234" # Thay bằng API key của bạn
+
+# --- Thực thi ---
+client = OpenAI(
+  api_key=AI_API_KEY,
+  base_url=AI_API_BASE
+)
+
+speech_file_path = Path(__file__).parent / "speech_from_openai.mp3"
+
+response = client.audio.speech.create(
+model="gemini-2.5-flash-preview-tts",
+voice="Charon",
+input="Hôm nay là một ngày đẹp trời để lập trình."
+)
+
+response.stream_to_file(speech_file_path)
+print(f"File âm thanh đã được lưu tại: {speech_file_path}")
+```
+..............................
+
+[CODE: python_code_3]
+```
+from openai import OpenAI
+from pathlib import Path
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "sk-1234" # Thay bằng API key của bạn
+
+# --- Thực thi ---
+client = OpenAI(
+  api_key=AI_API_KEY,
+  base_url=AI_API_BASE
+)
+
+speech_file_path = Path(__file__).parent / "speech_from_openai.mp3"
+
+response = client.audio.speech.create(
+model="gemini-2.5-flash-preview-tts",
+voice="Charon",
+input="Hôm nay là một ngày đẹp trời để lập trình."
+)
+
+response.stream_to_file(speech_file_path)
+print(f"File âm thanh đã được lưu tại: {speech_file_path}")
+```
+..............................
+
+[CODE: python_code_4]
+```
+from openai import OpenAI
+from pathlib import Path
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "sk-1234" # Thay bằng API key của bạn
+
+# --- Thực thi ---
+client = OpenAI(
+  api_key=AI_API_KEY,
+  base_url=AI_API_BASE
+)
+
+speech_file_path = Path(__file__).parent / "speech_from_openai.mp3"
+
+response = client.audio.speech.create(
+model="gemini-2.5-flash-preview-tts",
+voice="Charon",
+input="Hôm nay là một ngày đẹp trời để lập trình."
+)
+
+response.stream_to_file(speech_file_path)
+print(f"File âm thanh đã được lưu tại: {speech_file_path}")
+```
+..............................
+
+[CODE: unknown_code_1]
+```
+gemini-2.5-flash-preview-tts
+```
+..............................
+
+[CODE: unknown_code_2]
+```
+gemini-2.5-pro-preview-tts
+```
+..............................
+
+[CODE: unknown_code_7]
+```
+from openai import OpenAI
+from pathlib import Path
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "sk-1234" # Thay bằng API key của bạn
+
+# --- Thực thi ---
+client = OpenAI(
+  api_key=AI_API_KEY,
+  base_url=AI_API_BASE
+)
+
+speech_file_path = Path(__file__).parent / "speech_from_openai.mp3"
+
+response = client.audio.speech.create(
+model="gemini-2.5-flash-preview-tts",
+voice="Charon",
+input="Hôm nay là một ngày đẹp trời để lập trình."
+)
+
+response.stream_to_file(speech_file_path)
+print(f"File âm thanh đã được lưu tại: {speech_file_path}")
+```
+..............................
+
+FULL CONTENT:
+----------------------------------------
+Hướng dẫn sử dụng APIChuyển văn bản thành giọng nói (Text-to-Speech)
+Chuyển văn bản thành giọng nói (Text-to-Speech)
+Các mô hình Text-to-Speech (TTS) cho phép bạn chuyển đổi một đoạn văn bản thành file âm thanh có giọng nói tự nhiên.
+Các model được hỗ trợ:
+gemini-2.5-flash-preview-tts (Google Gemini)
+gemini-2.5-pro-preview-tts (Google Gemini)
+Endpoint: POST /audio/speech
+curl
+Python (requests)
+Python (openai)
+Cách này cho phép bạn nhanh chóng tạo và lưu file âm thanh.
+curl https://api.thucchien.ai/audio/speech \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer <your_api_key>" \
+-d '{
+  "model": "gemini-2.5-flash-preview-tts",
+  "input": "Xin chào, đây là một thử nghiệm chuyển văn bản thành giọng nói qua [AI Thực Chiến](https://thucchien.ai) gateway.",
+  "voice": "Zephyr"
+}' \
+--output speech_output.mp3
+Kết quả bạn sẽ có file audio như sau:
+Your browser does not support the audio element.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Các tham số tùy chọn
+Ngoài model, input, và voice, bạn có thể sử dụng thêm các tham số khác để tinh chỉnh giọng nói, tốc độ, và định dạng âm thanh đầu ra.
+Để biết danh sách đầy đủ các tham số và cách sử dụng, vui lòng tham khảo tài liệu chính thức tại đây: Google Cloud Text-to-Speech Documentation
+Ngoài ra, xem thêm nhiều lượt nói (multi-speaker) tại đây
+Previous
+Sinh video với Veo 3 (Quy trình bất đồng bộ)
+Next
+Tham khảo
+Các tham số tùy chọn
+
+=== TAB CONTENT ===
+
+--- curl_0 ---
+curl https://api.thucchien.ai/audio/speech \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer <your_api_key>" \
+-d '{
+  "model": "gemini-2.5-flash-preview-tts",
+  "input": "Xin chào, đây là một thử nghiệm chuyển văn bản thành giọng nói qua [AI Thực Chiến](https://thucchien.ai) gateway.",
+  "voice": "Zephyr"
+}' \
+--output speech_output.mp3
+
+--- Python (requests)_1 ---
+import requests
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "sk-1234" # Thay bằng API key của bạn
+
+# --- Thực thi ---
+url = f"{AI_API_BASE}/audio/speech"
+headers = {
+  "Content-Type": "application/json",
+  "Authorization": f"Bearer {AI_API_KEY}"
+}
+data = {
+  "model": "gemini-2.5-pro-preview-tts",
+  "input": "Hello world! This is a test of the text-to-speech API.",
+  "voice": "Puck"
+}
+
+response = requests.post(url, headers=headers, json=data, stream=True)
+
+if response.status_code == 200:
+  with open("speech_from_requests.mp3", "wb") as f:
+      for chunk in response.iter_content(chunk_size=8192):
+          f.write(chunk)
+  print("File âm thanh đã được tạo thành công!")
+else:
+  print(f"Error: {response.status_code}")
+  print(response.text)
+
+--- Python (openai)_2 ---
+from openai import OpenAI
+from pathlib import Path
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "sk-1234" # Thay bằng API key của bạn
+
+# --- Thực thi ---
+client = OpenAI(
+  api_key=AI_API_KEY,
+  base_url=AI_API_BASE
+)
+
+speech_file_path = Path(__file__).parent / "speech_from_openai.mp3"
+
+response = client.audio.speech.create(
+model="gemini-2.5-flash-preview-tts",
+voice="Charon",
+input="Hôm nay là một ngày đẹp trời để lập trình."
+)
+
+response.stream_to_file(speech_file_path)
+print(f"File âm thanh đã được lưu tại: {speech_file_path}")
+
+
+=== CODE BLOCKS ===
+
+--- unknown_code_3 ---
+from openai import OpenAI
+from pathlib import Path
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "sk-1234" # Thay bằng API key của bạn
+
+# --- Thực thi ---
+client = OpenAI(
+  api_key=AI_API_KEY,
+  base_url=AI_API_BASE
+)
+
+speech_file_path = Path(__file__).parent / "speech_from_openai.mp3"
+
+response = client.audio.speech.create(
+model="gemini-2.5-flash-preview-tts",
+voice="Charon",
+input="Hôm nay là một ngày đẹp trời để lập trình."
+)
+
+response.stream_to_file(speech_file_path)
+print(f"File âm thanh đã được lưu tại: {speech_file_path}")
+
+--- python_code_3 ---
+from openai import OpenAI
+from pathlib import Path
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "sk-1234" # Thay bằng API key của bạn
+
+# --- Thực thi ---
+client = OpenAI(
+  api_key=AI_API_KEY,
+  base_url=AI_API_BASE
+)
+
+speech_file_path = Path(__file__).parent / "speech_from_openai.mp3"
+
+response = client.audio.speech.create(
+model="gemini-2.5-flash-preview-tts",
+voice="Charon",
+input="Hôm nay là một ngày đẹp trời để lập trình."
+)
+
+response.stream_to_file(speech_file_path)
+print(f"File âm thanh đã được lưu tại: {speech_file_path}")
+
+--- python_code_4 ---
+from openai import OpenAI
+from pathlib import Path
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "sk-1234" # Thay bằng API key của bạn
+
+# --- Thực thi ---
+client = OpenAI(
+  api_key=AI_API_KEY,
+  base_url=AI_API_BASE
+)
+
+speech_file_path = Path(__file__).parent / "speech_from_openai.mp3"
+
+response = client.audio.speech.create(
+model="gemini-2.5-flash-preview-tts",
+voice="Charon",
+input="Hôm nay là một ngày đẹp trời để lập trình."
+)
+
+response.stream_to_file(speech_file_path)
+print(f"File âm thanh đã được lưu tại: {speech_file_path}")
+
+--- unknown_code_1 ---
+gemini-2.5-flash-preview-tts
+
+--- unknown_code_2 ---
+gemini-2.5-pro-preview-tts
+
+--- unknown_code_7 ---
+from openai import OpenAI
+from pathlib import Path
+
+# --- Cấu hình ---
+AI_API_BASE = "https://api.thucchien.ai"
+AI_API_KEY = "sk-1234" # Thay bằng API key của bạn
+
+# --- Thực thi ---
+client = OpenAI(
+  api_key=AI_API_KEY,
+  base_url=AI_API_BASE
+)
+
+speech_file_path = Path(__file__).parent / "speech_from_openai.mp3"
+
+response = client.audio.speech.create(
+model="gemini-2.5-flash-preview-tts",
+voice="Charon",
+input="Hôm nay là một ngày đẹp trời để lập trình."
+)
+
+response.stream_to_file(speech_file_path)
+print(f"File âm thanh đã được lưu tại: {speech_file_path}")

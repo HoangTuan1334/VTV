@@ -1,0 +1,60 @@
+# 📄 Ghép các panel thành trang hoàn chỉnh
+def compose_page(page_num, panels):
+    """
+    Ghép các panel thành một trang A4 hoàn chỉnh
+    """
+    # Tạo canvas trắng A4
+    page_img = Image.new("RGB", (PAGE_W, PAGE_H), "white")
+    
+    # Dán từng panel vào vị trí của nó
+    for panel in panels:
+        x, y, w, h = panel['position']
+        page_img.paste(panel['image'], (x, y))
+    
+    # Vẽ viền cho các panel
+    draw = ImageDraw.Draw(page_img)
+    for panel in panels:
+        x, y, w, h = panel['position']
+        draw.rectangle([x, y, x+w, y+h], outline="black", width=5)
+    
+    return page_img
+
+# Ghép tất cả các trang (BỎ QUA TRANG 0 - DEMO)
+final_pages = []
+demo_page_path = None
+os.makedirs("final_comic", exist_ok=True)
+
+if 'panel_images' in locals():
+    print("\n📄 Đang ghép các panel thành trang...")
+    
+    for page_num in sorted(panel_images.keys()):
+        panels = panel_images[page_num]
+        
+        print(f"   Trang {page_num}: Ghép {len(panels)} panels...")
+        
+        page_img = compose_page(page_num, panels)
+        
+        # Lưu trang
+        if page_num == 0:
+            # TRANG 0: Lưu riêng vào demo
+            page_path = f"final_comic/page_00_DEMO_CHARACTER_REFERENCE.png"
+            demo_page_path = page_path
+            print(f"   📌 DEMO PAGE - Không tính vào truyện chính")
+        else:
+            # TRANG 1+: Trang truyện thật
+            page_path = f"final_comic/page_{page_num:02d}.png"
+            final_pages.append(page_path)
+        
+        page_img.save(page_path, quality=95)
+        print(f"   ✅ Đã lưu: {page_path}")
+    
+    print(f"\n✅ Hoàn thành ghép {len(panel_images)} trang!")
+    print(f"   📌 Trang DEMO: {demo_page_path if demo_page_path else 'Không có'}")
+    print(f"   📖 Trang truyện: {len(final_pages)} trang")
+else:
+    print("❌ Chưa có dữ liệu panel. Vui lòng chạy lại bước 5.")
+
+
+
+
+

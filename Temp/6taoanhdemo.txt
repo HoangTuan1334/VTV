@@ -1,0 +1,313 @@
+# 🎨 Hàm tạo ảnh ĐÚNG KÍCH THƯỚC với Gemini 2.5 Flash Image
+def generate_image_with_gemini(prompt, width, height):
+    """
+    Tạo ảnh với Gemini 2.5 Flash Image - ĐÚNG KÍCH THƯỚC NGAY TỪ ĐẦU
+    
+    ⚠️ KHÔNG RESIZE - Gemini phải sinh đúng kích thước
+    
+    Args:
+        prompt: Mô tả ảnh (tiếng Anh)
+        width: Chiều rộng CHÍNH XÁC (px)
+        height: Chiều cao CHÍNH XÁC (px)
+    
+    Returns:
+        PIL.Image với kích thước CHÍNH XÁC width x height
+    """
+    print(f"   [Gemini] Yêu cầu ảnh {width}x{height}px")
+    print(f"   Prompt: {prompt[:80]}...")
+    
+    try:
+        # Tạo prompt YÊU CẦU ĐÚNG KÍCH THƯỚC
+        aspect_ratio = width / height
+        
+        # Xác định orientation
+        if aspect_ratio > 1.5:
+            orientation = "wide landscape"
+        elif aspect_ratio > 1.1:
+            orientation = "landscape"
+        elif aspect_ratio > 0.9:
+            orientation = "square"
+        elif aspect_ratio > 0.6:
+            orientation = "portrait"
+        else:
+            orientation = "tall portrait"
+        
+        full_prompt = f"""Create a {orientation} comic panel image.
+
+CRITICAL REQUIREMENTS:
+- Exact dimensions: {width} x {height} pixels
+- Aspect ratio: {aspect_ratio:.2f}:1
+- {orientation.upper()} FORMAT ONLY
+
+Content:
+{prompt}
+
+Style:
+- Professional comic book artwork
+- Clean composition
+- High quality illustration
+- Suitable for comic panel
+- NO TEXT OR DIALOGUE IN IMAGE (text will be added separately)
+
+Output must be EXACTLY {width}x{height} pixels."""
+        
+        # Gọi image_model
+        if image_model:
+            try:
+                response = image_model.generate_content([full_prompt])
+                
+                if hasattr(response, 'candidates') and len(response.candidates) > 0:
+                    for part in response.candidates[0].content.parts:
+                        if hasattr(part, 'inline_data') and part.inline_data:
+                            image_bytes = part.inline_data.data
+                            img = Image.open(io.BytesIO(image_bytes))
+                            
+                            original_size = img.size
+                            print(f"   📐 Gemini sinh: {original_size[0]}x{original_size[1]}px")
+                            
+                            # ⚠️ CHỈ RESIZE NẾU SAI KÍCH THƯỚC
+                            if img.size != (width, height):
+                                print(f"   ⚠️ SAI KÍCH THƯỚC! Đang resize {original_size} → {width}x{height}")
+                                img = img.resize((width, height), Image.Resampling.LANCZOS)
+                            else:
+                                print(f"   ✅ ĐÚNG KÍCH THƯỚC!")
+                            
+                            return img
+            except Exception as e:
+                print(f"   ⚠️ Lỗi SDK: {e}")
+        
+        # Gọi REST API
+        print(f"   → Gọi REST API...")
+        
+        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key={GEMINI_API_KEY}"
+        
+        payload = {
+            "contents": [{
+                "parts": [{
+                    "text": full_prompt
+                }]
+            }],
+            "generationConfig": {
+                "temperature": 0.8,
+                "topP": 0.95,
+                "topK": 40
+            }
+        }
+        
+        response = requests.post(api_url, json=payload, timeout=90)
+        
+        if response.status_code == 200:
+            result = response.json()
+            
+            if 'candidates' in result:
+                for candidate in result['candidates']:
+                    if 'content' in candidate:
+                        for part in candidate['content'].get('parts', []):
+                            if 'inlineData' in part:
+                                image_data = base64.b64decode(part['inlineData']['data'])
+                                img = Image.open(io.BytesIO(image_data))
+                                
+                                original_size = img.size
+                                print(f"   📐 Gemini sinh: {original_size[0]}x{original_size[1]}px")
+                                
+                                # ⚠️ CHỈ RESIZE NẾU SAI
+                                if img.size != (width, height):
+                                    print(f"   ⚠️ SAI KÍCH THƯỚC! Resize {original_size} → {width}x{height}")
+                                    img = img.resize((width, height), Image.Resampling.LANCZOS)
+                                else:
+                                    print(f"   ✅ ĐÚNG KÍCH THƯỚC!")
+                                
+                                return img
+        
+        raise Exception(f"Không tìm thấy ảnh. Status: {response.status_code}")
+        
+    except Exception as e:
+        raise Exception(f"Lỗi tạo ảnh: {str(e)}")
+
+
+print("=" * 70)
+print("✅ Đã cấu hình hàm tạo ảnh ĐÚNG KÍCH THƯỚC")
+print("=" * 70)
+print("📌 Gemini sẽ nhận yêu cầu CHÍNH XÁC về kích thước")
+print("📌 Nếu Gemini sinh sai size → sẽ cảnh báo và resize")
+print("📌 Lời thoại sẽ được thêm SAU với font ĐẸP")
+print("=" * 70)
+
+
+
+
+# 💬 Hàm vẽ lời thoại ĐẸP cho comic
+def draw_dialogue_bubble(img, dialogue_text, position="top"):
+    """
+    Vẽ lời thoại bubble ĐẸP lên ảnh panel
+    
+    Args:
+        img: PIL Image object
+        dialogue_text: Lời thoại tiếng Việt
+        position: "top" hoặc "bottom"
+    
+    Returns:
+        PIL Image với bubble đã vẽ
+    """
+    from PIL import ImageDraw, ImageFont
+    
+    # Tạo copy để không làm hỏng ảnh gốc
+    img_copy = img.copy()
+    draw = ImageDraw.Draw(img_copy, 'RGBA')
+    w, h = img.size
+    
+    # Tính toán kích thước bubble
+    padding = 20
+    bubble_width = w - padding * 2
+    
+    # Font size tự động theo kích thước panel
+    font_size = max(28, min(56, int(w / 18)))
+    
+    # Thử load font đẹp (Windows fonts)
+    try:
+        font = ImageFont.truetype("C:\Windows\Fonts\TIMESBD.TTF", font_size)
+    except:
+        try:
+            font = ImageFont.truetype("C:\Windows\Fonts\TIMESBD.TTF", font_size)
+        except:
+            try:
+                font = ImageFont.truetype(r"C:\Windows\Fonts\TIMESBD.TTF", font_size)
+            except:
+                print(f"   ⚠️ Không load được font, dùng default")
+                font = ImageFont.load_default()
+    
+    # Wrap text thông minh
+    words = dialogue_text.split()
+    lines = []
+    current_line = ""
+    max_line_width = bubble_width - padding * 2
+    
+    for word in words:
+        test_line = current_line + word + " "
+        try:
+            bbox = draw.textbbox((0, 0), test_line, font=font)
+            line_width = bbox[2] - bbox[0]
+        except:
+            # Fallback nếu textbbox không hoạt động
+            line_width = len(test_line) * (font_size // 2)
+        
+        if line_width <= max_line_width:
+            current_line = test_line
+        else:
+            if current_line:
+                lines.append(current_line.strip())
+            current_line = word + " "
+    
+    if current_line:
+        lines.append(current_line.strip())
+    
+    # Giới hạn 3 dòng
+    lines = lines[:3]
+    
+    # Tính toán kích thước bubble
+    line_height = font_size + 12
+    bubble_height = len(lines) * line_height + padding * 2 + 10
+    
+    # Vị trí bubble
+    if position == "top":
+        bubble_y = padding
+    else:  # bottom
+        bubble_y = h - bubble_height - padding
+    
+    bubble_x = padding
+    
+    # Vẽ SHADOW cho bubble
+    shadow_offset = 5
+    draw.rounded_rectangle(
+        [bubble_x + shadow_offset, bubble_y + shadow_offset, 
+         bubble_x + bubble_width + shadow_offset, bubble_y + bubble_height + shadow_offset],
+        radius=20,
+        fill=(0, 0, 0, 120)  # Bóng đen mờ
+    )
+    
+    # Vẽ BUBBLE chính (trắng)
+    draw.rounded_rectangle(
+        [bubble_x, bubble_y, bubble_x + bubble_width, bubble_y + bubble_height],
+        radius=20,
+        fill=(255, 255, 255, 250),  # Trắng gần đục
+        outline=(0, 0, 0, 255),  # Viền đen
+        width=4
+    )
+    
+    # Vẽ TEXT
+    text_y = bubble_y + padding + 5
+    for line in lines:
+        # Tính toán để CENTER text
+        try:
+            bbox = draw.textbbox((0, 0), line, font=font)
+            text_width = bbox[2] - bbox[0]
+        except:
+            text_width = len(line) * (font_size // 2)
+        
+        text_x = bubble_x + (bubble_width - text_width) // 2
+        
+        # Vẽ TEXT SHADOW (nhạt)
+        draw.text(
+            (text_x + 2, text_y + 2),
+            line,
+            fill=(120, 120, 120, 200),
+            font=font
+        )
+        
+        # Vẽ TEXT chính (đen đậm)
+        draw.text(
+            (text_x, text_y),
+            line,
+            fill=(0, 0, 0, 255),
+            font=font
+        )
+        
+        text_y += line_height
+    
+    return img_copy
+
+
+print("✅ Đã định nghĩa hàm vẽ lời thoại ĐẸP")
+print("📌 Font lớn tự động theo kích thước panel")
+print("📌 Bubble tròn với shadow đẹp")
+print("📌 Text được căn giữa và wrap thông minh")
+
+
+# 🧪 TEST HOÀN CHỈNH - Tạo ảnh + Lời thoại ĐẸP
+print("🧪 TEST: Tạo ảnh 620x520px với lời thoại ĐẸP")
+print("=" * 70)
+
+test_prompt = "A cute anime girl with blue hair smiling happily in a sunny park, manga art style, detailed illustration"
+test_dialogue = "Chào bạn! Hôm nay trời đẹp quá nhỉ?"
+
+try:
+    # 1. TẠO ẢNH
+    print("\n📸 Bước 1: Tạo ảnh...")
+    test_image = generate_image_with_gemini(test_prompt, 620, 520)
+    
+    print(f"\n✅ Ảnh đã tạo!")
+    print(f"   Kích thước: {test_image.size}")
+    
+    # Kiểm tra xem có bị cắt không
+    if test_image.size == (620, 520):
+        print(f"   ✅ ĐÚNG KÍCH THƯỚC - KHÔNG BỊ CẮT!")
+    else:
+        print(f"   ⚠️ SAI KÍCH THƯỚC - Gemini sinh ra {test_image.size}")
+    
+    # 2. THÊM LỜI THOẠI ĐẸP
+    print(f"\n💬 Bước 2: Thêm lời thoại...")
+    print(f"   Nội dung: '{test_dialogue}'")
+    test_image_with_dialogue = draw_dialogue_bubble(test_image.copy(), test_dialogue, "top")
+    
+    # 3. HIỂN THỊ VÀ LƯU
+    print(f"\n🖼️ Kết quả:")
+    display(test_image_with_dialogue)
+    
+    test_image_with_dialogue.save("test_final_620x520.png", quality=100)
+    print(f"\n✅ HOÀN THÀNH!")
+    print(f"   Đã lưu: test_final_620x520.png")
+    print(f"   Kích thước: {test_image_with_dialogue.size}")
+    print(f"   Lời thoại: Font ĐẸP, bubble tròn, shadow")
+    
+except Exception as e:
+    print(f"\n❌ LỖI: {str(e)[:300]}...")

@@ -1,0 +1,36 @@
+=== Tips và Tricks Thực Chiến | AI Thực Chiến ===
+URL: https://docs.thucchien.ai/docs/tips-and-tricks-real-world
+Crawled: 2025-10-23 00:19:23
+============================================================
+
+MAIN CONTENT:
+----------------------------------------
+Tips và Tricks Thực Chiến
+Tips và Tricks Thực Chiến
+Tổng hợp các tips và tricks thực chiến khi làm việc với AI để tối ưu hoá kết quả.
+📄️ Hướng Dẫn Sửa Lỗi Tiếng Việt Của AI Tạo Ảnh
+Hầu hết các Model AI tạo ảnh hiện tại đều chưa "hiểu" được tiếng Việt (cách tạo chữ tiếng Việt đúng chuẩn), do đó thường tạo ra các văn bản bị lỗi font, sai chính tả hoặc vô nghĩa. Điều này khiến ảnh AI chỉ dừng lại ở mức "nguyên liệu" thô. Dưới đây là 2 tips giúp bạn khắc phục vấn đề này:
+📄️ Đồng nhất nhân vật khi Generate nhiều ảnh
+1. Vấn đề
+📄️ Đồng Nhất Nhân Vật và Bối Cảnh Trong Video AI
+1. Vấn đề: Mất nhất quán nhân vật và bối cảnh trong video AI
+Previous
+Kiểm tra chi tiêu
+Next
+Hướng Dẫn Sửa Lỗi Tiếng Việt Của AI Tạo Ảnh
+
+FULL CONTENT:
+----------------------------------------
+Tips và Tricks Thực Chiến
+Tips và Tricks Thực Chiến
+Tổng hợp các tips và tricks thực chiến khi làm việc với AI để tối ưu hoá kết quả.
+📄️ Hướng Dẫn Sửa Lỗi Tiếng Việt Của AI Tạo Ảnh
+Hầu hết các Model AI tạo ảnh hiện tại đều chưa "hiểu" được tiếng Việt (cách tạo chữ tiếng Việt đúng chuẩn), do đó thường tạo ra các văn bản bị lỗi font, sai chính tả hoặc vô nghĩa. Điều này khiến ảnh AI chỉ dừng lại ở mức "nguyên liệu" thô. Dưới đây là 2 tips giúp bạn khắc phục vấn đề này:
+📄️ Đồng nhất nhân vật khi Generate nhiều ảnh
+1. Vấn đề
+📄️ Đồng Nhất Nhân Vật và Bối Cảnh Trong Video AI
+1. Vấn đề: Mất nhất quán nhân vật và bối cảnh trong video AI
+Previous
+Kiểm tra chi tiêu
+Next
+Hướng Dẫn Sửa Lỗi Tiếng Việt Của AI Tạo Ảnh

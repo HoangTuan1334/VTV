@@ -1,0 +1,48 @@
+=== Hướng dẫn sử dụng API | AI Thực Chiến ===
+URL: https://docs.thucchien.ai/docs/user-guide
+Crawled: 2025-10-23 00:17:52
+============================================================
+
+MAIN CONTENT:
+----------------------------------------
+Hướng dẫn sử dụng API
+Hướng dẫn sử dụng API
+Hướng dẫn chi tiết cách tương tác với các mô hình AI thông qua LiteLLM Proxy.
+📄️ Giới thiệu
+Chào mừng bạn đến với tài liệu hướng dẫn sử dụng AI Thực Chiến gateway. Tài liệu này sẽ cung cấp cho bạn mọi thông tin cần thiết để tích hợp các mô hình Trí tuệ nhân tạo (AI) mạnh mẽ vào ứng dụng của bạn chỉ với một API key duy nhất.
+📄️ Các khái niệm cốt lõi
+Để tận dụng tối đa sức mạnh của AI Thực chiến - API Gateway, điều quan trọng là phải hiểu các nguyên tắc thiết kế nền tảng của nó. Gateway này được xây dựng dựa trên nền tảng mã nguồn mở LiteLLM Proxy, giúp chuẩn hóa các yêu cầu đến nhiều loại mô hình ngôn ngữ khác nhau. Các khái niệm này áp dụng cho hầu hết các tương tác của bạn với API, từ sinh văn bản đến tạo hình ảnh.
+📄️ Sinh văn bản (Text Generation)
+Các mô hình sinh văn bản cho phép bạn thực hiện nhiều tác vụ như trả lời câu hỏi, viết nội dung, tóm tắt văn bản, và nhiều hơn nữa. API này tuân theo chuẩn của OpenAI, vì vậy bạn có thể sử dụng các thư viện client của OpenAI một cách trực tiếp.
+📄️ Sinh hình ảnh (Image Generation)
+AI cung cấp hai phương pháp để tạo hình ảnh từ mô tả văn bản (prompt), tùy thuộc vào mô hình bạn sử dụng.
+📄️ Sinh video với Veo 3 (Quy trình bất đồng bộ)
+Việc tạo video là một tác vụ tốn nhiều tài nguyên và thời gian. Do đó, tương tác với mô hình veo 3 không diễn ra ngay lập tức mà theo một quy trình bất đồng bộ (asynchronous) gồm 3 bước.
+📄️ Chuyển văn bản thành giọng nói (Text-to-Speech)
+Các mô hình Text-to-Speech (TTS) cho phép bạn chuyển đổi một đoạn văn bản thành file âm thanh có giọng nói tự nhiên.
+📄️ Tham khảo
+Tài liệu của chúng tôi cung cấp mọi thứ bạn cần để tích hợp AI Thực Chiến gateway vào ứng dụng của mình.
+Next
+Giới thiệu
+
+FULL CONTENT:
+----------------------------------------
+Hướng dẫn sử dụng API
+Hướng dẫn sử dụng API
+Hướng dẫn chi tiết cách tương tác với các mô hình AI thông qua LiteLLM Proxy.
+📄️ Giới thiệu
+Chào mừng bạn đến với tài liệu hướng dẫn sử dụng AI Thực Chiến gateway. Tài liệu này sẽ cung cấp cho bạn mọi thông tin cần thiết để tích hợp các mô hình Trí tuệ nhân tạo (AI) mạnh mẽ vào ứng dụng của bạn chỉ với một API key duy nhất.
+📄️ Các khái niệm cốt lõi
+Để tận dụng tối đa sức mạnh của AI Thực chiến - API Gateway, điều quan trọng là phải hiểu các nguyên tắc thiết kế nền tảng của nó. Gateway này được xây dựng dựa trên nền tảng mã nguồn mở LiteLLM Proxy, giúp chuẩn hóa các yêu cầu đến nhiều loại mô hình ngôn ngữ khác nhau. Các khái niệm này áp dụng cho hầu hết các tương tác của bạn với API, từ sinh văn bản đến tạo hình ảnh.
+📄️ Sinh văn bản (Text Generation)
+Các mô hình sinh văn bản cho phép bạn thực hiện nhiều tác vụ như trả lời câu hỏi, viết nội dung, tóm tắt văn bản, và nhiều hơn nữa. API này tuân theo chuẩn của OpenAI, vì vậy bạn có thể sử dụng các thư viện client của OpenAI một cách trực tiếp.
+📄️ Sinh hình ảnh (Image Generation)
+AI cung cấp hai phương pháp để tạo hình ảnh từ mô tả văn bản (prompt), tùy thuộc vào mô hình bạn sử dụng.
+📄️ Sinh video với Veo 3 (Quy trình bất đồng bộ)
+Việc tạo video là một tác vụ tốn nhiều tài nguyên và thời gian. Do đó, tương tác với mô hình veo 3 không diễn ra ngay lập tức mà theo một quy trình bất đồng bộ (asynchronous) gồm 3 bước.
+📄️ Chuyển văn bản thành giọng nói (Text-to-Speech)
+Các mô hình Text-to-Speech (TTS) cho phép bạn chuyển đổi một đoạn văn bản thành file âm thanh có giọng nói tự nhiên.
+📄️ Tham khảo
+Tài liệu của chúng tôi cung cấp mọi thứ bạn cần để tích hợp AI Thực Chiến gateway vào ứng dụng của mình.
+Next
+Giới thiệu

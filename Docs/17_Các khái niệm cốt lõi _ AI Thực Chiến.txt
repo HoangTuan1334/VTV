@@ -1,0 +1,209 @@
+=== Các khái niệm cốt lõi | AI Thực Chiến ===
+URL: https://docs.thucchien.ai/docs/user-guide/core-concepts
+Crawled: 2025-10-23 00:19:34
+============================================================
+
+MAIN CONTENT:
+----------------------------------------
+Hướng dẫn sử dụng APICác khái niệm cốt lõi
+Các khái niệm cốt lõi
+Để tận dụng tối đa sức mạnh của AI Thực chiến - API Gateway, điều quan trọng là phải hiểu các nguyên tắc thiết kế nền tảng của nó. Gateway này được xây dựng dựa trên nền tảng mã nguồn mở LiteLLM Proxy, giúp chuẩn hóa các yêu cầu đến nhiều loại mô hình ngôn ngữ khác nhau. Các khái niệm này áp dụng cho hầu hết các tương tác của bạn với API, từ sinh văn bản đến tạo hình ảnh.
+1. Giao diện API Hợp nhất & Tương thích OpenAI
+Thay vì phải làm việc với nhiều API phức tạp từ các nhà cung cấp khác nhau, AI Thực chiến - API Gateway cung cấp một endpoint duy nhất và một bộ quy tắc nhất quán.
+Endpoint duy nhất: Mọi yêu cầu đều được gửi đến https://api.thucchien.ai.
+Tương thích với nhiều nhà cung cấp: Cung cấp một giao diện thống nhất cho tất cả các nhà cung cấp này, cho phép bạn chuyển đổi giữa các model chỉ bằng cách thay đổi tham số model
+Sự hợp nhất này giúp đơn giản hóa mã nguồn của bạn và giúp việc chuyển đổi giữa các mô hình AI trở nên dễ dàng.
+2. Xác thực qua API Key
+Mọi yêu cầu gửi đến Gateway đều phải được xác thực bằng một API key. Key này phải được gửi trong header Authorization dưới dạng Bearer token.
+Ví dụ header:
+Authorization: Bearer <your_api_key>
+Nếu API key bị thiếu hoặc không hợp lệ, hệ thống sẽ trả về lỗi 401 Unauthorized.
+3. Lựa chọn Model Linh hoạt
+Bạn có thể truy cập hàng loạt mô hình AI từ các nhà cung cấp hàng đầu chỉ bằng cách thay đổi một tham số duy nhất: model.
+Ví dụ: Để chuyển từ mô hình của OpenAI sang Google, bạn chỉ cần thay đổi giá trị của trường model trong body request.
+OpenAI Model
+Google Model
+{
+"model": "gemini-2.5-pro",
+"messages": [
+  { "role": "user", "content": "Hello from OpenAI!" }
+]
+}
+
+
+
+
+
+
+Gateway sẽ tự động định tuyến yêu cầu của bạn đến nhà cung cấp tương ứng mà không yêu cầu bạn thay đổi bất kỳ logic nào khác.
+4. Các Tham số Chung để Kiểm soát Kết quả
+API của chúng tôi cung cấp các tham số chung giúp bạn kiểm soát đầu ra một cách nhất quán trên nhiều loại mô hình.
+prompt hoặc messages: Cung cấp đầu vào cho mô hình. prompt thường dùng cho các tác vụ đơn giản (như sinh ảnh), trong khi messages dùng cho các cuộc hội thoại có nhiều lượt.
+n: Chỉ định số lượng kết quả trả về. Ví dụ, n: 2 trong API sinh ảnh sẽ tạo ra hai hình ảnh khác nhau từ cùng một prompt.
+response_format: Yêu cầu định dạng đầu ra cụ thể. Ví dụ, khi tạo ảnh, bạn có thể yêu cầu một URL ("response_format": "url") hoặc dữ liệu ảnh mã hóa base64 ("response_format": "b64_json").
+5. Cấu trúc Phản hồi Nhất quán
+Dữ liệu trả về từ API luôn có cấu trúc JSON rõ ràng. Kết quả bạn cần thường nằm trong một trong hai trường sau:
+data: Một mảng các đối tượng kết quả. Thường được sử dụng cho các API trả về nhiều mục, như sinh ảnh hoặc âm thanh.
+choices: Một mảng các lựa chọn phản hồi. Thường được sử dụng trong các API sinh văn bản, nơi mỗi lựa chọn chứa một phiên bản hoàn thành văn bản.
+Việc hiểu rõ các khái niệm này sẽ giúp bạn xây dựng ứng dụng một cách nhanh chóng và hiệu quả hơn trên nền tảng AI Thực chiến - API Gateway.
+Previous
+Giới thiệu
+Next
+Sinh văn bản (Text Generation)
+1. Giao diện API Hợp nhất & Tương thích OpenAI
+2. Xác thực qua API Key
+3. Lựa chọn Model Linh hoạt
+4. Các Tham số Chung để Kiểm soát Kết quả
+5. Cấu trúc Phản hồi Nhất quán
+
+TAB CONTENT:
+----------------------------------------
+
+[TAB: OpenAI Model_0]
+Authorization: Bearer <your_api_key>
+..............................
+
+[TAB: Google Model_1]
+Authorization: Bearer <your_api_key>
+..............................
+
+CODE BLOCKS:
+----------------------------------------
+
+[CODE: unknown_code_1]
+```
+https://api.thucchien.ai
+```
+..............................
+
+[CODE: unknown_code_3]
+```
+{
+"model": "gemini-2.5-pro",
+"messages": [
+  { "role": "user", "content": "Hello from Google!" }
+]
+}
+```
+..............................
+
+[CODE: unknown_code_5]
+```
+Authorization: Bearer <your_api_key>
+```
+..............................
+
+[CODE: unknown_code_10]
+```
+{
+"model": "gemini-2.5-pro",
+"messages": [
+  { "role": "user", "content": "Hello from Google!" }
+]
+}
+```
+..............................
+
+[CODE: unknown_code_19]
+```
+"response_format": "url"
+```
+..............................
+
+[CODE: unknown_code_20]
+```
+"response_format": "b64_json"
+```
+..............................
+
+FULL CONTENT:
+----------------------------------------
+Hướng dẫn sử dụng APICác khái niệm cốt lõi
+Các khái niệm cốt lõi
+Để tận dụng tối đa sức mạnh của AI Thực chiến - API Gateway, điều quan trọng là phải hiểu các nguyên tắc thiết kế nền tảng của nó. Gateway này được xây dựng dựa trên nền tảng mã nguồn mở LiteLLM Proxy, giúp chuẩn hóa các yêu cầu đến nhiều loại mô hình ngôn ngữ khác nhau. Các khái niệm này áp dụng cho hầu hết các tương tác của bạn với API, từ sinh văn bản đến tạo hình ảnh.
+1. Giao diện API Hợp nhất & Tương thích OpenAI
+Thay vì phải làm việc với nhiều API phức tạp từ các nhà cung cấp khác nhau, AI Thực chiến - API Gateway cung cấp một endpoint duy nhất và một bộ quy tắc nhất quán.
+Endpoint duy nhất: Mọi yêu cầu đều được gửi đến https://api.thucchien.ai.
+Tương thích với nhiều nhà cung cấp: Cung cấp một giao diện thống nhất cho tất cả các nhà cung cấp này, cho phép bạn chuyển đổi giữa các model chỉ bằng cách thay đổi tham số model
+Sự hợp nhất này giúp đơn giản hóa mã nguồn của bạn và giúp việc chuyển đổi giữa các mô hình AI trở nên dễ dàng.
+2. Xác thực qua API Key
+Mọi yêu cầu gửi đến Gateway đều phải được xác thực bằng một API key. Key này phải được gửi trong header Authorization dưới dạng Bearer token.
+Ví dụ header:
+Authorization: Bearer <your_api_key>
+Nếu API key bị thiếu hoặc không hợp lệ, hệ thống sẽ trả về lỗi 401 Unauthorized.
+3. Lựa chọn Model Linh hoạt
+Bạn có thể truy cập hàng loạt mô hình AI từ các nhà cung cấp hàng đầu chỉ bằng cách thay đổi một tham số duy nhất: model.
+Ví dụ: Để chuyển từ mô hình của OpenAI sang Google, bạn chỉ cần thay đổi giá trị của trường model trong body request.
+OpenAI Model
+Google Model
+{
+"model": "gemini-2.5-pro",
+"messages": [
+  { "role": "user", "content": "Hello from OpenAI!" }
+]
+}
+
+
+
+
+
+
+Gateway sẽ tự động định tuyến yêu cầu của bạn đến nhà cung cấp tương ứng mà không yêu cầu bạn thay đổi bất kỳ logic nào khác.
+4. Các Tham số Chung để Kiểm soát Kết quả
+API của chúng tôi cung cấp các tham số chung giúp bạn kiểm soát đầu ra một cách nhất quán trên nhiều loại mô hình.
+prompt hoặc messages: Cung cấp đầu vào cho mô hình. prompt thường dùng cho các tác vụ đơn giản (như sinh ảnh), trong khi messages dùng cho các cuộc hội thoại có nhiều lượt.
+n: Chỉ định số lượng kết quả trả về. Ví dụ, n: 2 trong API sinh ảnh sẽ tạo ra hai hình ảnh khác nhau từ cùng một prompt.
+response_format: Yêu cầu định dạng đầu ra cụ thể. Ví dụ, khi tạo ảnh, bạn có thể yêu cầu một URL ("response_format": "url") hoặc dữ liệu ảnh mã hóa base64 ("response_format": "b64_json").
+5. Cấu trúc Phản hồi Nhất quán
+Dữ liệu trả về từ API luôn có cấu trúc JSON rõ ràng. Kết quả bạn cần thường nằm trong một trong hai trường sau:
+data: Một mảng các đối tượng kết quả. Thường được sử dụng cho các API trả về nhiều mục, như sinh ảnh hoặc âm thanh.
+choices: Một mảng các lựa chọn phản hồi. Thường được sử dụng trong các API sinh văn bản, nơi mỗi lựa chọn chứa một phiên bản hoàn thành văn bản.
+Việc hiểu rõ các khái niệm này sẽ giúp bạn xây dựng ứng dụng một cách nhanh chóng và hiệu quả hơn trên nền tảng AI Thực chiến - API Gateway.
+Previous
+Giới thiệu
+Next
+Sinh văn bản (Text Generation)
+1. Giao diện API Hợp nhất & Tương thích OpenAI
+2. Xác thực qua API Key
+3. Lựa chọn Model Linh hoạt
+4. Các Tham số Chung để Kiểm soát Kết quả
+5. Cấu trúc Phản hồi Nhất quán
+
+=== TAB CONTENT ===
+
+--- OpenAI Model_0 ---
+Authorization: Bearer <your_api_key>
+
+--- Google Model_1 ---
+Authorization: Bearer <your_api_key>
+
+
+=== CODE BLOCKS ===
+
+--- unknown_code_1 ---
+https://api.thucchien.ai
+
+--- unknown_code_3 ---
+{
+"model": "gemini-2.5-pro",
+"messages": [
+  { "role": "user", "content": "Hello from Google!" }
+]
+}
+
+--- unknown_code_5 ---
+Authorization: Bearer <your_api_key>
+
+--- unknown_code_10 ---
+{
+"model": "gemini-2.5-pro",
+"messages": [
+  { "role": "user", "content": "Hello from Google!" }
+]
+}
+
+--- unknown_code_19 ---
+"response_format": "url"
+
+--- unknown_code_20 ---
+"response_format": "b64_json"
